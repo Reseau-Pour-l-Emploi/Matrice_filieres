@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrice de Tension – France Travail</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <style>
+    :root {
+      --ft-blue:    #003189;
+      --ft-blue-lt: #0e5bca;
+      --ft-teal:    #00bfb3;
+      --ft-bg:      #f4f6fb;
+      --ft-card:    #ffffff;
+      --ft-border:  #d1d9ee;
+      --ft-text:    #111827;
+      --ft-muted:   #6b7280;
+      --col-faible: #2563eb;
+      --col-moyen:  #16a34a;
+      --col-forte:  #dc2626;
+      --shadow:     0 2px 12px rgba(0,49,137,.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--ft-bg);
+      color: var(--ft-text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ──────────────────────────────────────────── */
+    header {
+      background: var(--ft-blue);
+      color: #fff;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      height: 62px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo-badge {
+      background: var(--ft-teal);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .04em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-subtitle {
+      font-size: 12px;
+      opacity: .7;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN LAYOUT ─────────────────────────────────────── */
+    .page {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 62px);
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────── */
+    .sidebar {
+      background: var(--ft-card);
+      border-right: 1px solid var(--ft-border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      overflow-y: auto;
+      max-height: calc(100vh - 62px);
+      position: sticky;
+      top: 62px;
+    }
+    .filter-section h2 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ft-muted);
+      margin-bottom: 10px;
+    }
+
+    /* Tension chips */
+    .tension-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+    }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .chip[data-tension="Faible"] { color: var(--col-faible); border-color: var(--col-faible); background: #eff6ff; }
+    .chip[data-tension="Moyen"]  { color: var(--col-moyen);  border-color: var(--col-moyen);  background: #f0fdf4; }
+    .chip[data-tension="Forte"]  { color: var(--col-forte);  border-color: var(--col-forte);  background: #fef2f2; }
+    .chip.inactive { opacity: .35; background: #f3f4f6; border-color: #d1d5db; color: var(--ft-muted); }
+
+    /* Search */
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px 10px 8px 32px;
+      border: 1px solid var(--ft-border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--ft-bg);
+      color: var(--ft-text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .search-box input:focus { border-color: var(--ft-blue-lt); }
+    .search-box svg {
+      position: absolute;
+      left: 9px; top: 50%; transform: translateY(-50%);
+      opacity: .4;
+    }
+
+    /* Filière list */
+    .filiere-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-sm {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--ft-border);
+      background: #fff;
+      cursor: pointer;
+      transition: all .12s;
+      font-family: inherit;
+      letter-spacing: .03em;
+      color: var(--ft-muted);
+    }
+    .btn-sm:hover { background: var(--ft-bg); color: var(--ft-blue); border-color: var(--ft-blue); }
+
+    .filiere-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .filiere-list::-webkit-scrollbar { width: 4px; }
+    .filiere-list::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
+
+    .filiere-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .1s;
+      border: 1px solid transparent;
+    }
+    .filiere-item:hover { background: var(--ft-bg); }
+    .filiere-item input[type="checkbox"] {
+      width: 14px; height: 14px;
+      accent-color: var(--ft-blue);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .filiere-item label {
+      font-size: 12px;
+      line-height: 1.3;
+      cursor: pointer;
+      color: var(--ft-text);
+    }
+    .filiere-item .tension-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .filiere-item.hidden { display: none; }
+
+    /* Count badge */
+    .count-badge {
+      background: var(--ft-blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+    }
+
+    /* ── CHART AREA ──────────────────────────────────────── */
+    .chart-area {
+      padding: 24px 28px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .chart-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ft-blue);
+      line-height: 1.3;
+    }
+    .chart-subtitle {
+      font-size: 12px;
+      color: var(--ft-muted);
+      margin-top: 3px;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      opacity: .75;
+    }
+
+    /* Chart card */
+    .chart-card {
+      background: var(--ft-card);
+      border-radius: 12px;
+      border: 1px solid var(--ft-border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+    #chart-svg {
+      width: 100%;
+      display: block;
+    }
+
+    /* D3 styles */
+    .bubble {
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .bubble:hover { stroke-width: 2 !important; }
+    .grid-zone-line {
+      stroke: #9ca3af;
+      stroke-dasharray: 6,4;
+      stroke-width: 1.2;
+    }
+    .axis path, .axis line { stroke: var(--ft-border); }
+    .axis text { fill: var(--ft-muted); font-family: 'DM Sans', sans-serif; font-size: 11px; }
+    .axis-label { fill: var(--ft-muted); font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+    .refline { stroke: #9ca3af; stroke-dasharray: 4,3; stroke-width: 1; }
+    .grid-bg line, .grid-bg path { stroke: #e5e9f2; stroke-width: 1; }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.6;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 999;
+      max-width: 260px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+    .tooltip .tt-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; line-height: 1.3; }
+    .tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+    .tooltip .tt-val { font-weight: 600; }
+
+    /* Empty state */
+    .empty-state {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      color: var(--ft-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .empty-state svg { opacity: .3; margin-bottom: 8px; }
+
+    /* Size legend */
+    .size-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--ft-muted);
+    }
+    .size-legend .sl-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sl-circle {
+      background: #9ca3af;
+      border-radius: 50%;
+      opacity: .5;
+    }
+
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { max-height: 300px; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); }
+      .filiere-list { max-height: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-badge">FT</div>
+  <h1>Matrice de Tension des Filières</h1>
+  <span class="header-subtitle">Taux de recours · Évolution 6 mois · Poids</span>
+</header>
+
+<div class="page">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <!-- Niveau de tension -->
+    <div class="filter-section">
+      <h2>Niveau de tension</h2>
+      <div class="tension-chips">
+        <div class="chip" data-tension="Faible" onclick="toggleTension('Faible')">
+          <span class="dot" style="background:var(--col-faible)"></span> Faible
+        </div>
+        <div class="chip" data-tension="Moyen" onclick="toggleTension('Moyen')">
+          <span class="dot" style="background:var(--col-moyen)"></span> Moyen
+        </div>
+        <div class="chip" data-tension="Forte" onclick="toggleTension('Forte')">
+          <span class="dot" style="background:var(--col-forte)"></span> Forte
+        </div>
+      </div>
+    </div>
+
+    <!-- Filières -->
+    <div class="filter-section">
+      <h2>
+        Filières
+        <span class="count-badge" id="sel-count">30</span>
+      </h2>
+      <div class="search-box" style="margin-bottom:8px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Rechercher une filière…" oninput="filterSearch(this.value)">
+      </div>
+      <div class="filiere-actions">
+        <button class="btn-sm" onclick="selectAll()">Tout sélect.</button>
+        <button class="btn-sm" onclick="selectNone()">Tout désélect.</button>
+      </div>
+      <div class="filiere-list" id="filiere-list"></div>
+    </div>
+
+  </aside>
+
+  <!-- ── CHART AREA ── -->
+  <main class="chart-area">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Matrice de Tension : zoom 5 % – 75 %</div>
+        <div class="chart-subtitle">Taux de recours en abscisse · Évolution des recrutements à 6 mois en ordonnée · Taille = poids de la filière</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--col-faible)"></div>Faible tension
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--col-moyen)"></div>Tension moyenne
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--col-forte)"></div>Forte tension
+          </div>
+        </div>
+        <div class="size-legend">
+          <span>Poids :</span>
+          <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
+          <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
+          <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card" id="chart-card">
+      <svg id="chart-svg"></svg>
+      <div class="empty-state" id="empty-state" style="display:none">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
+        </svg>
+        <div>Aucune filière sélectionnée</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const RAW = [
+  {code:"FIL01",label:"AGRICULTURE, ÉLEVAGE ET PÊCHE",           tension:"Moyen", ent:0.17830, evol:-0.053647, poids:0.008904},
+  {code:"FIL02",label:"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",    tension:"Faible",ent:0.63964, evol: 0.073989, poids:0.000575},
+  {code:"FIL03",label:"BANQUES ASSURANCES IMMOBILIER",           tension:"Moyen", ent:0.12093, evol:-0.008894, poids:0.027946},
+  {code:"FIL04",label:"COMMERCE ET DISTRIBUTION",                tension:"Moyen", ent:0.20044, evol:-0.024052, poids:0.166523},
+  {code:"FIL05",label:"CONSTRUCTION (BTP ET MATÉRIAUX)",         tension:"Forte", ent:0.17983, evol:-0.024350, poids:0.080056},
+  {code:"FIL06",label:"CULTURE, CINÉMA, SPECTACLE, AUDIOVISUEL",tension:"Faible",ent:0.09535, evol: 0.317728, poids:0.008174},
+  {code:"FIL07",label:"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",   tension:"Faible",ent:0.44402, evol: 0.003364, poids:0.047502},
+  {code:"FIL08",label:"ÉNERGIES (RENOUVELABLES ET RÉSEAUX)",     tension:"Faible",ent:0.14979, evol:-0.102548, poids:0.001293},
+  {code:"FIL09",label:"FILIÈRE BOIS",                            tension:"Forte", ent:0.23305, evol:-0.013478, poids:0.010442},
+  {code:"FIL10",label:"HÔTELLERIE ET RESTAURATION (HCRB)",       tension:"Moyen", ent:0.26470, evol:-0.004627, poids:0.148088},
+  {code:"FIL11",label:"INDUSTRIE AGROALIMENTAIRE",               tension:"Moyen", ent:0.31691, evol:-0.046173, poids:0.012803},
+  {code:"FIL12",label:"INDUSTRIE AUTOMOBILE",                    tension:"Moyen", ent:0.32983, evol:-0.116647, poids:0.002497},
+  {code:"FIL13",label:"INDUSTRIE AÉRONAUTIQUE ET SPATIALE",      tension:"Moyen", ent:0.36013, evol:-0.081321, poids:0.003294},
+  {code:"FIL14",label:"INDUSTRIE CHIMIQUE",                      tension:"Moyen", ent:0.28565, evol:-0.031415, poids:0.002898},
+  {code:"FIL15",label:"INDUSTRIE DE SANTÉ",                      tension:"Moyen", ent:0.15786, evol:-0.018650, poids:0.013688},
+  {code:"FIL16",label:"INDUSTRIE FERROVIAIRE",                   tension:"Forte", ent:0.34127, evol: 0.272176, poids:0.000418},
+  {code:"FIL17",label:"NAVAL ET NAUTISME",                       tension:"Moyen", ent:0.25550, evol: 0.114613, poids:0.002091},
+  {code:"FIL18",label:"INDUSTRIE PLASTURGIQUE",                  tension:"Forte", ent:0.32045, evol:-0.008731, poids:0.003522},
+  {code:"FIL19",label:"INDUSTRIE TEXTILE, MODE ET LUXE",         tension:"Moyen", ent:0.32359, evol:-0.082749, poids:0.003435},
+  {code:"FIL20",label:"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",    tension:"Moyen", ent:0.31162, evol:-0.077616, poids:0.004197},
+  {code:"FIL21",label:"MÉTALLURGIE – SCOPE UIMM",                tension:"Forte", ent:0.28640, evol:-0.062289, poids:0.029791},
+  {code:"FIL22",label:"NUCLÉAIRE",                               tension:"Faible",ent:0.18062, evol:-0.064434, poids:0.001411},
+  {code:"FIL23",label:"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",         tension:"Moyen", ent:0.15527, evol:-0.074953, poids:0.054476},
+  {code:"FIL24",label:"PROPRETÉ",                                tension:"Moyen", ent:0.32737, evol: 0.174311, poids:0.036796},
+  {code:"FIL25",label:"SANTÉ, SOCIAL, SAP",                      tension:"Forte", ent:0.39163, evol: 0.141330, poids:0.105462},
+  {code:"FIL26",label:"SERVICES AUTOMOBILES",                    tension:"Forte", ent:0.23954, evol:-0.023150, poids:0.028032},
+  {code:"FIL27",label:"SPORT",                                   tension:"Faible",ent:0.13728, evol:-0.011687, poids:0.015025},
+  {code:"FIL28",label:"SÉCURITÉ PRIVÉE",                         tension:"Moyen", ent:0.28291, evol: 0.018363, poids:0.021555},
+  {code:"FIL29",label:"TRANSFORMATION, TRAITEMENT ET VALORISATION DES RESSOURCES", tension:"Moyen", ent:0.24517, evol:-0.031309, poids:0.008481},
+  {code:"FIL30",label:"TRANSPORTS ET LOGISTIQUE",                tension:"Moyen", ent:0.24533, evol: 0.022311, poids:0.069555},
+];
+
+const COL = { Faible:"#2563eb", Moyen:"#16a34a", Forte:"#dc2626" };
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const state = {
+  selectedCodes: new Set(RAW.map(d => d.code)),
+  activeTensions: new Set(["Faible","Moyen","Forte"]),
+};
+
+// ── SIDEBAR BUILD ─────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const list = document.getElementById("filiere-list");
+  list.innerHTML = "";
+  RAW.forEach(d => {
+    const item = document.createElement("div");
+    item.className = "filiere-item";
+    item.dataset.code = d.code;
+    item.dataset.label = d.label.toLowerCase();
+    item.innerHTML = `
+      <input type="checkbox" id="cb-${d.code}" checked>
+      <label for="cb-${d.code}">${d.label}</label>
+      <span class="tension-dot" style="background:${COL[d.tension]}"></span>
+    `;
+    item.querySelector("input").addEventListener("change", (e) => {
+      if (e.target.checked) state.selectedCodes.add(d.code);
+      else state.selectedCodes.delete(d.code);
+      updateCountBadge();
+      updateChart();
+    });
+    list.appendChild(item);
+  });
+}
+
+function filterSearch(q) {
+  const low = q.toLowerCase().trim();
+  document.querySelectorAll(".filiere-item").forEach(el => {
+    el.classList.toggle("hidden", low && !el.dataset.label.includes(low));
+  });
+}
+
+function selectAll() {
+  RAW.forEach(d => {
+    const cb = document.getElementById(`cb-${d.code}`);
+    if (cb && !document.querySelector(`.filiere-item[data-code="${d.code}"]`).classList.contains("hidden")) {
+      cb.checked = true;
+      state.selectedCodes.add(d.code);
+    }
+  });
+  updateCountBadge(); updateChart();
+}
+
+function selectNone() {
+  RAW.forEach(d => {
+    const cb = document.getElementById(`cb-${d.code}`);
+    if (cb && !document.querySelector(`.filiere-item[data-code="${d.code}"]`).classList.contains("hidden")) {
+      cb.checked = false;
+      state.selectedCodes.delete(d.code);
+    }
+  });
+  updateCountBadge(); updateChart();
+}
+
+function toggleTension(t) {
+  if (state.activeTensions.has(t)) state.activeTensions.delete(t);
+  else state.activeTensions.add(t);
+  document.querySelector(`.chip[data-tension="${t}"]`).classList.toggle("inactive", !state.activeTensions.has(t));
+  updateChart();
+}
+
+function updateCountBadge() {
+  const visible = filteredData().length;
+  document.getElementById("sel-count").textContent = visible;
+}
+
+function filteredData() {
+  return RAW.filter(d =>
+    state.selectedCodes.has(d.code) && state.activeTensions.has(d.tension)
+  );
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────────────
+const X_MIN = 0.05, X_MAX = 0.75;
+const Y_MIN = -0.16, Y_MAX = 0.37;
+const R_MIN = 5, R_MAX = 35;
+
+let svgEl, chartG, xScale, yScale, rScale, xAxis, yAxis;
+
+function initChart() {
+  const svg = d3.select("#chart-svg");
+  svg.selectAll("*").remove();
+
+  const card = document.getElementById("chart-card");
+  const W = card.clientWidth || 800;
+  const H = Math.max(500, Math.round(W * 0.6));
+  const margin = { top: 28, right: 30, bottom: 56, left: 62 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+
+  svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
+
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  svgEl = svg; chartG = g;
+
+  xScale = d3.scaleLinear().domain([X_MIN, X_MAX]).range([0, iW]);
+  yScale = d3.scaleLinear().domain([Y_MIN, Y_MAX]).range([iH, 0]);
+  rScale = d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids)]).range([R_MIN, R_MAX]);
+
+  // ── background
+  g.append("rect")
+    .attr("width", iW).attr("height", iH)
+    .attr("fill", "#f9fafb").attr("rx", 4);
+
+  // ── background grid (light)
+  g.append("g").attr("class","grid-bg")
+    .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+  g.append("g").attr("class","grid-bg")
+    .attr("transform",`translate(0,${iH})`)
+    .call(d3.axisBottom(xScale).tickSize(-iH).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+
+  // ── 9-zone dashed lines
+  const zoneLayer = g.append("g").attr("class","zone-lines");
+
+  // Vertical zone lines at 1/3 and 2/3 of X domain
+  [1/3, 2/3].forEach(t => {
+    const xv = X_MIN + (X_MAX - X_MIN) * t;
+    zoneLayer.append("line")
+      .attr("class","grid-zone-line")
+      .attr("x1", xScale(xv)).attr("x2", xScale(xv))
+      .attr("y1", 0).attr("y2", iH);
+  });
+  // Horizontal zone lines at 1/3 and 2/3 of Y domain
+  [1/3, 2/3].forEach(t => {
+    const yv = Y_MIN + (Y_MAX - Y_MIN) * t;
+    zoneLayer.append("line")
+      .attr("class","grid-zone-line")
+      .attr("x1", 0).attr("x2", iW)
+      .attr("y1", yScale(yv)).attr("y2", yScale(yv));
+  });
+
+  // ── Y=0 reference line
+  g.append("line").attr("class","refline")
+    .attr("x1",0).attr("x2",iW)
+    .attr("y1",yScale(0)).attr("y2",yScale(0));
+
+  // ── axes
+  const xFmt = d3.format(".0%");
+  const yFmt = d3.format("+.0%");
+  g.append("g").attr("class","axis").attr("transform",`translate(0,${iH})`)
+    .call(d3.axisBottom(xScale).ticks(8).tickFormat(xFmt))
+    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"));
+  g.append("g").attr("class","axis")
+    .call(d3.axisLeft(yScale).ticks(8).tickFormat(yFmt))
+    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"));
+
+  // ── axis labels
+  g.append("text").attr("class","axis-label")
+    .attr("x", iW/2).attr("y", iH + 46)
+    .attr("text-anchor","middle")
+    .text("Taux de recours (%)");
+  g.append("text").attr("class","axis-label")
+    .attr("transform","rotate(-90)")
+    .attr("x", -iH/2).attr("y", -50)
+    .attr("text-anchor","middle")
+    .text("Évolution des recrutements à 6 mois (%)");
+
+  // ── bubble layer (empty, filled by updateChart)
+  g.append("g").attr("class","bubbles");
+
+  updateChart();
+}
+
+function updateChart() {
+  if (!chartG) return;
+  const data = filteredData();
+  document.getElementById("empty-state").style.display = data.length === 0 ? "flex" : "none";
+  document.getElementById("sel-count").textContent = data.length;
+
+  const tooltip = document.getElementById("tooltip");
+  const fmt = d3.format(".1%");
+  const fmtEvol = d3.format("+.1%");
+
+  const bubbles = chartG.select(".bubbles")
+    .selectAll(".bubble")
+    .data(data, d => d.code);
+
+  bubbles.exit()
+    .transition().duration(200)
+    .attr("r", 0)
+    .remove();
+
+  const enter = bubbles.enter().append("circle")
+    .attr("class","bubble")
+    .attr("cx", d => xScale(d.ent))
+    .attr("cy", d => yScale(d.evol))
+    .attr("r", 0)
+    .attr("fill", d => COL[d.tension])
+    .attr("fill-opacity", 0.55)
+    .attr("stroke", d => COL[d.tension])
+    .attr("stroke-width", 1.2)
+    .attr("stroke-opacity", 0.8);
+
+  enter.merge(bubbles)
+    .on("mousemove", function(event, d) {
+      tooltip.style.opacity = "1";
+      tooltip.style.left = (event.clientX + 16) + "px";
+      tooltip.style.top  = (event.clientY - 10) + "px";
+      tooltip.innerHTML = `
+        <div class="tt-title">${d.label}</div>
+        <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
+        <div class="tt-row"><span>Évolution (6m)</span><span class="tt-val">${fmtEvol(d.evol)}</span></div>
+        <div class="tt-row"><span>Poids (6m)</span><span class="tt-val">${fmt(d.poids)}</span></div>
+        <div class="tt-row"><span>Tension</span><span class="tt-val" style="color:${COL[d.tension]}">${d.tension}</span></div>
+      `;
+      d3.select(this).attr("stroke-width", 2.5).attr("fill-opacity", 0.8);
+    })
+    .on("mouseleave", function() {
+      tooltip.style.opacity = "0";
+      d3.select(this).attr("stroke-width", 1.2).attr("fill-opacity", 0.55);
+    })
+    .transition().duration(300)
+    .attr("cx", d => xScale(d.ent))
+    .attr("cy", d => yScale(d.evol))
+    .attr("r",  d => rScale(d.poids));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildSidebar();
+initChart();
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(initChart, 120);
+});
+</script>
+</body>
+</html>
