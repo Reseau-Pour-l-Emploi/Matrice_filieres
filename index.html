@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matrice de décision par filière</title>
-  <link rel="icon" href="path/to/favicon.ico" type="image/x-icon"> <!-- Remplacez par le chemin vers votre favicon -->
+  <title>Matrice de Tension – France Travail</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <style>
     :root {
-      --ft-blue:    #00bfb3; /* Inversé */
+      --ft-blue:    #003189;
       --ft-blue-lt: #0e5bca;
-      --ft-teal:    #003189; /* Inversé */
+      --ft-teal:    #00bfb3;
       --ft-bg:      #f4f6fb;
       --ft-card:    #ffffff;
       --ft-border:  #d1d9ee;
       --ft-text:    #111827;
       --ft-muted:   #6b7280;
-      --col-faible: #16a34a; /* Inversé */
-      --col-moyen:  #2563eb; /* Inversé */
+      --col-faible: #2563eb;
+      --col-moyen:  #16a34a;
       --col-forte:  #dc2626;
       --shadow:     0 2px 12px rgba(0,49,137,.10);
     }
@@ -221,9 +220,6 @@
     }
 
     /* ── CHART AREA ──────────────────────────────────────── */
-    Voici la suite du code HTML complet, intégrant les modifications nécessaires pour charger les données à partir d'un fichier JSON externe, tout en respectant la structure originale de votre fichier index.html.
-
-Code HTML Complet (suite)
     .chart-area {
       padding: 24px 28px 20px 20px;
       display: flex;
@@ -361,8 +357,8 @@ Code HTML Complet (suite)
 
 <header>
   <div class="logo-badge">FT</div>
-  <h1>Matrice de décision par filière</h1>
-  <span class="header-subtitle">Taux de recours · Évolution annuelle · Poids</span>
+  <h1>Matrice de Tension des Filières</h1>
+  <span class="header-subtitle">Taux de recours · Évolution 6 mois · Poids</span>
 </header>
 
 <div class="page">
@@ -437,9 +433,6 @@ Code HTML Complet (suite)
 
     <div class="chart-card" id="chart-card">
       <svg id="chart-svg"></svg>
-      Voici la suite et la fin du code HTML complet, intégrant les modifications nécessaires pour charger les données à partir d'un fichier JSON externe, tout en respectant la structure originale de votre fichier index.html.
-
-Code HTML Complet (suite et fin)
       <div class="empty-state" id="empty-state" style="display:none">
         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
@@ -454,21 +447,42 @@ Code HTML Complet (suite et fin)
 
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────────
-let RAW = [];
+const RAW = [
+  {code:"FIL01",label:"AGRICULTURE, ÉLEVAGE ET PÊCHE",           tension:"Moyen", ent:0.17830, evol:-0.053647, poids:0.008904},
+  {code:"FIL02",label:"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",    tension:"Faible",ent:0.63964, evol: 0.073989, poids:0.000575},
+  {code:"FIL03",label:"BANQUES ASSURANCES IMMOBILIER",           tension:"Moyen", ent:0.12093, evol:-0.008894, poids:0.027946},
+  {code:"FIL04",label:"COMMERCE ET DISTRIBUTION",                tension:"Moyen", ent:0.20044, evol:-0.024052, poids:0.166523},
+  {code:"FIL05",label:"CONSTRUCTION (BTP ET MATÉRIAUX)",         tension:"Forte", ent:0.17983, evol:-0.024350, poids:0.080056},
+  {code:"FIL06",label:"CULTURE, CINÉMA, SPECTACLE, AUDIOVISUEL",tension:"Faible",ent:0.09535, evol: 0.317728, poids:0.008174},
+  {code:"FIL07",label:"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",   tension:"Faible",ent:0.44402, evol: 0.003364, poids:0.047502},
+  {code:"FIL08",label:"ÉNERGIES (RENOUVELABLES ET RÉSEAUX)",     tension:"Faible",ent:0.14979, evol:-0.102548, poids:0.001293},
+  {code:"FIL09",label:"FILIÈRE BOIS",                            tension:"Forte", ent:0.23305, evol:-0.013478, poids:0.010442},
+  {code:"FIL10",label:"HÔTELLERIE ET RESTAURATION (HCRB)",       tension:"Moyen", ent:0.26470, evol:-0.004627, poids:0.148088},
+  {code:"FIL11",label:"INDUSTRIE AGROALIMENTAIRE",               tension:"Moyen", ent:0.31691, evol:-0.046173, poids:0.012803},
+  {code:"FIL12",label:"INDUSTRIE AUTOMOBILE",                    tension:"Moyen", ent:0.32983, evol:-0.116647, poids:0.002497},
+  {code:"FIL13",label:"INDUSTRIE AÉRONAUTIQUE ET SPATIALE",      tension:"Moyen", ent:0.36013, evol:-0.081321, poids:0.003294},
+  {code:"FIL14",label:"INDUSTRIE CHIMIQUE",                      tension:"Moyen", ent:0.28565, evol:-0.031415, poids:0.002898},
+  {code:"FIL15",label:"INDUSTRIE DE SANTÉ",                      tension:"Moyen", ent:0.15786, evol:-0.018650, poids:0.013688},
+  {code:"FIL16",label:"INDUSTRIE FERROVIAIRE",                   tension:"Forte", ent:0.34127, evol: 0.272176, poids:0.000418},
+  {code:"FIL17",label:"NAVAL ET NAUTISME",                       tension:"Moyen", ent:0.25550, evol: 0.114613, poids:0.002091},
+  {code:"FIL18",label:"INDUSTRIE PLASTURGIQUE",                  tension:"Forte", ent:0.32045, evol:-0.008731, poids:0.003522},
+  {code:"FIL19",label:"INDUSTRIE TEXTILE, MODE ET LUXE",         tension:"Moyen", ent:0.32359, evol:-0.082749, poids:0.003435},
+  {code:"FIL20",label:"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",    tension:"Moyen", ent:0.31162, evol:-0.077616, poids:0.004197},
+  {code:"FIL21",label:"MÉTALLURGIE – SCOPE UIMM",                tension:"Forte", ent:0.28640, evol:-0.062289, poids:0.029791},
+  {code:"FIL22",label:"NUCLÉAIRE",                               tension:"Faible",ent:0.18062, evol:-0.064434, poids:0.001411},
+  {code:"FIL23",label:"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",         tension:"Moyen", ent:0.15527, evol:-0.074953, poids:0.054476},
+  {code:"FIL24",label:"PROPRETÉ",                                tension:"Moyen", ent:0.32737, evol: 0.174311, poids:0.036796},
+  {code:"FIL25",label:"SANTÉ, SOCIAL, SAP",                      tension:"Forte", ent:0.39163, evol: 0.141330, poids:0.105462},
+  {code:"FIL26",label:"SERVICES AUTOMOBILES",                    tension:"Forte", ent:0.23954, evol:-0.023150, poids:0.028032},
+  {code:"FIL27",label:"SPORT",                                   tension:"Faible",ent:0.13728, evol:-0.011687, poids:0.015025},
+  {code:"FIL28",label:"SÉCURITÉ PRIVÉE",                         tension:"Moyen", ent:0.28291, evol: 0.018363, poids:0.021555},
+  {code:"FIL29",label:"TRANSFORMATION, TRAITEMENT ET VALORISATION DES RESSOURCES", tension:"Moyen", ent:0.24517, evol:-0.031309, poids:0.008481},
+  {code:"FIL30",label:"TRANSPORTS ET LOGISTIQUE",                tension:"Moyen", ent:0.24533, evol: 0.022311, poids:0.069555},
+];
 
-// Charger les données depuis le fichier JSON
-fetch('data.json') // Assurez-vous que le chemin est correct
-  .then(response => response.json())
-  .then(data => {
-    RAW = data;
-    buildSidebar();
-    initChart();
-  })
-  .catch(error => console.error('Erreur lors du chargement des données :', error));
+const COL = { Faible:"#2563eb", Moyen:"#16a34a", Forte:"#dc2626" };
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const COL = { Faible:"#16a34a", Moyen:"#2563eb", Forte:"#dc2626" };
-
 const state = {
   selectedCodes: new Set(RAW.map(d => d.code)),
   activeTensions: new Set(["Faible","Moyen","Forte"]),
@@ -624,7 +638,7 @@ function initChart() {
   // ── axis labels
   g.append("text").attr("class","axis-label")
     .attr("x", iW/2).attr("y", iH + 46)
-        .attr("text-anchor","middle")
+    .attr("text-anchor","middle")
     .text("Taux de recours (%)");
   g.append("text").attr("class","axis-label")
     .attr("transform","rotate(-90)")
@@ -704,4 +718,3 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
-
