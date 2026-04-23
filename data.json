@@ -1,0 +1,302 @@
+[
+  {
+    "code": "FIL01",
+    "label": "AGRICULTURE, ÉLEVAGE ET PÊCHE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.459,
+    "taux_de_recours": 0.17829982841527739,
+    "dpaep6m": 57984,
+    "poids_dpaep6m": 0.00890411674122595,
+    "evolution_dpaep6m": -0.05364691289517065
+  },
+  {
+    "code": "FIL02",
+    "label": "ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+    "niveau_de_tension": "Faible",
+    "tension": 0.262,
+    "taux_de_recours": 0.6396396396396397,
+    "dpaep6m": 3745,
+    "poids_dpaep6m": 0.0005750882518607061,
+    "evolution_dpaep6m": 0.07398910238026968
+  },
+  {
+    "code": "FIL03",
+    "label": "BANQUES ASSURANCES IMMOBILIER",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.434,
+    "taux_de_recours": 0.12092517006802721,
+    "dpaep6m": 181984,
+    "poids_dpaep6m": 0.02794575712326268,
+    "evolution_dpaep6m": -0.008893512038645635
+  },
+  {
+    "code": "FIL04",
+    "label": "COMMERCE ET DISTRIBUTION",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.435,
+    "taux_de_recours": 0.20043962220593992,
+    "dpaep6m": 1084402,
+    "poids_dpaep6m": 0.16652252349646285,
+    "evolution_dpaep6m": -0.02405215605416844
+  },
+  {
+    "code": "FIL05",
+    "label": "CONSTRUCTION (BTP ET MATÉRIAUX)",
+    "niveau_de_tension": "Forte",
+    "tension": 0.66,
+    "taux_de_recours": 0.17982931576583322,
+    "dpaep6m": 521330,
+    "poids_dpaep6m": 0.08005627726102588,
+    "evolution_dpaep6m": -0.024349619437774805
+  },
+  {
+    "code": "FIL06",
+    "label": "CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+    "niveau_de_tension": "Faible",
+    "tension": 0.119,
+    "taux_de_recours": 0.09535378074703918,
+    "dpaep6m": 53227,
+    "poids_dpaep6m": 0.008173624133989267,
+    "evolution_dpaep6m": 0.31772831926323875
+  },
+  {
+    "code": "FIL07",
+    "label": "EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+    "niveau_de_tension": "Faible",
+    "tension": 0.358,
+    "taux_de_recours": 0.44402089510094594,
+    "dpaep6m": 309333,
+    "poids_dpaep6m": 0.047501675357230384,
+    "evolution_dpaep6m": 0.0033636505176843912
+  },
+  {
+    "code": "FIL08",
+    "label": "ENERGIES (RENOUVELABLES ET RÉSEAUX)",
+    "niveau_de_tension": "Faible",
+    "tension": 0.357,
+    "taux_de_recours": 0.14978601997146934,
+    "dpaep6m": 8419,
+    "poids_dpaep6m": 0.0012928352449707034,
+    "evolution_dpaep6m": -0.10254770280353909
+  },
+  {
+    "code": "FIL09",
+    "label": "FILIÈRE BOIS",
+    "niveau_de_tension": "Forte",
+    "tension": 0.678,
+    "taux_de_recours": 0.23305032607358189,
+    "dpaep6m": 67997,
+    "poids_dpaep6m": 0.010441729202075416,
+    "evolution_dpaep6m": -0.013478223021791469
+  },
+  {
+    "code": "FIL10",
+    "label": "HÔTELLERIE ET RESTAURATIONS (HCRB)",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.502,
+    "taux_de_recours": 0.264701431893967,
+    "dpaep6m": 964356,
+    "poids_dpaep6m": 0.14808806574402752,
+    "evolution_dpaep6m": -0.004627187799004839
+  },
+  {
+    "code": "FIL11",
+    "label": "INDUSTRIE AGROALIMENTAIRE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.531,
+    "taux_de_recours": 0.31691385537539385,
+    "dpaep6m": 83374,
+    "poids_dpaep6m": 0.012803046171063955,
+    "evolution_dpaep6m": -0.04617320672691916
+  },
+  {
+    "code": "FIL12",
+    "label": "INDUSTRIE AUTOMOBILE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.458,
+    "taux_de_recours": 0.3298332303891291,
+    "dpaep6m": 16259,
+    "poids_dpaep6m": 0.0024967583142865742,
+    "evolution_dpaep6m": -0.11664674562642618
+  },
+  {
+    "code": "FIL13",
+    "label": "INDUSTRIE AÉRONAUTIQUE ET SPATIALE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.422,
+    "taux_de_recours": 0.36012861736334406,
+    "dpaep6m": 21453,
+    "poids_dpaep6m": 0.0032943573477083386,
+    "evolution_dpaep6m": -0.0813206577595067
+  },
+  {
+    "code": "FIL14",
+    "label": "INDUSTRIE CHIMIQUE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.474,
+    "taux_de_recours": 0.28564705882352942,
+    "dpaep6m": 18869,
+    "poids_dpaep6m": 0.0028975541320052506,
+    "evolution_dpaep6m": -0.031415225091114385
+  },
+  {
+    "code": "FIL15",
+    "label": "INDUSTRIE DE SANTÉ",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.524,
+    "taux_de_recours": 0.1578639816604486,
+    "dpaep6m": 89137,
+    "poids_dpaep6m": 0.01368802176398071,
+    "evolution_dpaep6m": -0.018650020367495634
+  },
+  {
+    "code": "FIL16",
+    "label": "INDUSTRIE FERROVIAIRE",
+    "niveau_de_tension": "Forte",
+    "tension": 0.65,
+    "taux_de_recours": 0.3412698412698413,
+    "dpaep6m": 2725,
+    "poids_dpaep6m": 0.00041845540355685555,
+    "evolution_dpaep6m": 0.27217553688141916
+  },
+  {
+    "code": "FIL17",
+    "label": "NAVAL ET NAUTISME",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.514,
+    "taux_de_recours": 0.2554973821989529,
+    "dpaep6m": 13615,
+    "poids_dpaep6m": 0.002090741401624436,
+    "evolution_dpaep6m": 0.11461318051575931
+  },
+  {
+    "code": "FIL18",
+    "label": "INDUSTRIE PLASTURGIQUE",
+    "niveau_de_tension": "Forte",
+    "tension": 0.635,
+    "taux_de_recours": 0.3204505300353357,
+    "dpaep6m": 22933,
+    "poids_dpaep6m": 0.003521628539364906,
+    "evolution_dpaep6m": -0.008731359412146089
+  },
+  {
+    "code": "FIL19",
+    "label": "INDUSTRIE TEXTILE, MODE ET LUXE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.552,
+    "taux_de_recours": 0.323591798255951,
+    "dpaep6m": 22369,
+    "poids_dpaep6m": 0.0034350197879498357,
+    "evolution_dpaep6m": -0.08274900561774712
+  },
+  {
+    "code": "FIL20",
+    "label": "INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.566,
+    "taux_de_recours": 0.3116182572614108,
+    "dpaep6m": 27333,
+    "poids_dpaep6m": 0.004197299649695242,
+    "evolution_dpaep6m": -0.07761617116053055
+  },
+  {
+    "code": "FIL21",
+    "label": "MÉTALLURGIE - SCOPE UIMM",
+    "niveau_de_tension": "Forte",
+    "tension": 0.614,
+    "taux_de_recours": 0.2863973863973864,
+    "dpaep6m": 194002,
+    "poids_dpaep6m": 0.0297912606241604,
+    "evolution_dpaep6m": -0.06228944023123506
+  },
+  {
+    "code": "FIL22",
+    "label": "NUCLÉAIRE",
+    "niveau_de_tension": "Faible",
+    "tension": 0.249,
+    "taux_de_recours": 0.18061674008810572,
+    "dpaep6m": 9191,
+    "poids_dpaep6m": 0.0014113848125104807,
+    "evolution_dpaep6m": -0.06443403908794787
+  },
+  {
+    "code": "FIL23",
+    "label": "NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.538,
+    "taux_de_recours": 0.15526716726520839,
+    "dpaep6m": 354751,
+    "poids_dpaep6m": 0.05447613683199929,
+    "evolution_dpaep6m": -0.07495273732382435
+  },
+  {
+    "code": "FIL24",
+    "label": "PROPRETÉ",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.519,
+    "taux_de_recours": 0.32736586396282213,
+    "dpaep6m": 239617,
+    "poids_dpaep6m": 0.036795973737278186,
+    "evolution_dpaep6m": 0.17431107234046728
+  },
+  {
+    "code": "FIL25",
+    "label": "SANTÉ, SOCIAL, SAP",
+    "niveau_de_tension": "Forte",
+    "tension": 0.63,
+    "taux_de_recours": 0.39162918008144215,
+    "dpaep6m": 686775,
+    "poids_dpaep6m": 0.10546227881752641,
+    "evolution_dpaep6m": 0.14133035969501373
+  },
+  {
+    "code": "FIL26",
+    "label": "SERVICES AUTOMOBILES",
+    "niveau_de_tension": "Forte",
+    "tension": 0.686,
+    "taux_de_recours": 0.2395424523786733,
+    "dpaep6m": 182546,
+    "poids_dpaep6m": 0.028032058751445783,
+    "evolution_dpaep6m": -0.023149535510938013
+  },
+  {
+    "code": "FIL27",
+    "label": "SPORT",
+    "niveau_de_tension": "Faible",
+    "tension": 0.373,
+    "taux_de_recours": 0.13728039672220374,
+    "dpaep6m": 97846,
+    "poids_dpaep6m": 0.015025389877586823,
+    "evolution_dpaep6m": -0.011686514550064087
+  },
+  {
+    "code": "FIL28",
+    "label": "SÉCURITÉ PRIVÉE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.523,
+    "taux_de_recours": 0.28291435875585852,
+    "dpaep6m": 140365,
+    "poids_dpaep6m": 0.021554676227617628,
+    "evolution_dpaep6m": 0.018362668137034355
+  },
+  {
+    "code": "FIL29",
+    "label": "TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.439,
+    "taux_de_recours": 0.24516850343395624,
+    "dpaep6m": 55228,
+    "poids_dpaep6m": 0.008480900927573585,
+    "evolution_dpaep6m": -0.031308648904635805
+  },
+  {
+    "code": "FIL30",
+    "label": "TRANSPORTS ET LOGISTIQUE",
+    "niveau_de_tension": "Moyen",
+    "tension": 0.494,
+    "taux_de_recours": 0.24532557293561294,
+    "dpaep6m": 452946,
+    "poids_dpaep6m": 0.0695551197135646,
+    "evolution_dpaep6m": 0.022310697624029263
+  }
+]
