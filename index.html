@@ -812,7 +812,6 @@ function initChart1() {
   g.append("g").attr("class","axis axis-y");
   g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Taux de recours (%)");
   g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Évolution des recrutements à 6 mois (%)");
-  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip1)");
 
   // Zoom
   chart1.zoom = d3.zoom()
@@ -827,11 +826,14 @@ function initChart1() {
       document.getElementById("zoom-reset-1").classList.toggle("visible", isZoomed);
     });
 
-  // Transparent overlay to capture zoom events (must be on top)
+  // Transparent overlay to capture zoom events
   g.append("rect").attr("class","zoom-rect")
     .attr("width",iW).attr("height",iH)
     .attr("fill","transparent")
     .call(chart1.zoom);
+
+  // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
+  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip1)");
 
   updateChart1();
 }
@@ -840,7 +842,8 @@ function initChart1() {
 function redrawChart1(useTransition = false) {
   const { g, iW, iH, xScale, yScale, rScale } = chart1;
   const dur = useTransition ? 400 : 0;
-  const T = dur > 0 ? (sel) => sel.transition().duration(dur) : (sel) => sel;
+  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
+  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
 
   const xFmt = d3.format(".0%"), yFmt = d3.format("+.0%");
 
@@ -866,7 +869,8 @@ function redrawChart1(useTransition = false) {
   const zeroY = (yScale.domain()[0] <= 0 && yScale.domain()[1] >= 0) ? yScale(0) : -999;
   T(g.select(".refline")).attr("y1", zeroY).attr("y2", zeroY);
 
-  T(g.select(".bubbles").selectAll(".bubble"))
+  // Transition nommée "bubble" — n'interrompt pas "bubble-exit" ni les transitions entrantes
+  Tbub(g.select(".bubbles").selectAll(".bubble"))
     .attr("cx", d => xScale(d.ent))
     .attr("cy", d => yScale(d.evol))
     .attr("r",  d => chart1.rScale(d.poids));
@@ -894,7 +898,7 @@ function updateChart1() {
   const { g, xScale, yScale, rScale } = chart1;
 
   const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-  bubbles.exit().transition().duration(200).attr("r",0).remove();
+  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
   const enter = bubbles.enter().append("circle")
     .attr("class","bubble")
     .attr("cx", d => xScale(d.ent))
@@ -925,7 +929,7 @@ function updateChart1() {
       tooltip.style.opacity = "0";
       d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
     })
-    .transition().duration(400)
+    .transition("bubble").duration(400)
     .attr("cx", d => xScale(d.ent))
     .attr("cy", d => yScale(d.evol))
     .attr("r",  d => rScale(d.poids));
@@ -981,7 +985,6 @@ function initChart2() {
   g.append("g").attr("class","axis axis-y");
   g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Tension (score)");
   g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-58).attr("text-anchor","middle").text("Poids de la filière (%)");
-  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip2)");
 
   chart2.zoom = d3.zoom()
     .scaleExtent([1, 12])
@@ -999,13 +1002,17 @@ function initChart2() {
     .attr("fill","transparent")
     .call(chart2.zoom);
 
+  // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
+  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip2)");
+
   updateChart2();
 }
 
 function redrawChart2(useTransition = false) {
   const { g, iW, iH, xScale, yScale } = chart2;
   const dur = useTransition ? 400 : 0;
-  const T = dur > 0 ? (sel) => sel.transition().duration(dur) : (sel) => sel;
+  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
+  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
 
   const xFmt = d3.format(".0%"), yFmt = d3.format(".1%");
 
@@ -1028,7 +1035,7 @@ function redrawChart2(useTransition = false) {
     .attr("y1", t => yScale(y0 + (y1-y0)*t))
     .attr("y2", t => yScale(y0 + (y1-y0)*t));
 
-  T(g.select(".bubbles").selectAll(".bubble"))
+  Tbub(g.select(".bubbles").selectAll(".bubble"))
     .attr("cx", d => xScale(d.tensionVal))
     .attr("cy", d => yScale(d.poids))
     .attr("r",  d => chart2.rScale(d.ent));
@@ -1045,7 +1052,12 @@ function updateChart2() {
 
   if (data.length > 0) {
     chart2.xScaleBase.domain(paddedExtent(data, d => d.tensionVal)).nice();
-    chart2.yScaleBase.domain(paddedExtent(data, d => d.poids, 0.12, true)).nice();
+    // Padding adaptatif : on ajoute une marge en dessous proportionnelle au rayon max des bulles
+    // pour éviter que les bulles proches de 0 soient tronquées par le clip-path
+    const [poidsMin, poidsMax] = d3.extent(data, d => d.poids);
+    const poidsSpan = (poidsMax - poidsMin) || poidsMax || 1;
+    const radiusPad = (R_MAX / chart2.iH) * poidsSpan * 2;
+    chart2.yScaleBase.domain([poidsMin - radiusPad, poidsMax + radiusPad * 0.5]).nice();
     chart2.xScale = chart2.xScaleBase.copy();
     chart2.yScale = chart2.yScaleBase.copy();
   }
@@ -1055,7 +1067,7 @@ function updateChart2() {
   const { g, xScale, yScale, rScale } = chart2;
 
   const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-  bubbles.exit().transition().duration(200).attr("r",0).remove();
+  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
   const enter = bubbles.enter().append("circle")
     .attr("class","bubble")
     .attr("cx", d => xScale(d.tensionVal))
@@ -1086,7 +1098,7 @@ function updateChart2() {
       tooltip.style.opacity = "0";
       d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
     })
-    .transition().duration(400)
+    .transition("bubble").duration(400)
     .attr("cx", d => xScale(d.tensionVal))
     .attr("cy", d => yScale(d.poids))
     .attr("r",  d => rScale(d.ent));
