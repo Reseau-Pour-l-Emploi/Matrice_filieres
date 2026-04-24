@@ -294,7 +294,7 @@
     .chart-svg { width: 100%; display: block; }
 
     /* D3 styles */
-    .bubble { cursor: pointer; transition: opacity .15s; }
+    .bubble { cursor: pointer; }
     .bubble:hover { stroke-width: 2 !important; }
     .grid-zone-line { stroke: #9ca3af; stroke-dasharray: 6,4; stroke-width: 1.2; }
     .axis path, .axis line { stroke: var(--ft-border); }
@@ -302,6 +302,38 @@
     .axis-label { fill: var(--ft-muted); font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
     .refline { stroke: #9ca3af; stroke-dasharray: 4,3; stroke-width: 1; }
     .grid-bg line, .grid-bg path { stroke: #e5e9f2; stroke-width: 1; }
+    .zoom-rect { cursor: grab; }
+    .zoom-rect:active { cursor: grabbing; }
+    .zoom-reset-btn {
+      position: absolute;
+      top: 10px; right: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ft-blue);
+      background: #fff;
+      border: 1px solid var(--ft-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(0,49,137,.10);
+      transition: background .12s, border-color .12s;
+      z-index: 10;
+    }
+    .zoom-reset-btn:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
+    .zoom-reset-btn.visible { display: flex; }
+    .zoom-hint {
+      position: absolute;
+      bottom: 8px; right: 12px;
+      font-size: 10px;
+      color: var(--ft-muted);
+      opacity: .6;
+      pointer-events: none;
+      font-family: 'DM Sans', sans-serif;
+    }
 
     /* Tooltip */
     .tooltip {
@@ -448,6 +480,11 @@
       </div>
       <div class="chart-card" id="chart-card-1">
         <svg class="chart-svg" id="chart-svg-1"></svg>
+        <button class="zoom-reset-btn" id="zoom-reset-1" onclick="resetZoom1()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser le zoom
+        </button>
+        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
         <div class="empty-state" id="empty-state-1" style="display:none">
           <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
@@ -466,16 +503,16 @@
     <!-- SIDEBAR 2 -->
     <aside class="sidebar">
       <div class="filter-section">
-        <h2>Niveau de tension</h2>
+        <h2>Évolution des recrutements</h2>
         <div class="tension-chips">
-          <div class="chip" data-tension="Faible" onclick="toggleTension2('Faible')">
-            <span class="dot" style="background:var(--col-faible)"></span> Faible
+          <div class="chip" data-evol="neg" onclick="toggleEvol2('neg')" style="color:var(--col-evol-neg);border-color:var(--col-evol-neg);background:#fef2f2">
+            <span class="dot" style="background:var(--col-evol-neg)"></span> &lt; −1 %
           </div>
-          <div class="chip" data-tension="Moyen" onclick="toggleTension2('Moyen')">
-            <span class="dot" style="background:var(--col-moyen)"></span> Moyen
+          <div class="chip" data-evol="neu" onclick="toggleEvol2('neu')" style="color:var(--col-evol-neu);border-color:var(--col-evol-neu);background:#eff6ff">
+            <span class="dot" style="background:var(--col-evol-neu)"></span> ± 1 %
           </div>
-          <div class="chip" data-tension="Forte" onclick="toggleTension2('Forte')">
-            <span class="dot" style="background:var(--col-forte)"></span> Forte
+          <div class="chip" data-evol="pos" onclick="toggleEvol2('pos')" style="color:var(--col-evol-pos);border-color:var(--col-evol-pos);background:#f0fdf4">
+            <span class="dot" style="background:var(--col-evol-pos)"></span> &gt; +1 %
           </div>
         </div>
       </div>
@@ -518,6 +555,11 @@
       </div>
       <div class="chart-card" id="chart-card-2">
         <svg class="chart-svg" id="chart-svg-2"></svg>
+        <button class="zoom-reset-btn" id="zoom-reset-2" onclick="resetZoom2()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser le zoom
+        </button>
+        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
         <div class="empty-state" id="empty-state-2" style="display:none">
           <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
@@ -579,10 +621,17 @@ function switchTab(id) {
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 const state1 = { selectedCodes: new Set(), activeTensions: new Set(["Faible","Moyen","Forte"]) };
-const state2 = { selectedCodes: new Set(), activeTensions: new Set(["Faible","Moyen","Forte"]) };
+const state2 = { selectedCodes: new Set(), activeEvols: new Set(["neg","neu","pos"]) };
+
+// Catégorie d'évolution d'un point
+function evolCat(evol) {
+  if (evol < -0.01) return "neg";
+  if (evol >  0.01) return "pos";
+  return "neu";
+}
 
 // ── SIDEBAR BUILD ─────────────────────────────────────────────────────────────
-function buildSidebar(listId, stateObj, onChangeFn) {
+function buildSidebar(listId, stateObj, onChangeFn, dotColorFn) {
   const list = document.getElementById(listId);
   list.innerHTML = "";
   RAW.forEach(d => {
@@ -591,10 +640,11 @@ function buildSidebar(listId, stateObj, onChangeFn) {
     item.dataset.code = d.code;
     item.dataset.label = d.label.toLowerCase();
     const cbId = `cb-${listId}-${d.code}`;
+    const dotColor = dotColorFn(d);
     item.innerHTML = `
       <input type="checkbox" id="${cbId}" checked>
       <label for="${cbId}">${d.label}</label>
-      <span class="tension-dot" style="background:${COL_TENSION[d.tension]}"></span>
+      <span class="tension-dot" style="background:${dotColor}"></span>
     `;
     item.querySelector("input").addEventListener("change", e => {
       if (e.target.checked) stateObj.selectedCodes.add(d.code);
@@ -652,19 +702,17 @@ function filteredData1() {
 function filterSearch2(q) { filterSearch("filiere-list-2", q, state2, updateChart2); }
 function selectAll2()     { selectAll("filiere-list-2", state2, updateChart2); }
 function selectNone2()    { selectNone("filiere-list-2", state2, updateChart2); }
-function toggleTension2(t) {
-  if (state2.activeTensions.has(t)) state2.activeTensions.delete(t);
-  else state2.activeTensions.add(t);
-  document.querySelector(`#tab2 .chip[data-tension="${t}"]`).classList.toggle("inactive", !state2.activeTensions.has(t));
+function toggleEvol2(cat) {
+  if (state2.activeEvols.has(cat)) state2.activeEvols.delete(cat);
+  else state2.activeEvols.add(cat);
+  document.querySelector(`#tab2 .chip[data-evol="${cat}"]`).classList.toggle("inactive", !state2.activeEvols.has(cat));
   updateChart2();
 }
 function filteredData2() {
-  return RAW.filter(d => state2.selectedCodes.has(d.code) && state2.activeTensions.has(d.tension));
+  return RAW.filter(d => state2.selectedCodes.has(d.code) && state2.activeEvols.has(evolCat(d.evol)));
 }
 
 // ── HELPERS : domaine avec marge ─────────────────────────────────────────────
-// Retourne [min-pad, max+pad] en ajoutant paddingRatio de l'étendue de chaque côté.
-// forceZeroMin : si true, le min est au moins 0 (utile pour poids).
 function paddedExtent(data, accessor, paddingRatio = 0.12, forceZeroMin = false) {
   let [lo, hi] = d3.extent(data, accessor);
   if (lo === undefined) return [0, 1];
@@ -689,109 +737,115 @@ function initChart1() {
   svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
   const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
 
+  // Clip path to keep bubbles inside chart area
+  svg.append("defs").append("clipPath").attr("id","clip1")
+    .append("rect").attr("width", iW).attr("height", iH);
+
   chart1 = {
     svg, g, iW, iH,
-    xScale: d3.scaleLinear().range([0, iW]),
-    yScale: d3.scaleLinear().range([iH, 0]),
+    xScaleBase: d3.scaleLinear().range([0, iW]),
+    yScaleBase: d3.scaleLinear().range([iH, 0]),
+    xScale:     d3.scaleLinear().range([0, iW]),
+    yScale:     d3.scaleLinear().range([iH, 0]),
     rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids)]).range([R_MIN, R_MAX]),
   };
 
-  // Fond
   g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
-
-  // Grilles (mises à jour via updateChart1)
   g.append("g").attr("class","grid-y");
   g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
-
-  // Lignes de zone (quarts) et ligne de référence Y=0
   g.append("g").attr("class","zone-lines")
-    .selectAll(".grid-zone-line-x")
-    .data([1/3, 2/3]).enter()
+    .selectAll("line").data([1/3,2/3]).enter()
     .append("line").attr("class","grid-zone-line").attr("y1",0).attr("y2",iH);
   g.append("g").attr("class","zone-lines-y")
-    .selectAll(".grid-zone-line-y")
-    .data([1/3, 2/3]).enter()
+    .selectAll("line").data([1/3,2/3]).enter()
     .append("line").attr("class","grid-zone-line").attr("x1",0).attr("x2",iW);
   g.append("line").attr("class","refline").attr("x1",0).attr("x2",iW);
-
-  // Axes
   g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
   g.append("g").attr("class","axis axis-y");
-
-  // Labels
   g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Taux de recours (%)");
   g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Évolution des recrutements à 6 mois (%)");
+  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip1)");
 
-  // Bulles
-  g.append("g").attr("class","bubbles");
+  // Zoom
+  chart1.zoom = d3.zoom()
+    .scaleExtent([1, 12])
+    .translateExtent([[0,0],[iW,iH]])
+    .on("zoom", (event) => {
+      chart1.xScale = event.transform.rescaleX(chart1.xScaleBase);
+      chart1.yScale = event.transform.rescaleY(chart1.yScaleBase);
+      redrawChart1();
+      // Show reset button only when zoomed
+      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
+      document.getElementById("zoom-reset-1").classList.toggle("visible", isZoomed);
+    });
+
+  // Transparent overlay to capture zoom events (must be on top)
+  g.append("rect").attr("class","zoom-rect")
+    .attr("width",iW).attr("height",iH)
+    .attr("fill","transparent")
+    .call(chart1.zoom);
 
   updateChart1();
+}
+
+// Redraws axes, grid, zone lines, refline, bubbles from current xScale/yScale
+function redrawChart1(useTransition = false) {
+  const { g, iW, iH, xScale, yScale, rScale } = chart1;
+  const dur = useTransition ? 400 : 0;
+  const T = dur > 0 ? (sel) => sel.transition().duration(dur) : (sel) => sel;
+
+  const xFmt = d3.format(".0%"), yFmt = d3.format("+.0%");
+
+  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+
+  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+
+  const [x0, x1] = xScale.domain();
+  T(g.select(".zone-lines").selectAll("line").data([1/3,2/3]))
+    .attr("x1", t => xScale(x0 + (x1-x0)*t))
+    .attr("x2", t => xScale(x0 + (x1-x0)*t));
+  const [y0, y1] = yScale.domain();
+  T(g.select(".zone-lines-y").selectAll("line").data([1/3,2/3]))
+    .attr("y1", t => yScale(y0 + (y1-y0)*t))
+    .attr("y2", t => yScale(y0 + (y1-y0)*t));
+
+  const zeroY = (yScale.domain()[0] <= 0 && yScale.domain()[1] >= 0) ? yScale(0) : -999;
+  T(g.select(".refline")).attr("y1", zeroY).attr("y2", zeroY);
+
+  T(g.select(".bubbles").selectAll(".bubble"))
+    .attr("cx", d => xScale(d.ent))
+    .attr("cy", d => yScale(d.evol));
 }
 
 function updateChart1() {
   if (!chart1.g) return;
   const data = filteredData1();
-  const { g, iW, iH, xScale, yScale, rScale } = chart1;
   document.getElementById("empty-state-1").style.display = data.length === 0 ? "flex" : "none";
   document.getElementById("sel-count-1").textContent = data.length;
 
-  const T = 400; // durée transition ms
+  // Reset zoom to identity on filter change
+  chart1.svg.select(".zoom-rect").call(chart1.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-1").classList.remove("visible");
 
-  // ── Mise à jour des domaines ──
   if (data.length > 0) {
-    xScale.domain(paddedExtent(data, d => d.ent)).nice();
-    yScale.domain(paddedExtent(data, d => d.evol)).nice();
+    chart1.xScaleBase.domain(paddedExtent(data, d => d.ent)).nice();
+    chart1.yScaleBase.domain(paddedExtent(data, d => d.evol)).nice();
+    chart1.xScale = chart1.xScaleBase.copy();
+    chart1.yScale = chart1.yScaleBase.copy();
   }
 
-  const xFmt = d3.format(".0%"), yFmt = d3.format("+.0%");
-  const xAxis = d3.axisBottom(xScale).ticks(7).tickFormat(xFmt);
-  const yAxis = d3.axisLeft(yScale).ticks(7).tickFormat(yFmt);
-
-  // ── Axes ──
-  g.select(".axis-x").transition().duration(T)
-    .call(xAxis)
-    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"))
-    .call(ax => ax.selectAll("line").attr("stroke","#d1d9ee"));
-  g.select(".axis-y").transition().duration(T)
-    .call(yAxis)
-    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"))
-    .call(ax => ax.selectAll("line").attr("stroke","#d1d9ee"));
-
-  // ── Grilles ──
-  g.select(".grid-y").transition().duration(T)
-    .call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-  g.select(".grid-x").transition().duration(T)
-    .call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-
-  // ── Lignes de zone (tiers de l'axe X) ──
-  const [x0, x1] = xScale.domain();
-  g.select(".zone-lines").selectAll("line").data([1/3, 2/3])
-    .transition().duration(T)
-    .attr("x1", t => xScale(x0 + (x1-x0)*t))
-    .attr("x2", t => xScale(x0 + (x1-x0)*t));
-
-  // ── Lignes de zone (tiers de l'axe Y) ──
-  const [y0, y1] = yScale.domain();
-  g.select(".zone-lines-y").selectAll("line").data([1/3, 2/3])
-    .transition().duration(T)
-    .attr("y1", t => yScale(y0 + (y1-y0)*t))
-    .attr("y2", t => yScale(y0 + (y1-y0)*t));
-
-  // ── Ligne de référence Y=0 ──
-  const zeroY = yScale.domain()[0] <= 0 && yScale.domain()[1] >= 0 ? yScale(0) : -999;
-  g.select(".refline").transition().duration(T)
-    .attr("y1", zeroY).attr("y2", zeroY);
-
-  // ── Bulles ──
   const tooltip = document.getElementById("tooltip");
   const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
+  const { g, xScale, yScale, rScale } = chart1;
 
   const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-
   bubbles.exit().transition().duration(200).attr("r",0).remove();
-
   const enter = bubbles.enter().append("circle")
     .attr("class","bubble")
     .attr("cx", d => xScale(d.ent))
@@ -822,10 +876,21 @@ function updateChart1() {
       tooltip.style.opacity = "0";
       d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
     })
-    .transition().duration(T)
+    .transition().duration(400)
     .attr("cx", d => xScale(d.ent))
     .attr("cy", d => yScale(d.evol))
     .attr("r",  d => rScale(d.poids));
+
+  redrawChart1(true);
+}
+
+function resetZoom1() {
+  chart1.xScale = chart1.xScaleBase.copy();
+  chart1.yScale = chart1.yScaleBase.copy();
+  chart1.svg.select(".zoom-rect")
+    .transition().duration(400)
+    .call(chart1.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-1").classList.remove("visible");
 }
 
 // ── CHART 2 (Poids / Tension) ─────────────────────────────────────────────────
@@ -842,84 +907,102 @@ function initChart2() {
   svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
   const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
 
+  svg.append("defs").append("clipPath").attr("id","clip2")
+    .append("rect").attr("width", iW).attr("height", iH);
+
   chart2 = {
     svg, g, iW, iH,
-    xScale: d3.scaleLinear().range([0, iW]),
-    yScale: d3.scaleLinear().range([iH, 0]),
+    xScaleBase: d3.scaleLinear().range([0, iW]),
+    yScaleBase: d3.scaleLinear().range([iH, 0]),
+    xScale:     d3.scaleLinear().range([0, iW]),
+    yScale:     d3.scaleLinear().range([iH, 0]),
     rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.ent)]).range([R_MIN, R_MAX]),
   };
 
   g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
-
   g.append("g").attr("class","grid-y");
   g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
-
   g.append("g").attr("class","zone-lines")
-    .selectAll("line").data([1/3, 2/3]).enter()
+    .selectAll("line").data([1/3,2/3]).enter()
     .append("line").attr("class","grid-zone-line").attr("y1",0).attr("y2",iH);
   g.append("g").attr("class","zone-lines-y")
-    .selectAll("line").data([1/3, 2/3]).enter()
+    .selectAll("line").data([1/3,2/3]).enter()
     .append("line").attr("class","grid-zone-line").attr("x1",0).attr("x2",iW);
-
   g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
   g.append("g").attr("class","axis axis-y");
-
   g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Tension (score)");
   g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-58).attr("text-anchor","middle").text("Poids de la filière (%)");
+  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip2)");
 
-  g.append("g").attr("class","bubbles");
+  chart2.zoom = d3.zoom()
+    .scaleExtent([1, 12])
+    .translateExtent([[0,0],[iW,iH]])
+    .on("zoom", (event) => {
+      chart2.xScale = event.transform.rescaleX(chart2.xScaleBase);
+      chart2.yScale = event.transform.rescaleY(chart2.yScaleBase);
+      redrawChart2();
+      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
+      document.getElementById("zoom-reset-2").classList.toggle("visible", isZoomed);
+    });
+
+  g.append("rect").attr("class","zoom-rect")
+    .attr("width",iW).attr("height",iH)
+    .attr("fill","transparent")
+    .call(chart2.zoom);
 
   updateChart2();
+}
+
+function redrawChart2(useTransition = false) {
+  const { g, iW, iH, xScale, yScale } = chart2;
+  const dur = useTransition ? 400 : 0;
+  const T = dur > 0 ? (sel) => sel.transition().duration(dur) : (sel) => sel;
+
+  const xFmt = d3.format(".0%"), yFmt = d3.format(".1%");
+
+  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+
+  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+
+  const [x0, x1] = xScale.domain();
+  T(g.select(".zone-lines").selectAll("line").data([1/3,2/3]))
+    .attr("x1", t => xScale(x0 + (x1-x0)*t))
+    .attr("x2", t => xScale(x0 + (x1-x0)*t));
+  const [y0, y1] = yScale.domain();
+  T(g.select(".zone-lines-y").selectAll("line").data([1/3,2/3]))
+    .attr("y1", t => yScale(y0 + (y1-y0)*t))
+    .attr("y2", t => yScale(y0 + (y1-y0)*t));
+
+  T(g.select(".bubbles").selectAll(".bubble"))
+    .attr("cx", d => xScale(d.tensionVal))
+    .attr("cy", d => yScale(d.poids));
 }
 
 function updateChart2() {
   if (!chart2.g) return;
   const data = filteredData2();
-  const { g, iW, iH, xScale, yScale, rScale } = chart2;
   document.getElementById("empty-state-2").style.display = data.length === 0 ? "flex" : "none";
   document.getElementById("sel-count-2").textContent = data.length;
 
-  const T = 400;
+  chart2.svg.select(".zoom-rect").call(chart2.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-2").classList.remove("visible");
 
   if (data.length > 0) {
-    xScale.domain(paddedExtent(data, d => d.tensionVal)).nice();
-    yScale.domain(paddedExtent(data, d => d.poids, 0.12, true)).nice();
+    chart2.xScaleBase.domain(paddedExtent(data, d => d.tensionVal)).nice();
+    chart2.yScaleBase.domain(paddedExtent(data, d => d.poids, 0.12, true)).nice();
+    chart2.xScale = chart2.xScaleBase.copy();
+    chart2.yScale = chart2.yScaleBase.copy();
   }
-
-  const xFmt = d3.format(".0%"), yFmt = d3.format(".1%");
-  const xAxis = d3.axisBottom(xScale).ticks(7).tickFormat(xFmt);
-  const yAxis = d3.axisLeft(yScale).ticks(7).tickFormat(yFmt);
-
-  g.select(".axis-x").transition().duration(T)
-    .call(xAxis)
-    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"))
-    .call(ax => ax.selectAll("line").attr("stroke","#d1d9ee"));
-  g.select(".axis-y").transition().duration(T)
-    .call(yAxis)
-    .call(ax => ax.select(".domain").attr("stroke","#d1d9ee"))
-    .call(ax => ax.selectAll("line").attr("stroke","#d1d9ee"));
-
-  g.select(".grid-y").transition().duration(T)
-    .call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-  g.select(".grid-x").transition().duration(T)
-    .call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-
-  const [x0, x1] = xScale.domain();
-  g.select(".zone-lines").selectAll("line").data([1/3, 2/3])
-    .transition().duration(T)
-    .attr("x1", t => xScale(x0 + (x1-x0)*t))
-    .attr("x2", t => xScale(x0 + (x1-x0)*t));
-
-  const [y0, y1] = yScale.domain();
-  g.select(".zone-lines-y").selectAll("line").data([1/3, 2/3])
-    .transition().duration(T)
-    .attr("y1", t => yScale(y0 + (y1-y0)*t))
-    .attr("y2", t => yScale(y0 + (y1-y0)*t));
 
   const tooltip = document.getElementById("tooltip");
   const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
+  const { g, xScale, yScale, rScale } = chart2;
 
   const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
   bubbles.exit().transition().duration(200).attr("r",0).remove();
@@ -953,10 +1036,21 @@ function updateChart2() {
       tooltip.style.opacity = "0";
       d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
     })
-    .transition().duration(T)
+    .transition().duration(400)
     .attr("cx", d => xScale(d.tensionVal))
     .attr("cy", d => yScale(d.poids))
     .attr("r",  d => rScale(d.ent));
+
+  redrawChart2(true);
+}
+
+function resetZoom2() {
+  chart2.xScale = chart2.xScaleBase.copy();
+  chart2.yScale = chart2.yScaleBase.copy();
+  chart2.svg.select(".zoom-rect")
+    .transition().duration(400)
+    .call(chart2.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-2").classList.remove("visible");
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -967,8 +1061,10 @@ function updateChart2() {
 
   RAW.forEach(d => { state1.selectedCodes.add(d.code); state2.selectedCodes.add(d.code); });
 
-  buildSidebar("filiere-list-1", state1, () => { updateChart1(); document.getElementById("sel-count-1").textContent = filteredData1().length; });
-  buildSidebar("filiere-list-2", state2, () => { updateChart2(); document.getElementById("sel-count-2").textContent = filteredData2().length; });
+  buildSidebar("filiere-list-1", state1, () => { updateChart1(); document.getElementById("sel-count-1").textContent = filteredData1().length; },
+    d => COL_TENSION[d.tension]);
+  buildSidebar("filiere-list-2", state2, () => { updateChart2(); document.getElementById("sel-count-2").textContent = filteredData2().length; },
+    d => evolColor(d.evol));
 
   initChart1();
 
