@@ -868,7 +868,8 @@ function redrawChart1(useTransition = false) {
 
   T(g.select(".bubbles").selectAll(".bubble"))
     .attr("cx", d => xScale(d.ent))
-    .attr("cy", d => yScale(d.evol));
+    .attr("cy", d => yScale(d.evol))
+    .attr("r",  d => chart1.rScale(d.poids));
 }
 
 function updateChart1() {
@@ -1029,7 +1030,8 @@ function redrawChart2(useTransition = false) {
 
   T(g.select(".bubbles").selectAll(".bubble"))
     .attr("cx", d => xScale(d.tensionVal))
-    .attr("cy", d => yScale(d.poids));
+    .attr("cy", d => yScale(d.poids))
+    .attr("r",  d => chart2.rScale(d.ent));
 }
 
 function updateChart2() {
