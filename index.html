@@ -6,6 +6,28 @@
   <title>Matrice de décision par filière – France Travail</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  DONNÉES INLINE  –  pour ouverture sans serveur (file://)       ║
+  ║                                                                  ║
+  ║  Remplacez les données ci-dessous par votre propre JSON.         ║
+  ║  Noms de champs attendus :                                       ║
+  ║    code, label, niveau_de_tension, tension (0–1),                ║
+  ║    taux_de_recours (0–1), evolution_dpaep6m (±décimal),          ║
+  ║    poids_dpaep6m (0–1)                                           ║
+  ║                                                                  ║
+  ║  Si vous utilisez un serveur web, vous pouvez supprimer          ║
+  ║  ce bloc — data.json sera chargé automatiquement.                ║
+  ╚══════════════════════════════════════════════════════════════════╝
+  -->
+  <script>
+  // Collez ici votre tableau JSON complet, ex :
+  // const INLINE_DATA = [ { "code": "A01", "label": "...", ... }, ... ];
+  //
+  // Laissez undefined (commenté) pour utiliser fetch('data.json').
+  // const INLINE_DATA = undefined;
+  </script>
   <style>
     :root {
       --ft-blue:    #003189;
@@ -585,25 +607,51 @@ function evolColor(evol) {
   return "#2563eb";
 }
 
+function mapRow(d) {
+  return {
+    code:       d.code,
+    label:      d.label,
+    tension:    d.niveau_de_tension,
+    tensionVal: +d.tension,
+    ent:        +d.taux_de_recours,
+    evol:       +d.evolution_dpaep6m,
+    poids:      +d.poids_dpaep6m,
+  };
+}
+
 async function loadData() {
+  // ── 1. Données injectées en ligne (ouverture fichier:// sans serveur) ──────
+  if (typeof INLINE_DATA !== 'undefined' && Array.isArray(INLINE_DATA) && INLINE_DATA.length > 0) {
+    RAW = INLINE_DATA.map(mapRow);
+    console.log(`✅ Données inline chargées : ${RAW.length} filières`);
+    return true;
+  }
+
+  // ── 2. Fallback : fetch data.json (serveur web) ───────────────────────────
   try {
     const res = await fetch('data.json');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    RAW = json.map(d => ({
-      code:       d.code,
-      label:      d.label,
-      tension:    d.niveau_de_tension,
-      tensionVal: d.tension,
-      ent:        d.taux_de_recours,
-      evol:       d.evolution_dpaep6m,
-      poids:      d.poids_dpaep6m,
-    }));
+    RAW = json.map(mapRow);
+    console.log(`✅ data.json chargé : ${RAW.length} filières`);
+
+    // Vérification rapide des champs attendus
+    if (RAW.length > 0) {
+      const sample = RAW[0];
+      const missing = ['code','label','tension','tensionVal','ent','evol','poids']
+        .filter(k => sample[k] === undefined || (typeof sample[k] === 'number' && isNaN(sample[k])));
+      if (missing.length > 0) {
+        console.warn('⚠️ Champs manquants ou NaN dans data.json :', missing,
+          '\nVérifiez les noms de colonnes :', Object.keys(json[0]));
+      }
+    }
   } catch(err) {
-    console.error('Erreur chargement data.json :', err);
+    console.error('❌ Erreur chargement data.json :', err);
     document.getElementById('loading-overlay').innerHTML =
       '<div style="color:#dc2626;font-weight:600;font-size:14px;padding:24px;text-align:center">' +
-      '⚠️ Impossible de charger data.json.<br>Vérifiez que le fichier est dans le même répertoire que ce HTML.</div>';
+      '⚠️ Impossible de charger data.json.<br>' +
+      'Si vous ouvrez ce fichier directement (file://), intégrez vos données via <code>INLINE_DATA</code><br>' +
+      '(voir commentaire dans le &lt;head&gt; du HTML).</div>';
     return false;
   }
   return true;
