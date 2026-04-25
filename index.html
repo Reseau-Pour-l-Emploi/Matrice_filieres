@@ -417,33 +417,38 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── GRID LINE INPUTS ────────────────────────────────── */
-    .grid-axis-inputs { display: flex; flex-direction: column; gap: 7px; }
-    .grid-axis-row { display: flex; align-items: center; gap: 8px; }
-    .grid-axis-label {
-      font-size: 11px; font-weight: 600; color: var(--ft-muted);
-      width: 36px; flex-shrink: 0;
-    }
-    .grid-inputs { display: flex; gap: 4px; flex: 1; }
-    .grid-input {
-      flex: 1; min-width: 0;
-      padding: 4px 4px;
-      border: 1px solid var(--ft-border);
+    /* ── GRID LINE PANEL ─────────────────────────────────── */
+    .grid-val-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
+    .grid-val-row { display: flex; align-items: center; gap: 5px; }
+    .grid-val-lbl { font-size: 11px; color: var(--ft-muted); flex: 1; white-space: nowrap; }
+    .grid-val-eq  { font-size: 11px; color: var(--ft-muted); }
+    .grid-val-inp {
+      width: 62px; padding: 4px 6px;
+      border: 1px solid var(--ft-blue-lt);
       border-radius: 5px;
-      font-size: 12px;
-      font-family: inherit;
-      background: var(--ft-bg);
-      color: var(--ft-text);
-      outline: none;
-      text-align: center;
-      transition: border-color .15s;
+      font-size: 12px; font-family: inherit;
+      background: #eff6ff; color: var(--ft-blue); font-weight: 700;
+      outline: none; text-align: right;
+      transition: border-color .15s, background .15s;
       -moz-appearance: textfield;
     }
-    .grid-input::-webkit-inner-spin-button,
-    .grid-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    .grid-input:focus { border-color: var(--ft-blue-lt); background: #fff; }
-    .grid-input.has-value { border-color: var(--ft-blue-lt); background: #eff6ff; color: var(--ft-blue); font-weight: 600; }
-    .grid-hint { font-size: 10px; color: var(--ft-muted); opacity: .75; margin-top: 2px; line-height: 1.4; }
+    .grid-val-inp::-webkit-inner-spin-button,
+    .grid-val-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .grid-val-inp:focus { border-color: var(--ft-blue); background: #fff; }
+    .grid-val-unit { font-size: 11px; color: var(--ft-muted); }
+    .btn-bary {
+      width: 100%; padding: 7px 8px;
+      border-radius: 6px; border: 1px solid var(--ft-border);
+      background: #fff; font-family: inherit;
+      font-size: 11px; font-weight: 600; color: var(--ft-blue);
+      cursor: pointer; text-align: center;
+      transition: background .12s, border-color .12s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .btn-bary:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
+    /* Drag hint on grid lines */
+    .grid-zone-line-drag { cursor: ew-resize; }
+    .grid-zone-line-drag-y { cursor: ns-resize; }
 
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
@@ -493,26 +498,22 @@
         </div>
       </div>
       <div class="filter-section">
-        <h2>Lignes de grille — Matrice 1</h2>
-        <div class="grid-axis-inputs">
-          <div class="grid-axis-row">
-            <span class="grid-axis-label">Axe X</span>
-            <div class="grid-inputs">
-              <input type="number" class="grid-input" id="g1x0" placeholder="—" step="any" oninput="onGridInput1()">
-              <input type="number" class="grid-input" id="g1x1" placeholder="—" step="any" oninput="onGridInput1()">
-              <input type="number" class="grid-input" id="g1x2" placeholder="—" step="any" oninput="onGridInput1()">
-            </div>
+        <h2>Lignes de grille</h2>
+        <div class="grid-val-rows">
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">X (abscisses)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g1x" step="0.01" oninput="onManualGrid1('x')">
+            <span class="grid-val-unit">%</span>
           </div>
-          <div class="grid-axis-row">
-            <span class="grid-axis-label">Axe Y</span>
-            <div class="grid-inputs">
-              <input type="number" class="grid-input" id="g1y0" placeholder="—" step="any" oninput="onGridInput1()">
-              <input type="number" class="grid-input" id="g1y1" placeholder="—" step="any" oninput="onGridInput1()">
-              <input type="number" class="grid-input" id="g1y2" placeholder="—" step="any" oninput="onGridInput1()">
-            </div>
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">Y (ordonnées)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g1y" step="0.01" oninput="onManualGrid1('y')">
+            <span class="grid-val-unit">%</span>
           </div>
         </div>
-        <div class="grid-hint">Valeurs en % (ex : 20, 50, 80) · vide = tiers automatiques</div>
+        <button class="btn-bary" onclick="resetToBarycenter1()">♻️ Position par défaut (barycentre)</button>
       </div>
       <div class="filter-section">
         <h2>Filières <span class="count-badge" id="sel-count-1">0</span></h2>
@@ -590,26 +591,22 @@
         </div>
       </div>
       <div class="filter-section">
-        <h2>Lignes de grille — Matrice 2</h2>
-        <div class="grid-axis-inputs">
-          <div class="grid-axis-row">
-            <span class="grid-axis-label">Axe X</span>
-            <div class="grid-inputs">
-              <input type="number" class="grid-input" id="g2x0" placeholder="—" step="any" oninput="onGridInput2()">
-              <input type="number" class="grid-input" id="g2x1" placeholder="—" step="any" oninput="onGridInput2()">
-              <input type="number" class="grid-input" id="g2x2" placeholder="—" step="any" oninput="onGridInput2()">
-            </div>
+        <h2>Lignes de grille</h2>
+        <div class="grid-val-rows">
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">X (abscisses)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g2x" step="0.01" oninput="onManualGrid2('x')">
+            <span class="grid-val-unit">%</span>
           </div>
-          <div class="grid-axis-row">
-            <span class="grid-axis-label">Axe Y</span>
-            <div class="grid-inputs">
-              <input type="number" class="grid-input" id="g2y0" placeholder="—" step="any" oninput="onGridInput2()">
-              <input type="number" class="grid-input" id="g2y1" placeholder="—" step="any" oninput="onGridInput2()">
-              <input type="number" class="grid-input" id="g2y2" placeholder="—" step="any" oninput="onGridInput2()">
-            </div>
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">Y (ordonnées)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g2y" step="0.01" oninput="onManualGrid2('y')">
+            <span class="grid-val-unit">%</span>
           </div>
         </div>
-        <div class="grid-hint">Valeurs en % (ex : 25, 50, 75) · vide = tiers automatiques</div>
+        <button class="btn-bary" onclick="resetToBarycenter2()">♻️ Position par défaut (barycentre)</button>
       </div>
       <div class="filter-section">
         <h2>Filières <span class="count-badge" id="sel-count-2">0</span></h2>
@@ -744,60 +741,72 @@ function switchTab(id) {
 const state1 = { selectedCodes: new Set(), activeTensions: new Set(["Faible","Moyen","Forte"]) };
 const state2 = { selectedCodes: new Set(), activeEvols: new Set(["neg","neu","pos"]) };
 
-// ── GRID LINES STATE ──────────────────────────────────────────────────────────
-// Valeurs en unités données (fraction 0–1). [] = auto (tiers égaux).
-const gridState1 = { xLines: [], yLines: [] };
-const gridState2 = { xLines: [], yLines: [] };
+// ── GRID LINES STATE (barycentre pondéré) ─────────────────────────────────────
+// x / y : valeur en espace données (null = utiliser le barycentre calculé)
+// bx / by : barycentre calculé à chaque updateChart
+const gridState1 = { x: null, y: null, bx: 0, by: 0 };
+const gridState2 = { x: null, y: null, bx: 0, by: 0 };
 
-function readGridInputs(ids) {
-  return ids.map(id => {
-    const el = document.getElementById(id);
-    if (!el || el.value.trim() === "") return null;
-    return parseFloat(el.value) / 100;
-  }).filter(v => v !== null && !isNaN(v));
+// Calcule le barycentre pondéré d'un jeu de données
+function computeBarycenter(data, xAcc, yAcc, wAcc) {
+  const totalW = d3.sum(data, wAcc);
+  if (!totalW) return { x: d3.mean(data, xAcc) || 0, y: d3.mean(data, yAcc) || 0 };
+  return {
+    x: d3.sum(data, d => xAcc(d) * wAcc(d)) / totalW,
+    y: d3.sum(data, d => yAcc(d) * wAcc(d)) / totalW,
+  };
 }
 
-function styleGridInputs(ids) {
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle("has-value", el.value.trim() !== "");
-  });
+// Valeur effective de la ligne (custom ou barycentre)
+function getGridX1() { return gridState1.x !== null ? gridState1.x : gridState1.bx; }
+function getGridY1() { return gridState1.y !== null ? gridState1.y : gridState1.by; }
+function getGridX2() { return gridState2.x !== null ? gridState2.x : gridState2.bx; }
+function getGridY2() { return gridState2.y !== null ? gridState2.y : gridState2.by; }
+
+// Met à jour les inputs de la sidebar depuis l'état courant
+function syncGridInputs1() {
+  const xi = document.getElementById("g1x");
+  const yi = document.getElementById("g1y");
+  if (xi) xi.value = (getGridX1() * 100).toFixed(2);
+  if (yi) yi.value = (getGridY1() * 100).toFixed(2);
+}
+function syncGridInputs2() {
+  const xi = document.getElementById("g2x");
+  const yi = document.getElementById("g2y");
+  if (xi) xi.value = (getGridX2() * 100).toFixed(2);
+  if (yi) yi.value = (getGridY2() * 100).toFixed(2);
 }
 
-function onGridInput1() {
-  styleGridInputs(["g1x0","g1x1","g1x2","g1y0","g1y1","g1y2"]);
-  gridState1.xLines = readGridInputs(["g1x0","g1x1","g1x2"]);
-  gridState1.yLines = readGridInputs(["g1y0","g1y1","g1y2"]);
+// Saisie manuelle depuis la sidebar
+function onManualGrid1(axis) {
+  const el = document.getElementById(axis === 'x' ? 'g1x' : 'g1y');
+  const v = parseFloat(el.value);
+  if (!isNaN(v)) {
+    if (axis === 'x') gridState1.x = v / 100;
+    else              gridState1.y = v / 100;
+    if (chart1.g) redrawChart1(false);
+  }
+}
+function onManualGrid2(axis) {
+  const el = document.getElementById(axis === 'x' ? 'g2x' : 'g2y');
+  const v = parseFloat(el.value);
+  if (!isNaN(v)) {
+    if (axis === 'x') gridState2.x = v / 100;
+    else              gridState2.y = v / 100;
+    if (chart2.g) redrawChart2(false);
+  }
+}
+
+// Réinitialise vers le barycentre automatique
+function resetToBarycenter1() {
+  gridState1.x = null; gridState1.y = null;
+  syncGridInputs1();
   if (chart1.g) redrawChart1(false);
 }
-
-function onGridInput2() {
-  styleGridInputs(["g2x0","g2x1","g2x2","g2y0","g2y1","g2y2"]);
-  gridState2.xLines = readGridInputs(["g2x0","g2x1","g2x2"]);
-  gridState2.yLines = readGridInputs(["g2y0","g2y1","g2y2"]);
+function resetToBarycenter2() {
+  gridState2.x = null; gridState2.y = null;
+  syncGridInputs2();
   if (chart2.g) redrawChart2(false);
-}
-
-// Retourne les valeurs data pour les lignes verticales (axe X)
-function getZoneLinesX1() {
-  if (gridState1.xLines.length > 0) return [...gridState1.xLines].sort((a,b)=>a-b);
-  const [x0, x1] = chart1.xScaleBase.domain();
-  return [x0 + (x1-x0)/3, x0 + (x1-x0)*2/3];
-}
-function getZoneLinesY1() {
-  if (gridState1.yLines.length > 0) return [...gridState1.yLines].sort((a,b)=>a-b);
-  const [y0, y1] = chart1.yScaleBase.domain();
-  return [y0 + (y1-y0)/3, y0 + (y1-y0)*2/3];
-}
-function getZoneLinesX2() {
-  if (gridState2.xLines.length > 0) return [...gridState2.xLines].sort((a,b)=>a-b);
-  const [x0, x1] = chart2.xScaleBase.domain();
-  return [x0 + (x1-x0)/3, x0 + (x1-x0)*2/3];
-}
-function getZoneLinesY2() {
-  if (gridState2.yLines.length > 0) return [...gridState2.yLines].sort((a,b)=>a-b);
-  const [y0, y1] = chart2.yScaleBase.domain();
-  return [y0 + (y1-y0)/3, y0 + (y1-y0)*2/3];
 }
 
 // Catégorie d'évolution d'un point
@@ -959,6 +968,9 @@ function initChart1() {
 
   // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
   g.append("g").attr("class","bubbles").attr("clip-path","url(#clip1)");
+  // Drag handles for grid lines — above bubbles so they intercept pointer events
+  g.append("g").attr("class","drag-handles-x");
+  g.append("g").attr("class","drag-handles-y");
 
   updateChart1();
 }
@@ -982,18 +994,53 @@ function redrawChart1(useTransition = false) {
   T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
     .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
 
-  const [x0, x1] = xScale.domain();
-  const xlv1 = getZoneLinesX1();
-  const xLinesEl1 = g.select(".zone-lines").selectAll("line").data(xlv1);
-  xLinesEl1.enter().append("line").attr("class","grid-zone-line").attr("y1",0).attr("y2",iH)
-    .merge(xLinesEl1).attr("x1", v => xScale(v)).attr("x2", v => xScale(v));
-  xLinesEl1.exit().remove();
-  const [y0, y1] = yScale.domain();
-  const ylv1 = getZoneLinesY1();
-  const yLinesEl1 = g.select(".zone-lines-y").selectAll("line").data(ylv1);
-  yLinesEl1.enter().append("line").attr("class","grid-zone-line").attr("x1",0).attr("x2",iW)
-    .merge(yLinesEl1).attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
-  yLinesEl1.exit().remove();
+  // ── Zone lines (1 vertical + 1 horizontal au barycentre) ──────────────────
+  const gxVal = getGridX1(), gyVal = getGridY1();
+
+  g.select(".zone-lines").selectAll("line").data([gxVal])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH);
+
+  g.select(".zone-lines-y").selectAll("line").data([gyVal])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
+
+  // ── Drag handles (bandes transparentes au-dessus des bulles) ───────────────
+  const dragX1 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [xmin, xmax] = chart1.xScale.domain();
+      gridState1.x = Math.max(xmin, Math.min(xmax, chart1.xScale.invert(event.x)));
+      syncGridInputs1();
+      redrawChart1(false);
+    });
+
+  g.select(".drag-handles-x").selectAll("line").data([gxVal])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH)
+    .call(dragX1);
+
+  const dragY1 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [ymin, ymax] = chart1.yScale.domain();
+      gridState1.y = Math.max(ymin, Math.min(ymax, chart1.yScale.invert(event.y)));
+      syncGridInputs1();
+      redrawChart1(false);
+    });
+
+  g.select(".drag-handles-y").selectAll("line").data([gyVal])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
+    .call(dragY1);
 
   const zeroY = (yScale.domain()[0] <= 0 && yScale.domain()[1] >= 0) ? yScale(0) : -999;
   T(g.select(".refline")).attr("y1", zeroY).attr("y2", zeroY);
@@ -1029,6 +1076,12 @@ function updateChart1() {
 
     chart1.xScale = chart1.xScaleBase.copy();
     chart1.yScale = chart1.yScaleBase.copy();
+
+    // Barycentre pondéré par le poids de la filière
+    const bary = computeBarycenter(data, d => d.ent, d => d.evol, d => d.poids);
+    gridState1.bx = bary.x;
+    gridState1.by = bary.y;
+    syncGridInputs1();
   }
 
   const tooltip = document.getElementById("tooltip");
@@ -1138,6 +1191,9 @@ function initChart2() {
 
   // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
   g.append("g").attr("class","bubbles").attr("clip-path","url(#clip2)");
+  // Drag handles for grid lines — above bubbles
+  g.append("g").attr("class","drag-handles-x");
+  g.append("g").attr("class","drag-handles-y");
 
   updateChart2();
 }
@@ -1160,18 +1216,53 @@ function redrawChart2(useTransition = false) {
   T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
     .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
 
-  const [x0, x1] = xScale.domain();
-  const xlv2 = getZoneLinesX2();
-  const xLinesEl2 = g.select(".zone-lines").selectAll("line").data(xlv2);
-  xLinesEl2.enter().append("line").attr("class","grid-zone-line").attr("y1",0).attr("y2",iH)
-    .merge(xLinesEl2).attr("x1", v => xScale(v)).attr("x2", v => xScale(v));
-  xLinesEl2.exit().remove();
-  const [y0, y1] = yScale.domain();
-  const ylv2 = getZoneLinesY2();
-  const yLinesEl2 = g.select(".zone-lines-y").selectAll("line").data(ylv2);
-  yLinesEl2.enter().append("line").attr("class","grid-zone-line").attr("x1",0).attr("x2",iW)
-    .merge(yLinesEl2).attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
-  yLinesEl2.exit().remove();
+  // ── Zone lines (1 vertical + 1 horizontal au barycentre) ──────────────────
+  const gxVal2 = getGridX2(), gyVal2 = getGridY2();
+
+  g.select(".zone-lines").selectAll("line").data([gxVal2])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH);
+
+  g.select(".zone-lines-y").selectAll("line").data([gyVal2])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
+
+  // ── Drag handles ───────────────────────────────────────────────────────────
+  const dragX2 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [xmin, xmax] = chart2.xScale.domain();
+      gridState2.x = Math.max(xmin, Math.min(xmax, chart2.xScale.invert(event.x)));
+      syncGridInputs2();
+      redrawChart2(false);
+    });
+
+  g.select(".drag-handles-x").selectAll("line").data([gxVal2])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH)
+    .call(dragX2);
+
+  const dragY2 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [ymin, ymax] = chart2.yScale.domain();
+      gridState2.y = Math.max(ymin, Math.min(ymax, chart2.yScale.invert(event.y)));
+      syncGridInputs2();
+      redrawChart2(false);
+    });
+
+  g.select(".drag-handles-y").selectAll("line").data([gyVal2])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
+    .call(dragY2);
 
   Tbub(g.select(".bubbles").selectAll(".bubble"))
     .attr("cx", d => xScale(d.tensionVal))
@@ -1190,14 +1281,18 @@ function updateChart2() {
 
   if (data.length > 0) {
     chart2.xScaleBase.domain(paddedExtent(data, d => d.tensionVal)).nice();
-    // Padding adaptatif : on ajoute une marge en dessous proportionnelle au rayon max des bulles
-    // pour éviter que les bulles proches de 0 soient tronquées par le clip-path
     const [poidsMin, poidsMax] = d3.extent(data, d => d.poids);
     const poidsSpan = (poidsMax - poidsMin) || poidsMax || 1;
     const radiusPad = (R_MAX / chart2.iH) * poidsSpan * 2;
     chart2.yScaleBase.domain([poidsMin - radiusPad, poidsMax + radiusPad * 0.5]).nice();
     chart2.xScale = chart2.xScaleBase.copy();
     chart2.yScale = chart2.yScaleBase.copy();
+
+    // Barycentre pondéré par le taux de recours (taille des bulles de la matrice 2)
+    const bary2 = computeBarycenter(data, d => d.tensionVal, d => d.poids, d => d.ent);
+    gridState2.bx = bary2.x;
+    gridState2.by = bary2.y;
+    syncGridInputs2();
   }
 
   const tooltip = document.getElementById("tooltip");
