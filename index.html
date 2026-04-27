@@ -451,6 +451,28 @@
     .grid-zone-line-drag { cursor: ew-resize; }
     .grid-zone-line-drag-y { cursor: ns-resize; }
 
+    /* Interpretation example block */
+    .interp-block {
+      background: #f0f4ff;
+      border-left: 4px solid var(--ft-blue-lt);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 16px;
+      font-size: 12.5px;
+      color: #1e3a6e;
+      line-height: 1.6;
+      margin-top: 2px;
+    }
+    .interp-block strong { font-weight: 700; }
+    .interp-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ft-blue-lt);
+      margin-bottom: 4px;
+    }
+
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
       .sidebar { max-height: 300px; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); top: auto; }
@@ -469,7 +491,7 @@
 <header>
   <div class="logo-badge">FT</div>
   <h1>Matrice de décision par filière</h1>
-  <span class="header-subtitle">Taux de recours · Évolution des recrutements · Tension</span>
+
 </header>
 
 <!-- ── TABS ── -->
@@ -568,6 +590,10 @@
           <div>Aucune filière sélectionnée</div>
         </div>
       </div>
+      <div class="interp-block">
+        <div class="interp-label">💡 Exemple de lecture</div><br>
+        La bulle <strong>Santé, Social, SAP</strong> est positionnée à droite (taux de recours élevé, ~39 %) et en haut du graphique (évolution des recrutements à 1 mois positive, +6 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une forte tension de recrutement dans cette filière. Sa grande taille reflète un volume de recrutements parmi les plus importants, avec plus d'1,2 million de DPAE sur 1 mois.
+      </div>
     </main>
   </div>
 </div>
@@ -661,6 +687,10 @@
           <div>Aucune filière sélectionnée</div>
         </div>
       </div>
+      <div class="interp-block">
+        <div class="interp-label">💡 Exemple de lecture</div><br>
+        La bulle <strong>Hôtellerie et Restauration</strong> est positionnée dans la zone de tension moyenne (score ~0,50) et présente l'un des poids les plus élevés de toutes les filières (près de 1,6 million de DPAE sur 1 mois). Sa couleur <strong style="color:#2563eb">bleue</strong> indique une évolution modérée des recrutements (entre −1 % et +1 %). Sa taille relativement grande traduit un taux de recours assez élevé (~26 %).
+      </div>
     </main>
   </div>
 </div>
@@ -675,13 +705,13 @@
         <h2>Évolution DPAE &gt; 1 mois</h2>
         <div class="tension-chips">
           <div class="chip" data-e3="bas" onclick="toggleEvol3('bas')" style="color:var(--col-e3-bas);border-color:var(--col-e3-bas);background:#fef2f2">
-            <span class="dot" style="background:var(--col-e3-bas)"></span> Décroissance forte
+            <span class="dot" style="background:var(--col-e3-bas)"></span> Baisse (&lt; −1 %)
           </div>
           <div class="chip" data-e3="mid" onclick="toggleEvol3('mid')" style="color:#b45309;border-color:var(--col-e3-mid);background:#fffbeb">
-            <span class="dot" style="background:var(--col-e3-mid)"></span> Évolution modérée
+            <span class="dot" style="background:var(--col-e3-mid)"></span> Modérée (± 1 %)
           </div>
           <div class="chip" data-e3="haut" onclick="toggleEvol3('haut')" style="color:var(--col-e3-haut);border-color:var(--col-e3-haut);background:#f0fdf4">
-            <span class="dot" style="background:var(--col-e3-haut)"></span> Croissance
+            <span class="dot" style="background:var(--col-e3-haut)"></span> Hausse (&gt; +1 %)
           </div>
         </div>
       </div>
@@ -724,13 +754,13 @@
       <div class="chart-header">
         <div>
           <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
-          <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois (3 terciles de 10 filières)</div>
+          <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois (baisse &lt;−1%, modérée ±1%, hausse &gt;+1%)</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
           <div class="legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Croissance (tercile haut)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Modérée (tercile médian)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Décroissance forte (tercile bas)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Hausse (&gt; +1%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Évolution modérée (± 1%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Baisse (&lt; −1%)</div>
           </div>
           <div class="size-legend">
             <span>Nb DPAE &gt; 1 mois :</span>
@@ -753,6 +783,10 @@
           </svg>
           <div>Aucune filière sélectionnée</div>
         </div>
+      </div>
+      <div class="interp-block">
+        <div class="interp-label">💡 Exemple de lecture</div><br>
+        La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse (−2,9 %, soit inférieure à −1 %). Sa grande taille traduit un volume de recrutements très élevé, avec plus d'1,5 million de DPAE sur 1 mois.
       </div>
     </main>
   </div>
@@ -785,7 +819,7 @@ function mapRow(d) {
     evol6m:      +d.evolution_dpaep6m,         // Évolution DPAE > 6 mois
     dpae6m:      +d.dpae_6m,                   // Nb DPAE > 6 mois
     diffRecruit: +d.difficulte_recrutement,    // = tensionVal, axe X M3
-    evol3cat:    d.evol3cat,                   // bas / mid / haut
+    evol3cat:    (+d.evolution_dpaep1m < -0.01) ? "bas" : (+d.evolution_dpaep1m > 0.01) ? "haut" : "mid",
   };
 }
 
@@ -1663,7 +1697,7 @@ function updateChart3() {
     .attr("stroke-width", 1.2)
     .attr("stroke-opacity", 0.8);
 
-  const EVOL3_LABEL = { bas:"Décroissance forte", mid:"Évolution modérée", haut:"Croissance" };
+  const EVOL3_LABEL = { bas:"Baisse", mid:"Évolution modérée", haut:"Hausse" };
 
   enter.merge(bubbles)
     .on("mousemove", function(event, d) {
