@@ -23,10 +23,7 @@
   ╚══════════════════════════════════════════════════════════════════╝
   -->
   <script>
-  // Collez ici votre tableau JSON complet, ex :
-  // const INLINE_DATA = [ { "code": "A01", "label": "...", ... }, ... ];
-  //
-  // Laissez undefined (commenté) pour utiliser fetch('data.json').
+  // Données chargées depuis data.json (placez les deux fichiers dans le même dossier)
   // const INLINE_DATA = undefined;
   </script>
   <style>
@@ -47,6 +44,10 @@
       --col-evol-neg:  #dc2626;
       --col-evol-neu:  #2563eb;
       --col-evol-pos:  #16a34a;
+      /* Couleurs évolution discrétisée (matrice 3 — terciles) */
+      --col-e3-bas:  #dc2626;
+      --col-e3-mid:  #f59e0b;
+      --col-e3-haut: #16a34a;
       --shadow:     0 2px 12px rgba(0,49,137,.10);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -475,6 +476,7 @@
 <div class="tabs-bar">
   <button class="tab-btn active" onclick="switchTab('tab1')">Taux de recours / Evolution</button>
   <button class="tab-btn"       onclick="switchTab('tab2')">Poids / Tension</button>
+  <button class="tab-btn"       onclick="switchTab('tab3')">Difficultés / Taux de recours</button>
 </div>
 
 <!-- ═══════════════════ TAB 1 ═══════════════════ -->
@@ -663,13 +665,107 @@
   </div>
 </div>
 
+<!-- ═══════════════════ TAB 3 ═══════════════════ -->
+<div class="tab-panel" id="tab3">
+  <div class="page">
+
+    <!-- SIDEBAR 3 -->
+    <aside class="sidebar">
+      <div class="filter-section">
+        <h2>Évolution DPAE &gt; 1 mois</h2>
+        <div class="tension-chips">
+          <div class="chip" data-e3="bas" onclick="toggleEvol3('bas')" style="color:var(--col-e3-bas);border-color:var(--col-e3-bas);background:#fef2f2">
+            <span class="dot" style="background:var(--col-e3-bas)"></span> Décroissance forte
+          </div>
+          <div class="chip" data-e3="mid" onclick="toggleEvol3('mid')" style="color:#b45309;border-color:var(--col-e3-mid);background:#fffbeb">
+            <span class="dot" style="background:var(--col-e3-mid)"></span> Évolution modérée
+          </div>
+          <div class="chip" data-e3="haut" onclick="toggleEvol3('haut')" style="color:var(--col-e3-haut);border-color:var(--col-e3-haut);background:#f0fdf4">
+            <span class="dot" style="background:var(--col-e3-haut)"></span> Croissance
+          </div>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h2>Lignes de grille</h2>
+        <div class="grid-val-rows">
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">X (abscisses)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g3x" step="0.01" oninput="onManualGrid3('x')">
+            <span class="grid-val-unit">%</span>
+          </div>
+          <div class="grid-val-row">
+            <span class="grid-val-lbl">Y (ordonnées)</span>
+            <span class="grid-val-eq">=</span>
+            <input type="number" class="grid-val-inp" id="g3y" step="0.01" oninput="onManualGrid3('y')">
+            <span class="grid-val-unit">%</span>
+          </div>
+        </div>
+        <button class="btn-bary" onclick="resetToBarycenter3()">♻️ Position par défaut (barycentre)</button>
+      </div>
+      <div class="filter-section">
+        <h2>Filières <span class="count-badge" id="sel-count-3">0</span></h2>
+        <div class="search-box" style="margin-bottom:8px">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="search-input-3" placeholder="Rechercher une filière…" oninput="filterSearch3(this.value)">
+        </div>
+        <div class="filiere-actions">
+          <button class="btn-sm" onclick="selectAll3()">Tout sélect.</button>
+          <button class="btn-sm" onclick="selectNone3()">Tout désélect.</button>
+        </div>
+        <div class="filiere-list" id="filiere-list-3"></div>
+      </div>
+    </aside>
+
+    <!-- CHART AREA 3 -->
+    <main class="chart-area">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
+          <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois (3 terciles de 10 filières)</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Croissance (tercile haut)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Modérée (tercile médian)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Décroissance forte (tercile bas)</div>
+          </div>
+          <div class="size-legend">
+            <span>Nb DPAE &gt; 1 mois :</span>
+            <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
+            <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
+            <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card" id="chart-card-3">
+        <svg class="chart-svg" id="chart-svg-3"></svg>
+        <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser le zoom
+        </button>
+        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
+        <div class="empty-state" id="empty-state-3" style="display:none">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
+          </svg>
+          <div>Aucune filière sélectionnée</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
 <div class="tooltip" id="tooltip"></div>
 
 <script>
 // ── DATA LOADING FROM JSON ────────────────────────────────────────────────────
 let RAW = [];
 
-const COL_TENSION = { Faible:"#16a34a", Moyen:"#2563eb", Forte:"#dc2626" };
+const COL_TENSION  = { Faible:"#16a34a", Moyen:"#2563eb", Forte:"#dc2626" };
+const COL_EVOL3    = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
 
 function evolColor(evol) {
   if (evol < -0.01) return "#dc2626";
@@ -679,13 +775,17 @@ function evolColor(evol) {
 
 function mapRow(d) {
   return {
-    code:       d.code,
-    label:      d.label,
-    tension:    d.niveau_de_tension,
-    tensionVal: +d.tension,
-    ent:        +d.taux_de_recours,
-    evol:       +d.evolution_dpaep6m,
-    poids:      +d.poids_dpaep6m,
+    code:        d.code,
+    label:       d.label,
+    tension:     d.niveau_de_tension,        // texte Faible/Moyen/Forte
+    tensionVal:  +d.tension,                  // Difficultés de recrutement (0–1)
+    ent:         +d.taux_de_recours,           // Taux de recours (0–1)
+    evol:        +d.evolution_dpaep1m,         // Évolution DPAE > 1 mois
+    poids:       +d.dpae_1m,                   // Nb DPAE > 1 mois (taille bulle M1&M3)
+    evol6m:      +d.evolution_dpaep6m,         // Évolution DPAE > 6 mois
+    dpae6m:      +d.dpae_6m,                   // Nb DPAE > 6 mois
+    diffRecruit: +d.difficulte_recrutement,    // = tensionVal, axe X M3
+    evol3cat:    d.evol3cat,                   // bas / mid / haut
   };
 }
 
@@ -732,20 +832,24 @@ let activeTab = 'tab1';
 function switchTab(id) {
   activeTab = id;
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === id));
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0 && id==='tab1') || (i===1 && id==='tab2')));
-  if (id === 'tab1') { setTimeout(initChart1, 50); }
-  else               { setTimeout(initChart2, 50); }
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active', (i===0&&id==='tab1')||(i===1&&id==='tab2')||(i===2&&id==='tab3')));
+  if (id === 'tab1')      setTimeout(initChart1, 50);
+  else if (id === 'tab2') setTimeout(initChart2, 50);
+  else                    setTimeout(initChart3, 50);
 }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 const state1 = { selectedCodes: new Set(), activeTensions: new Set(["Faible","Moyen","Forte"]) };
 const state2 = { selectedCodes: new Set(), activeEvols: new Set(["neg","neu","pos"]) };
+const state3 = { selectedCodes: new Set(), activeEvol3: new Set(["bas","mid","haut"]) };
 
 // ── GRID LINES STATE (barycentre pondéré) ─────────────────────────────────────
 // x / y : valeur en espace données (null = utiliser le barycentre calculé)
 // bx / by : barycentre calculé à chaque updateChart
 const gridState1 = { x: null, y: null, bx: 0, by: 0 };
 const gridState2 = { x: null, y: null, bx: 0, by: 0 };
+const gridState3 = { x: null, y: null, bx: 0, by: 0 };
 
 // Calcule le barycentre pondéré d'un jeu de données
 function computeBarycenter(data, xAcc, yAcc, wAcc) {
@@ -762,6 +866,8 @@ function getGridX1() { return gridState1.x !== null ? gridState1.x : gridState1.
 function getGridY1() { return gridState1.y !== null ? gridState1.y : gridState1.by; }
 function getGridX2() { return gridState2.x !== null ? gridState2.x : gridState2.bx; }
 function getGridY2() { return gridState2.y !== null ? gridState2.y : gridState2.by; }
+function getGridX3() { return gridState3.x !== null ? gridState3.x : gridState3.bx; }
+function getGridY3() { return gridState3.y !== null ? gridState3.y : gridState3.by; }
 
 // Met à jour les inputs de la sidebar depuis l'état courant
 function syncGridInputs1() {
@@ -775,6 +881,12 @@ function syncGridInputs2() {
   const yi = document.getElementById("g2y");
   if (xi) xi.value = (getGridX2() * 100).toFixed(2);
   if (yi) yi.value = (getGridY2() * 100).toFixed(2);
+}
+function syncGridInputs3() {
+  const xi = document.getElementById("g3x");
+  const yi = document.getElementById("g3y");
+  if (xi) xi.value = (getGridX3() * 100).toFixed(2);
+  if (yi) yi.value = (getGridY3() * 100).toFixed(2);
 }
 
 // Saisie manuelle depuis la sidebar
@@ -796,8 +908,16 @@ function onManualGrid2(axis) {
     if (chart2.g) redrawChart2(false);
   }
 }
+function onManualGrid3(axis) {
+  const el = document.getElementById(axis === 'x' ? 'g3x' : 'g3y');
+  const v = parseFloat(el.value);
+  if (!isNaN(v)) {
+    if (axis === 'x') gridState3.x = v / 100;
+    else              gridState3.y = v / 100;
+    if (chart3.g) redrawChart3(false);
+  }
+}
 
-// Réinitialise vers le barycentre automatique
 function resetToBarycenter1() {
   gridState1.x = null; gridState1.y = null;
   syncGridInputs1();
@@ -807,6 +927,11 @@ function resetToBarycenter2() {
   gridState2.x = null; gridState2.y = null;
   syncGridInputs2();
   if (chart2.g) redrawChart2(false);
+}
+function resetToBarycenter3() {
+  gridState3.x = null; gridState3.y = null;
+  syncGridInputs3();
+  if (chart3.g) redrawChart3(false);
 }
 
 // Catégorie d'évolution d'un point
@@ -898,6 +1023,20 @@ function filteredData2() {
   return RAW.filter(d => state2.selectedCodes.has(d.code) && state2.activeEvols.has(evolCat(d.evol)));
 }
 
+// ── TAB 3 CALLBACKS ───────────────────────────────────────────────────────────
+function filterSearch3(q) { filterSearch("filiere-list-3", q, state3, updateChart3); }
+function selectAll3()     { selectAll("filiere-list-3", state3, updateChart3); }
+function selectNone3()    { selectNone("filiere-list-3", state3, updateChart3); }
+function toggleEvol3(cat) {
+  if (state3.activeEvol3.has(cat)) state3.activeEvol3.delete(cat);
+  else state3.activeEvol3.add(cat);
+  document.querySelector(`#tab3 .chip[data-e3="${cat}"]`).classList.toggle("inactive", !state3.activeEvol3.has(cat));
+  updateChart3();
+}
+function filteredData3() {
+  return RAW.filter(d => state3.selectedCodes.has(d.code) && state3.activeEvol3.has(d.evol3cat));
+}
+
 // ── HELPERS : domaine avec marge ─────────────────────────────────────────────
 function paddedExtent(data, accessor, paddingRatio = 0.12, forceZeroMin = false) {
   let [lo, hi] = d3.extent(data, accessor);
@@ -945,7 +1084,7 @@ function initChart1() {
   g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
   g.append("g").attr("class","axis axis-y");
   g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Taux de recours (%)");
-  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Évolution des recrutements à 6 mois (%)");
+  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Évolution DPAE > 1 mois (%)");
 
   // Zoom
   chart1.zoom = d3.zoom()
@@ -1109,10 +1248,10 @@ function updateChart1() {
       tooltip.innerHTML = `
         <div class="tt-title">${d.label}</div>
         <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
-        <div class="tt-row"><span>Score de tension</span><span class="tt-val">${(d.tensionVal*100).toFixed(1)} %</span></div>
+        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.tensionVal)}</span></div>
         <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
-        <div class="tt-row"><span>Évolution (6m)</span><span class="tt-val">${fmtEvol(d.evol)}</span></div>
-        <div class="tt-row"><span>Poids (6m)</span><span class="tt-val">${fmt(d.poids)}</span></div>
+        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val">${fmtEvol(d.evol)}</span></div>
+        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
       `;
       d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
     })
@@ -1170,8 +1309,8 @@ function initChart2() {
   g.append("g").attr("class","zone-lines-y");
   g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
   g.append("g").attr("class","axis axis-y");
-  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Tension (score)");
-  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-58).attr("text-anchor","middle").text("Poids de la filière (%)");
+  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Difficultés de recrutement (score)");
+  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-58).attr("text-anchor","middle").text("Nb DPAE > 1 mois");
 
   chart2.zoom = d3.zoom()
     .scaleExtent([1, 12])
@@ -1204,7 +1343,7 @@ function redrawChart2(useTransition = false) {
   const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
   const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
 
-  const xFmt = d3.format(".0%"), yFmt = d3.format(".1%");
+  const xFmt = d3.format(".0%"), yFmt = v => v >= 1e6 ? d3.format(".2s")(v).replace('G','Md') : d3.format(",.0f")(v);
 
   T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
     .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
@@ -1284,7 +1423,7 @@ function updateChart2() {
     const [poidsMin, poidsMax] = d3.extent(data, d => d.poids);
     const poidsSpan = (poidsMax - poidsMin) || poidsMax || 1;
     const radiusPad = (R_MAX / chart2.iH) * poidsSpan * 2;
-    chart2.yScaleBase.domain([poidsMin - radiusPad, poidsMax + radiusPad * 0.5]).nice();
+    chart2.yScaleBase.domain([Math.max(0, poidsMin - radiusPad), poidsMax + radiusPad * 0.5]).nice();
     chart2.xScale = chart2.xScaleBase.copy();
     chart2.yScale = chart2.yScaleBase.copy();
 
@@ -1320,10 +1459,10 @@ function updateChart2() {
       tooltip.innerHTML = `
         <div class="tt-title">${d.label}</div>
         <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
-        <div class="tt-row"><span>Score de tension</span><span class="tt-val">${(d.tensionVal*100).toFixed(1)} %</span></div>
-        <div class="tt-row"><span>Poids (6m)</span><span class="tt-val">${fmt(d.poids)}</span></div>
+        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.tensionVal)}</span></div>
+        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
         <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
-        <div class="tt-row"><span>Évolution (6m)</span><span class="tt-val" style="color:${evolColor(d.evol)}">${fmtEvol(d.evol)}</span></div>
+        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${evolColor(d.evol)}">${fmtEvol(d.evol)}</span></div>
       `;
       d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
     })
@@ -1348,18 +1487,238 @@ function resetZoom2() {
   document.getElementById("zoom-reset-2").classList.remove("visible");
 }
 
+// ── CHART 3 (Difficultés de recrutement / Taux de recours) ───────────────────
+let chart3 = {};
+
+function initChart3() {
+  const svg = d3.select("#chart-svg-3");
+  svg.selectAll("*").remove();
+  const card = document.getElementById("chart-card-3");
+  const W = card.clientWidth || 800;
+  const H = Math.max(500, Math.round(W * 0.6));
+  const m = { top:28, right:30, bottom:56, left:66 };
+  const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
+  svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
+  const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
+
+  svg.append("defs").append("clipPath").attr("id","clip3")
+    .append("rect").attr("width", iW).attr("height", iH);
+
+  chart3 = {
+    svg, g, iW, iH,
+    xScaleBase: d3.scaleLinear().range([0, iW]),
+    yScaleBase: d3.scaleLinear().range([iH, 0]),
+    xScale:     d3.scaleLinear().range([0, iW]),
+    yScale:     d3.scaleLinear().range([iH, 0]),
+    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids)]).range([R_MIN, R_MAX]),
+  };
+
+  g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
+  g.append("g").attr("class","grid-y");
+  g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
+  g.append("g").attr("class","zone-lines");
+  g.append("g").attr("class","zone-lines-y");
+  g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
+  g.append("g").attr("class","axis axis-y");
+  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Difficultés de recrutement (score)");
+  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Taux de recours (%)");
+
+  chart3.zoom = d3.zoom()
+    .scaleExtent([1, 12])
+    .translateExtent([[0,0],[iW,iH]])
+    .on("zoom", (event) => {
+      chart3.xScale = event.transform.rescaleX(chart3.xScaleBase);
+      chart3.yScale = event.transform.rescaleY(chart3.yScaleBase);
+      redrawChart3();
+      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
+      document.getElementById("zoom-reset-3").classList.toggle("visible", isZoomed);
+    });
+
+  g.append("rect").attr("class","zoom-rect")
+    .attr("width",iW).attr("height",iH)
+    .attr("fill","transparent")
+    .call(chart3.zoom);
+
+  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip3)");
+  g.append("g").attr("class","drag-handles-x");
+  g.append("g").attr("class","drag-handles-y");
+
+  updateChart3();
+}
+
+function redrawChart3(useTransition = false) {
+  const { g, iW, iH, xScale, yScale, rScale } = chart3;
+  const dur = useTransition ? 400 : 0;
+  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
+  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
+
+  const xFmt = d3.format(".0%"), yFmt = d3.format(".0%");
+
+  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
+    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
+
+  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
+    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+
+  const gxVal3 = getGridX3(), gyVal3 = getGridY3();
+
+  g.select(".zone-lines").selectAll("line").data([gxVal3])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH);
+
+  g.select(".zone-lines-y").selectAll("line").data([gyVal3])
+    .join("line").attr("class","grid-zone-line")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
+
+  const dragX3 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [xmin, xmax] = chart3.xScale.domain();
+      gridState3.x = Math.max(xmin, Math.min(xmax, chart3.xScale.invert(event.x)));
+      syncGridInputs3();
+      redrawChart3(false);
+    });
+
+  g.select(".drag-handles-x").selectAll("line").data([gxVal3])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
+    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
+    .attr("y1", 0).attr("y2", iH)
+    .call(dragX3);
+
+  const dragY3 = d3.drag()
+    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
+    .on("drag",  (event) => {
+      const [ymin, ymax] = chart3.yScale.domain();
+      gridState3.y = Math.max(ymin, Math.min(ymax, chart3.yScale.invert(event.y)));
+      syncGridInputs3();
+      redrawChart3(false);
+    });
+
+  g.select(".drag-handles-y").selectAll("line").data([gyVal3])
+    .join("line")
+    .attr("stroke", "transparent").attr("stroke-width", 16)
+    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
+    .attr("x1", 0).attr("x2", iW)
+    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
+    .call(dragY3);
+
+  Tbub(g.select(".bubbles").selectAll(".bubble"))
+    .attr("cx", d => xScale(d.diffRecruit))
+    .attr("cy", d => yScale(d.ent))
+    .attr("r",  d => rScale(d.poids));
+}
+
+function updateChart3() {
+  if (!chart3.g) return;
+  const data = filteredData3();
+  document.getElementById("empty-state-3").style.display = data.length === 0 ? "flex" : "none";
+  document.getElementById("sel-count-3").textContent = data.length;
+
+  chart3.svg.select(".zoom-rect").call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-3").classList.remove("visible");
+
+  if (data.length > 0) {
+    const [xMin, xMax] = d3.extent(data, d => d.diffRecruit);
+    const xSpan = (xMax - xMin) || Math.abs(xMax) || 1;
+    const xPad = (R_MAX / chart3.iW) * xSpan * 2;
+    chart3.xScaleBase.domain([xMin - xPad, xMax + xPad]).nice();
+
+    const [yMin, yMax] = d3.extent(data, d => d.ent);
+    const ySpan = (yMax - yMin) || Math.abs(yMax) || 1;
+    const yPad = (R_MAX / chart3.iH) * ySpan * 2;
+    chart3.yScaleBase.domain([yMin - yPad, yMax + yPad]).nice();
+
+    chart3.xScale = chart3.xScaleBase.copy();
+    chart3.yScale = chart3.yScaleBase.copy();
+
+    // Barycentre pondéré par le nombre de DPAE > 1 mois (taille des bulles)
+    const bary3 = computeBarycenter(data, d => d.diffRecruit, d => d.ent, d => d.poids);
+    gridState3.bx = bary3.x;
+    gridState3.by = bary3.y;
+    syncGridInputs3();
+  }
+
+  const tooltip = document.getElementById("tooltip");
+  const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
+  const { g, xScale, yScale, rScale } = chart3;
+
+  const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
+  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
+  const enter = bubbles.enter().append("circle")
+    .attr("class","bubble")
+    .attr("cx", d => xScale(d.diffRecruit))
+    .attr("cy", d => yScale(d.ent))
+    .attr("r", 0)
+    .attr("fill", d => COL_EVOL3[d.evol3cat])
+    .attr("fill-opacity", 0.55)
+    .attr("stroke", d => COL_EVOL3[d.evol3cat])
+    .attr("stroke-width", 1.2)
+    .attr("stroke-opacity", 0.8);
+
+  const EVOL3_LABEL = { bas:"Décroissance forte", mid:"Évolution modérée", haut:"Croissance" };
+
+  enter.merge(bubbles)
+    .on("mousemove", function(event, d) {
+      tooltip.style.opacity = "1";
+      tooltip.style.left = (event.clientX+16)+"px";
+      tooltip.style.top  = (event.clientY-10)+"px";
+      tooltip.innerHTML = `
+        <div class="tt-title">${d.label}</div>
+        <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
+        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.diffRecruit)}</span></div>
+        <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
+        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
+        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${COL_EVOL3[d.evol3cat]}">${fmtEvol(d.evol)} (${EVOL3_LABEL[d.evol3cat]})</span></div>
+      `;
+      d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
+    })
+    .on("mouseleave", function() {
+      tooltip.style.opacity = "0";
+      d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
+    })
+    .transition("bubble").duration(400)
+    .attr("cx", d => xScale(d.diffRecruit))
+    .attr("cy", d => yScale(d.ent))
+    .attr("r",  d => rScale(d.poids));
+
+  redrawChart3(true);
+}
+
+function resetZoom3() {
+  chart3.xScale = chart3.xScaleBase.copy();
+  chart3.yScale = chart3.yScaleBase.copy();
+  chart3.svg.select(".zoom-rect")
+    .transition().duration(400)
+    .call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById("zoom-reset-3").classList.remove("visible");
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (async () => {
   const ok = await loadData();
   document.getElementById("loading-overlay").style.display = "none";
   if (!ok) return;
 
-  RAW.forEach(d => { state1.selectedCodes.add(d.code); state2.selectedCodes.add(d.code); });
+  RAW.forEach(d => {
+    state1.selectedCodes.add(d.code);
+    state2.selectedCodes.add(d.code);
+    state3.selectedCodes.add(d.code);
+  });
 
   buildSidebar("filiere-list-1", state1, () => { updateChart1(); document.getElementById("sel-count-1").textContent = filteredData1().length; },
     d => COL_TENSION[d.tension]);
   buildSidebar("filiere-list-2", state2, () => { updateChart2(); document.getElementById("sel-count-2").textContent = filteredData2().length; },
     d => evolColor(d.evol));
+  buildSidebar("filiere-list-3", state3, () => { updateChart3(); document.getElementById("sel-count-3").textContent = filteredData3().length; },
+    d => COL_EVOL3[d.evol3cat]);
 
   initChart1();
 
@@ -1367,8 +1726,9 @@ function resetZoom2() {
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      if (activeTab === 'tab1') initChart1();
-      else initChart2();
+      if (activeTab === 'tab1')      initChart1();
+      else if (activeTab === 'tab2') initChart2();
+      else                           initChart3();
     }, 120);
   });
 })();
