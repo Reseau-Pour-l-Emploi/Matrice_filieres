@@ -3,28 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matrice de décision par filière – France Travail</title>
+  <title>Matrice de décision – Difficultés / Taux de recours – France Travail</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003189'/%3E%3Crect x='4' y='4' width='24' height='4' rx='2' fill='%2300bfb3'/%3E%3Ctext x='16' y='26' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='14' fill='%23ffffff'%3EFT%3C/text%3E%3C/svg%3E">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-
-  <!--
-  ╔══════════════════════════════════════════════════════════════════╗
-  ║  DONNÉES INLINE  –  pour ouverture sans serveur (file://)       ║
-  ║                                                                  ║
-  ║  Remplacez les données ci-dessous par votre propre JSON.         ║
-  ║  Noms de champs attendus :                                       ║
-  ║    code, label, niveau_de_tension, tension (0–1),                ║
-  ║    taux_de_recours (0–1), evolution_dpaep6m (±décimal),          ║
-  ║    poids_dpaep6m (0–1)                                           ║
-  ║                                                                  ║
-  ║  Si vous utilisez un serveur web, vous pouvez supprimer          ║
-  ║  ce bloc — data.json sera chargé automatiquement.                ║
-  ╚══════════════════════════════════════════════════════════════════╝
-  -->
   <script>
-  // Données chargées depuis data.json (placez les deux fichiers dans le même dossier)
-  // const INLINE_DATA = undefined;
+    const ALL_FILIERES = {"FIL01": "AGRICULTURE, ÉLEVAGE ET PÊCHE", "FIL02": "ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE", "FIL03": "BANQUES ASSURANCES IMMOBILIER", "FIL04": "COMMERCE ET DISTRIBUTION", "FIL05": "CONSTRUCTION (BTP ET MATÉRIAUX)", "FIL06": "CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL", "FIL07": "EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)", "FIL08": "ENERGIES (RENOUVELABLES ET RÉSEAUX)", "FIL09": "FILIÈRE BOIS", "FIL10": "HÔTELLERIE ET RESTAURATIONS (HCRB)", "FIL11": "INDUSTRIE AGROALIMENTAIRE", "FIL12": "INDUSTRIE AUTOMOBILE", "FIL13": "INDUSTRIE AÉRONAUTIQUE ET SPATIALE", "FIL14": "INDUSTRIE CHIMIQUE", "FIL15": "INDUSTRIE DE SANTÉ", "FIL16": "INDUSTRIE FERROVIAIRE", "FIL17": "NAVAL ET NAUTISME", "FIL18": "INDUSTRIE PLASTURGIQUE", "FIL19": "INDUSTRIE TEXTILE, MODE ET LUXE", "FIL20": "INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE", "FIL21": "MÉTALLURGIE - SCOPE UIMM", "FIL22": "NUCLÉAIRE", "FIL23": "NUMÉRIQUE ET TÉLÉCOMMUNICATIONS", "FIL24": "PROPRETÉ", "FIL25": "SANTÉ, SOCIAL, SAP", "FIL26": "SERVICES AUTOMOBILES", "FIL27": "SPORT", "FIL28": "SÉCURITÉ PRIVÉE", "FIL29": "TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES", "FIL30": "TRANSPORTS ET LOGISTIQUE"};
   </script>
   <style>
     :root {
@@ -36,22 +20,12 @@
       --ft-border:  #d1d9ee;
       --ft-text:    #111827;
       --ft-muted:   #6b7280;
-      /* Faible = vert, Moyen = bleu (inversés) */
-      --col-faible: #16a34a;
-      --col-moyen:  #2563eb;
-      --col-forte:  #dc2626;
-      /* Couleurs évolution (matrice 2) */
-      --col-evol-neg:  #dc2626;
-      --col-evol-neu:  #2563eb;
-      --col-evol-pos:  #16a34a;
-      /* Couleurs évolution discrétisée (matrice 3 — terciles) */
       --col-e3-bas:  #dc2626;
       --col-e3-mid:  #f59e0b;
       --col-e3-haut: #16a34a;
       --shadow:     0 2px 12px rgba(0,49,137,.10);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'DM Sans', system-ui, sans-serif;
       background: var(--ft-bg);
@@ -59,7 +33,7 @@
       min-height: 100vh;
     }
 
-    /* ── HEADER ──────────────────────────────────────────── */
+    /* ── HEADER ── */
     header {
       background: var(--ft-blue);
       color: #fff;
@@ -89,56 +63,16 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .header-subtitle {
-      font-size: 12px;
-      opacity: .7;
-      margin-left: auto;
-      flex-shrink: 0;
-    }
 
-    /* ── TABS ────────────────────────────────────────────── */
-    .tabs-bar {
-      background: var(--ft-card);
-      border-bottom: 1px solid var(--ft-border);
-      display: flex;
-      gap: 0;
-      padding: 0 28px;
-      position: sticky;
-      top: 62px;
-      z-index: 90;
-    }
-    .tab-btn {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ft-muted);
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      padding: 14px 20px 11px;
-      cursor: pointer;
-      letter-spacing: .02em;
-      transition: color .15s, border-color .15s;
-      white-space: nowrap;
-    }
-    .tab-btn:hover { color: var(--ft-blue); }
-    .tab-btn.active {
-      color: var(--ft-blue);
-      border-bottom-color: var(--ft-blue);
-    }
-
-    /* ── MAIN LAYOUT ─────────────────────────────────────── */
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
+    /* ── MAIN LAYOUT ── */
     .page {
       display: grid;
       grid-template-columns: 300px 1fr;
       gap: 0;
-      min-height: calc(100vh - 110px);
+      min-height: calc(100vh - 62px);
     }
 
-    /* ── SIDEBAR ─────────────────────────────────────────── */
+    /* ── SIDEBAR ── */
     .sidebar {
       background: var(--ft-card);
       border-right: 1px solid var(--ft-border);
@@ -147,9 +81,9 @@
       flex-direction: column;
       gap: 22px;
       overflow-y: auto;
-      max-height: calc(100vh - 110px);
+      max-height: calc(100vh - 62px);
       position: sticky;
-      top: 110px;
+      top: 62px;
     }
     .filter-section h2 {
       font-size: 11px;
@@ -160,273 +94,201 @@
       margin-bottom: 10px;
     }
 
-    /* Tension chips */
-    .tension-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
+    /* ── TERRITORY SELECTOR ── */
+    .territory-selector {
+      background: #eff6ff;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 10px;
+      padding: 12px 14px;
     }
-    .chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 11px;
-      border-radius: 20px;
-      border: 2px solid transparent;
+    .territory-selector h2 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ft-blue);
+      margin-bottom: 8px;
+    }
+    .territory-selector select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 7px;
       font-size: 13px;
-      font-weight: 500;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ft-text);
+      outline: none;
       cursor: pointer;
-      transition: all .15s;
-      user-select: none;
+      transition: border-color .15s;
+    }
+    .territory-selector select:focus { border-color: var(--ft-blue); }
+    .territory-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ft-blue);
+      background: #dbeafe;
+      padding: 3px 9px;
+      border-radius: 10px;
+    }
+
+    /* Chips */
+    .tension-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 11px; border-radius: 20px;
+      border: 2px solid transparent;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s; user-select: none;
     }
     .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .chip[data-tension="Faible"] { color: var(--col-faible); border-color: var(--col-faible); background: #f0fdf4; }
-    .chip[data-tension="Moyen"]  { color: var(--col-moyen);  border-color: var(--col-moyen);  background: #eff6ff; }
-    .chip[data-tension="Forte"]  { color: var(--col-forte);  border-color: var(--col-forte);  background: #fef2f2; }
     .chip.inactive { opacity: .35; background: #f3f4f6; border-color: #d1d5db; color: var(--ft-muted); }
 
     /* Search */
     .search-box { position: relative; }
     .search-box input {
-      width: 100%;
-      padding: 8px 10px 8px 32px;
-      border: 1px solid var(--ft-border);
-      border-radius: 8px;
-      font-size: 13px;
-      font-family: inherit;
-      background: var(--ft-bg);
-      color: var(--ft-text);
-      outline: none;
-      transition: border-color .15s;
+      width: 100%; padding: 8px 10px 8px 32px;
+      border: 1px solid var(--ft-border); border-radius: 8px;
+      font-size: 13px; font-family: inherit;
+      background: var(--ft-bg); color: var(--ft-text);
+      outline: none; transition: border-color .15s;
     }
     .search-box input:focus { border-color: var(--ft-blue-lt); }
-    .search-box svg {
-      position: absolute;
-      left: 9px; top: 50%; transform: translateY(-50%);
-      opacity: .4;
-    }
+    .search-box svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); opacity: .4; }
 
     /* Filière list */
     .filiere-actions { display: flex; gap: 8px; margin-bottom: 8px; }
     .btn-sm {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 5px;
-      border: 1px solid var(--ft-border);
-      background: #fff;
-      cursor: pointer;
-      transition: all .12s;
-      font-family: inherit;
-      letter-spacing: .03em;
-      color: var(--ft-muted);
+      font-size: 11px; font-weight: 600; padding: 4px 10px;
+      border-radius: 5px; border: 1px solid var(--ft-border);
+      background: #fff; cursor: pointer; transition: all .12s;
+      font-family: inherit; letter-spacing: .03em; color: var(--ft-muted);
     }
     .btn-sm:hover { background: var(--ft-bg); color: var(--ft-blue); border-color: var(--ft-blue); }
-
     .filiere-list {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      max-height: 420px;
-      overflow-y: auto;
-      padding-right: 2px;
+      display: flex; flex-direction: column; gap: 2px;
+      max-height: 380px; overflow-y: auto; padding-right: 2px;
     }
     .filiere-list::-webkit-scrollbar { width: 4px; }
     .filiere-list::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
-
     .filiere-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background .1s;
-      border: 1px solid transparent;
+      display: flex; align-items: center; gap: 9px;
+      padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      transition: background .1s; border: 1px solid transparent;
     }
     .filiere-item:hover { background: var(--ft-bg); }
     .filiere-item input[type="checkbox"] {
-      width: 14px; height: 14px;
-      accent-color: var(--ft-blue);
-      flex-shrink: 0;
-      cursor: pointer;
+      width: 14px; height: 14px; accent-color: var(--ft-blue); flex-shrink: 0; cursor: pointer;
     }
-    .filiere-item label {
-      font-size: 12px;
-      line-height: 1.3;
-      cursor: pointer;
-      color: var(--ft-text);
-    }
-    .filiere-item .tension-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      margin-left: auto;
-    }
+    .filiere-item label { font-size: 12px; line-height: 1.3; cursor: pointer; color: var(--ft-text); }
+    .filiere-item .tension-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-left: auto; }
     .filiere-item.hidden { display: none; }
 
-    /* Count badge */
     .count-badge {
-      background: var(--ft-blue);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 10px;
-      margin-left: 6px;
+      background: var(--ft-blue); color: #fff;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px; margin-left: 6px;
     }
 
-    /* ── CHART AREA ──────────────────────────────────────── */
-    .chart-area {
-      padding: 24px 28px 20px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .chart-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .chart-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--ft-blue);
-      line-height: 1.3;
-    }
-    .chart-subtitle {
-      font-size: 12px;
-      color: var(--ft-muted);
-      margin-top: 3px;
-    }
+    /* ── CHART AREA ── */
+    .chart-area { padding: 24px 28px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
+    .chart-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .chart-title { font-size: 17px; font-weight: 700; color: var(--ft-blue); line-height: 1.3; }
+    .chart-subtitle { font-size: 12px; color: var(--ft-muted); margin-top: 3px; }
 
-    /* Legend */
     .legend { display: flex; gap: 20px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; }
     .legend-dot { width: 12px; height: 12px; border-radius: 50%; opacity: .75; }
 
-    /* Chart card */
     .chart-card {
-      background: var(--ft-card);
-      border-radius: 12px;
+      background: var(--ft-card); border-radius: 12px;
       border: 1px solid var(--ft-border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      position: relative;
+      box-shadow: var(--shadow); overflow: hidden; position: relative;
     }
     .chart-svg { width: 100%; display: block; }
 
-    /* D3 styles */
     .bubble { cursor: pointer; }
     .bubble:hover { stroke-width: 2 !important; }
     .grid-zone-line { stroke: #9ca3af; stroke-dasharray: 6,4; stroke-width: 2.5; }
     .axis path, .axis line { stroke: var(--ft-border); }
     .axis text { fill: var(--ft-muted); font-family: 'DM Sans', sans-serif; font-size: 11px; }
     .axis-label { fill: var(--ft-muted); font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
-    .refline { stroke: #9ca3af; stroke-dasharray: 4,3; stroke-width: 1; }
-    .grid-bg line, .grid-bg path { stroke: #e5e9f2; stroke-width: 1; }
     .zoom-rect { cursor: grab; }
     .zoom-rect:active { cursor: grabbing; }
     .zoom-reset-btn {
-      position: absolute;
-      top: 10px; right: 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--ft-blue);
-      background: #fff;
-      border: 1px solid var(--ft-border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      gap: 5px;
+      position: absolute; top: 10px; right: 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+      color: var(--ft-blue); background: #fff;
+      border: 1px solid var(--ft-border); border-radius: 6px;
+      padding: 4px 10px; cursor: pointer;
+      display: none; align-items: center; gap: 5px;
       box-shadow: 0 1px 4px rgba(0,49,137,.10);
-      transition: background .12s, border-color .12s;
-      z-index: 10;
+      transition: background .12s, border-color .12s; z-index: 10;
     }
     .zoom-reset-btn:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
     .zoom-reset-btn.visible { display: flex; }
     .zoom-hint {
-      position: absolute;
-      bottom: 8px; right: 12px;
-      font-size: 10px;
-      color: var(--ft-muted);
-      opacity: .6;
-      pointer-events: none;
-      font-family: 'DM Sans', sans-serif;
+      position: absolute; bottom: 8px; right: 12px;
+      font-size: 10px; color: var(--ft-muted); opacity: .6;
+      pointer-events: none; font-family: 'DM Sans', sans-serif;
     }
 
-    /* Tooltip */
     .tooltip {
-      position: fixed;
-      background: #1e293b;
-      color: #f1f5f9;
-      padding: 10px 14px;
-      border-radius: 9px;
-      font-size: 12px;
-      font-family: 'DM Sans', sans-serif;
-      line-height: 1.6;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .15s;
-      z-index: 999;
-      max-width: 280px;
+      position: fixed; background: #1e293b; color: #f1f5f9;
+      padding: 10px 14px; border-radius: 9px;
+      font-size: 12px; font-family: 'DM Sans', sans-serif;
+      line-height: 1.6; pointer-events: none; opacity: 0;
+      transition: opacity .15s; z-index: 999; max-width: 280px;
       box-shadow: 0 4px 20px rgba(0,0,0,.3);
     }
     .tooltip .tt-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; line-height: 1.3; }
     .tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
     .tooltip .tt-val { font-weight: 600; }
 
-    /* Empty state */
     .empty-state {
-      position: absolute;
-      top: 50%; left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%,-50%);
-      text-align: center;
-      color: var(--ft-muted);
-      font-size: 14px;
-      pointer-events: none;
+      text-align: center; color: var(--ft-muted);
+      font-size: 14px; pointer-events: none;
     }
     .empty-state svg { opacity: .3; margin-bottom: 8px; }
 
-    /* Size legend */
     .size-legend { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--ft-muted); }
     .size-legend .sl-item { display: flex; align-items: center; gap: 6px; }
     .sl-circle { background: #9ca3af; border-radius: 50%; opacity: .5; }
 
     /* Loading overlay */
     .loading-overlay {
-      position: fixed; inset: 0;
-      background: rgba(244,246,251,.8);
+      position: fixed; inset: 0; background: rgba(244,246,251,.92);
       display: flex; align-items: center; justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      gap: 12px;
-      font-size: 14px;
-      color: var(--ft-muted);
-      font-family: 'DM Sans', sans-serif;
+      z-index: 9999; flex-direction: column; gap: 12px;
+      font-size: 14px; color: var(--ft-muted); font-family: 'DM Sans', sans-serif;
+    }
+    .loading-overlay .load-msg { font-size: 13px; color: var(--ft-muted); }
+    .loading-overlay .load-err {
+      color: #dc2626; font-weight: 600; font-size: 13px;
+      max-width: 440px; text-align: center; line-height: 1.6;
+      padding: 0 24px;
     }
     .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid var(--ft-border);
-      border-top-color: var(--ft-blue);
-      border-radius: 50%;
+      width: 36px; height: 36px; border: 3px solid var(--ft-border);
+      border-top-color: var(--ft-blue); border-radius: 50%;
       animation: spin .7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── GRID LINE PANEL ─────────────────────────────────── */
+    /* Grid line panel */
     .grid-val-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
     .grid-val-row { display: flex; align-items: center; gap: 5px; }
     .grid-val-lbl { font-size: 11px; color: var(--ft-muted); flex: 1; white-space: nowrap; }
     .grid-val-eq  { font-size: 11px; color: var(--ft-muted); }
     .grid-val-inp {
       width: 62px; padding: 4px 6px;
-      border: 1px solid var(--ft-blue-lt);
-      border-radius: 5px;
+      border: 1px solid var(--ft-blue-lt); border-radius: 5px;
       font-size: 12px; font-family: inherit;
       background: #eff6ff; color: var(--ft-blue); font-weight: 700;
       outline: none; text-align: right;
@@ -438,40 +300,57 @@
     .grid-val-inp:focus { border-color: var(--ft-blue); background: #fff; }
     .grid-val-unit { font-size: 11px; color: var(--ft-muted); }
     .btn-bary {
-      width: 100%; padding: 7px 8px;
-      border-radius: 6px; border: 1px solid var(--ft-border);
-      background: #fff; font-family: inherit;
+      width: 100%; padding: 7px 8px; border-radius: 6px;
+      border: 1px solid var(--ft-border); background: #fff; font-family: inherit;
       font-size: 11px; font-weight: 600; color: var(--ft-blue);
       cursor: pointer; text-align: center;
       transition: background .12s, border-color .12s;
       display: flex; align-items: center; justify-content: center; gap: 5px;
     }
     .btn-bary:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
-    /* Drag hint on grid lines */
-    .grid-zone-line-drag { cursor: ew-resize; }
-    .grid-zone-line-drag-y { cursor: ns-resize; }
 
-    /* Interpretation example block */
     .interp-block {
-      background: #f0f4ff;
-      border-left: 4px solid var(--ft-blue-lt);
-      border-radius: 0 8px 8px 0;
-      padding: 11px 16px;
-      font-size: 12.5px;
-      color: #1e3a6e;
-      line-height: 1.6;
-      margin-top: 2px;
+      background: #f0f4ff; border-left: 4px solid var(--ft-blue-lt);
+      border-radius: 0 8px 8px 0; padding: 11px 16px;
+      font-size: 12.5px; color: #1e3a6e; line-height: 1.6;
     }
     .interp-block strong { font-weight: 700; }
     .interp-label {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      color: var(--ft-blue-lt);
-      margin-bottom: 4px;
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--ft-blue-lt); margin-bottom: 4px;
     }
+
+    /* ── NON-SIGNIFICANT FILIÈRES PANEL ── */
+    .ns-panel {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .ns-panel-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .ns-panel-title {
+      font-size: 12px; font-weight: 700;
+      color: #92400e; letter-spacing: .02em;
+    }
+    .ns-count {
+      background: #fcd34d; color: #78350f;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+    .ns-list {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .ns-tag {
+      background: #fef3c7; border: 1px solid #fcd34d;
+      color: #78350f; font-size: 11px; font-weight: 500;
+      padding: 3px 9px; border-radius: 6px;
+      line-height: 1.4;
+    }
+    .ns-panel.hidden { display: none; }
 
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
@@ -482,410 +361,368 @@
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div class="loading-overlay" id="loading-overlay">
-  <div class="spinner"></div>
-  <span>Chargement des données…</span>
+  <div class="spinner" id="spinner"></div>
+  <span class="load-msg" id="load-msg">Chargement des données…</span>
 </div>
 
 <header>
   <div class="logo-badge">FT</div>
-  <h1>Matrice de décision par filière</h1>
-
+  <h1>Matrice de décision – Difficultés / Taux de recours</h1>
 </header>
 
-<!-- ── TABS ── -->
-<div class="tabs-bar">
-  <button class="tab-btn active" onclick="switchTab('tab1')">Taux de recours / Evolution</button>
-  <button class="tab-btn"       onclick="switchTab('tab2')">Poids / Tension</button>
-  <button class="tab-btn"       onclick="switchTab('tab3')">Difficultés / Taux de recours</button>
-</div>
+<div class="page">
 
-<!-- ═══════════════════ TAB 1 ═══════════════════ -->
-<div class="tab-panel active" id="tab1">
-  <div class="page">
+  <aside class="sidebar">
 
-    <!-- SIDEBAR 1 -->
-    <aside class="sidebar">
-      <div class="filter-section">
-        <h2>Niveau de tension</h2>
-        <div class="tension-chips">
-          <div class="chip" data-tension="Faible" onclick="toggleTension1('Faible')">
-            <span class="dot" style="background:var(--col-faible)"></span> Faible
-          </div>
-          <div class="chip" data-tension="Moyen" onclick="toggleTension1('Moyen')">
-            <span class="dot" style="background:var(--col-moyen)"></span> Moyen
-          </div>
-          <div class="chip" data-tension="Forte" onclick="toggleTension1('Forte')">
-            <span class="dot" style="background:var(--col-forte)"></span> Forte
-          </div>
-        </div>
-      </div>
-      <div class="filter-section">
-        <h2>Lignes de grille</h2>
-        <div class="grid-val-rows">
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">X (abscisses)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g1x" step="0.01" oninput="onManualGrid1('x')">
-            <span class="grid-val-unit">%</span>
-          </div>
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">Y (ordonnées)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g1y" step="0.01" oninput="onManualGrid1('y')">
-            <span class="grid-val-unit">%</span>
-          </div>
-        </div>
-        <button class="btn-bary" onclick="resetToBarycenter1()">♻️ Position par défaut (barycentre)</button>
-      </div>
-      <div class="filter-section">
-        <h2>Filières <span class="count-badge" id="sel-count-1">0</span></h2>
-        <div class="search-box" style="margin-bottom:8px">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" id="search-input-1" placeholder="Rechercher une filière…" oninput="filterSearch1(this.value)">
-        </div>
-        <div class="filiere-actions">
-          <button class="btn-sm" onclick="selectAll1()">Tout sélect.</button>
-          <button class="btn-sm" onclick="selectNone1()">Tout désélect.</button>
-        </div>
-        <div class="filiere-list" id="filiere-list-1"></div>
-      </div>
-    </aside>
+    <div class="territory-selector">
+      <h2>📍 Territoire</h2>
+      <select id="territory-select" onchange="onTerritoryChange(this.value)">
+        <optgroup label="National">
+          <option value="00|National">🇫🇷 France entière</option>
+        </optgroup>
+        <optgroup label="Régions">
+          <option value="01|Régional">Guadeloupe</option>
+<option value="02|Régional">Martinique</option>
+<option value="03|Régional">Guyane</option>
+<option value="04|Régional">La Réunion</option>
+<option value="06|Régional">Mayotte</option>
+<option value="11|Régional">Île-de-France</option>
+<option value="24|Régional">Centre-Val de Loire</option>
+<option value="27|Régional">Bourgogne-Franche-Comté</option>
+<option value="28|Régional">Normandie</option>
+<option value="32|Régional">Hauts-de-France</option>
+<option value="44|Régional">Grand Est</option>
+<option value="52|Régional">Pays de la Loire</option>
+<option value="53|Régional">Bretagne</option>
+<option value="75|Régional">Nouvelle-Aquitaine</option>
+<option value="76|Régional">Occitanie</option>
+<option value="84|Régional">Auvergne-Rhône-Alpes</option>
+<option value="93|Régional">Provence-Alpes-Côte d'Azur</option>
+<option value="94|Régional">Corse</option>
+        </optgroup>
+        <optgroup label="Départements">
+          <option value="01|Départemental">01 – Ain</option>
+<option value="02|Départemental">02 – Aisne</option>
+<option value="03|Départemental">03 – Allier</option>
+<option value="04|Départemental">04 – Alpes-de-Haute-Provence</option>
+<option value="05|Départemental">05 – Hautes-Alpes</option>
+<option value="06|Départemental">06 – Alpes-Maritimes</option>
+<option value="07|Départemental">07 – Ardèche</option>
+<option value="08|Départemental">08 – Ardennes</option>
+<option value="09|Départemental">09 – Ariège</option>
+<option value="10|Départemental">10 – Aube</option>
+<option value="11|Départemental">11 – Aude</option>
+<option value="12|Départemental">12 – Aveyron</option>
+<option value="13|Départemental">13 – Bouches-du-Rhône</option>
+<option value="14|Départemental">14 – Calvados</option>
+<option value="15|Départemental">15 – Cantal</option>
+<option value="16|Départemental">16 – Charente</option>
+<option value="17|Départemental">17 – Charente-Maritime</option>
+<option value="18|Départemental">18 – Cher</option>
+<option value="19|Départemental">19 – Corrèze</option>
+<option value="21|Départemental">21 – Côte-d'Or</option>
+<option value="22|Départemental">22 – Côtes-d'Armor</option>
+<option value="23|Départemental">23 – Creuse</option>
+<option value="24|Départemental">24 – Dordogne</option>
+<option value="25|Départemental">25 – Doubs</option>
+<option value="26|Départemental">26 – Drôme</option>
+<option value="27|Départemental">27 – Eure</option>
+<option value="28|Départemental">28 – Eure-et-Loir</option>
+<option value="29|Départemental">29 – Finistère</option>
+<option value="2A|Départemental">2A – Corse-du-Sud</option>
+<option value="2B|Départemental">2B – Haute-Corse</option>
+<option value="30|Départemental">30 – Gard</option>
+<option value="31|Départemental">31 – Haute-Garonne</option>
+<option value="32|Départemental">32 – Gers</option>
+<option value="33|Départemental">33 – Gironde</option>
+<option value="34|Départemental">34 – Hérault</option>
+<option value="35|Départemental">35 – Ille-et-Vilaine</option>
+<option value="36|Départemental">36 – Indre</option>
+<option value="37|Départemental">37 – Indre-et-Loire</option>
+<option value="38|Départemental">38 – Isère</option>
+<option value="39|Départemental">39 – Jura</option>
+<option value="40|Départemental">40 – Landes</option>
+<option value="41|Départemental">41 – Loir-et-Cher</option>
+<option value="42|Départemental">42 – Loire</option>
+<option value="43|Départemental">43 – Haute-Loire</option>
+<option value="44|Départemental">44 – Loire-Atlantique</option>
+<option value="45|Départemental">45 – Loiret</option>
+<option value="46|Départemental">46 – Lot</option>
+<option value="47|Départemental">47 – Lot-et-Garonne</option>
+<option value="48|Départemental">48 – Lozère</option>
+<option value="49|Départemental">49 – Maine-et-Loire</option>
+<option value="50|Départemental">50 – Manche</option>
+<option value="51|Départemental">51 – Marne</option>
+<option value="52|Départemental">52 – Haute-Marne</option>
+<option value="53|Départemental">53 – Mayenne</option>
+<option value="54|Départemental">54 – Meurthe-et-Moselle</option>
+<option value="55|Départemental">55 – Meuse</option>
+<option value="56|Départemental">56 – Morbihan</option>
+<option value="57|Départemental">57 – Moselle</option>
+<option value="58|Départemental">58 – Nièvre</option>
+<option value="59|Départemental">59 – Nord</option>
+<option value="60|Départemental">60 – Oise</option>
+<option value="61|Départemental">61 – Orne</option>
+<option value="62|Départemental">62 – Pas-de-Calais</option>
+<option value="63|Départemental">63 – Puy-de-Dôme</option>
+<option value="64|Départemental">64 – Pyrénées-Atlantiques</option>
+<option value="65|Départemental">65 – Hautes-Pyrénées</option>
+<option value="66|Départemental">66 – Pyrénées-Orientales</option>
+<option value="67|Départemental">67 – Bas-Rhin</option>
+<option value="68|Départemental">68 – Haut-Rhin</option>
+<option value="69|Départemental">69 – Rhône</option>
+<option value="70|Départemental">70 – Haute-Saône</option>
+<option value="71|Départemental">71 – Saône-et-Loire</option>
+<option value="72|Départemental">72 – Sarthe</option>
+<option value="73|Départemental">73 – Savoie</option>
+<option value="74|Départemental">74 – Haute-Savoie</option>
+<option value="75|Départemental">75 – Paris</option>
+<option value="76|Départemental">76 – Seine-Maritime</option>
+<option value="77|Départemental">77 – Seine-et-Marne</option>
+<option value="78|Départemental">78 – Yvelines</option>
+<option value="79|Départemental">79 – Deux-Sèvres</option>
+<option value="80|Départemental">80 – Somme</option>
+<option value="81|Départemental">81 – Tarn</option>
+<option value="82|Départemental">82 – Tarn-et-Garonne</option>
+<option value="83|Départemental">83 – Var</option>
+<option value="84|Départemental">84 – Vaucluse</option>
+<option value="85|Départemental">85 – Vendée</option>
+<option value="86|Départemental">86 – Vienne</option>
+<option value="87|Départemental">87 – Haute-Vienne</option>
+<option value="88|Départemental">88 – Vosges</option>
+<option value="89|Départemental">89 – Yonne</option>
+<option value="90|Départemental">90 – Territoire de Belfort</option>
+<option value="91|Départemental">91 – Essonne</option>
+<option value="92|Départemental">92 – Hauts-de-Seine</option>
+<option value="93|Départemental">93 – Seine-Saint-Denis</option>
+<option value="94|Départemental">94 – Val-de-Marne</option>
+<option value="95|Départemental">95 – Val-d'Oise</option>
+<option value="971|Départemental">971 – Guadeloupe</option>
+<option value="972|Départemental">972 – Martinique</option>
+<option value="973|Départemental">973 – Guyane</option>
+<option value="974|Départemental">974 – La Réunion</option>
+<option value="976|Départemental">976 – Mayotte</option>
+        </optgroup>
+      </select>
+      <div class="territory-badge" id="territory-badge">🇫🇷 France entière</div>
+    </div>
 
-    <!-- CHART AREA 1 -->
-    <main class="chart-area">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Taux de recours / Evolution</div>
-          <div class="chart-subtitle">Taux de recours en abscisse · Évolution des recrutements à 6 mois en ordonnée · Taille = poids de la filière · Couleur = niveau de tension</div>
+    <div class="filter-section">
+      <h2>Évolution DPAE &gt; 1 mois</h2>
+      <div class="tension-chips">
+        <div class="chip" data-e3="bas" onclick="toggleEvol3('bas')" style="color:var(--col-e3-bas);border-color:var(--col-e3-bas);background:#fef2f2">
+          <span class="dot" style="background:var(--col-e3-bas)"></span> Baisse (&lt; −1 %)
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <div class="legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-faible)"></div>Faible tension</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-moyen)"></div>Tension moyenne</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-forte)"></div>Forte tension</div>
-          </div>
-          <div class="size-legend">
-            <span>Poids :</span>
-            <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
-            <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
-            <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
-          </div>
+        <div class="chip" data-e3="mid" onclick="toggleEvol3('mid')" style="color:#b45309;border-color:var(--col-e3-mid);background:#fffbeb">
+          <span class="dot" style="background:var(--col-e3-mid)"></span> Modérée (± 1 %)
+        </div>
+        <div class="chip" data-e3="haut" onclick="toggleEvol3('haut')" style="color:var(--col-e3-haut);border-color:var(--col-e3-haut);background:#f0fdf4">
+          <span class="dot" style="background:var(--col-e3-haut)"></span> Hausse (&gt; +1 %)
         </div>
       </div>
-      <div class="chart-card" id="chart-card-1">
-        <svg class="chart-svg" id="chart-svg-1"></svg>
-        <button class="zoom-reset-btn" id="zoom-reset-1" onclick="resetZoom1()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Réinitialiser le zoom
-        </button>
-        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
-        <div class="empty-state" id="empty-state-1" style="display:none">
-          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
-          </svg>
-          <div>Aucune filière sélectionnée</div>
-        </div>
-      </div>
-      <div class="interp-block">
-        <div class="interp-label">💡 Exemple de lecture</div><br>
-        La bulle <strong>Santé, Social, SAP</strong> est positionnée à droite (taux de recours élevé, ~39 %) et en haut du graphique (évolution des recrutements à 1 mois positive, +6 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une forte tension de recrutement dans cette filière. Sa grande taille reflète un volume de recrutements parmi les plus importants, avec plus d'1,2 million de DPAE sur 1 mois.
-      </div>
-    </main>
-  </div>
-</div>
+    </div>
 
-<!-- ═══════════════════ TAB 2 ═══════════════════ -->
-<div class="tab-panel" id="tab2">
-  <div class="page">
+    <div class="filter-section">
+      <h2>Lignes de grille</h2>
+      <div class="grid-val-rows">
+        <div class="grid-val-row">
+          <span class="grid-val-lbl">X (abscisses)</span>
+          <span class="grid-val-eq">=</span>
+          <input type="number" class="grid-val-inp" id="g3x" step="0.01" oninput="onManualGrid3('x')">
+          <span class="grid-val-unit">%</span>
+        </div>
+        <div class="grid-val-row">
+          <span class="grid-val-lbl">Y (ordonnées)</span>
+          <span class="grid-val-eq">=</span>
+          <input type="number" class="grid-val-inp" id="g3y" step="0.01" oninput="onManualGrid3('y')">
+          <span class="grid-val-unit">%</span>
+        </div>
+      </div>
+      <button class="btn-bary" onclick="resetToBarycenter3()">♻️ Position par défaut (barycentre)</button>
+    </div>
 
-    <!-- SIDEBAR 2 -->
-    <aside class="sidebar">
-      <div class="filter-section">
-        <h2>Évolution des recrutements</h2>
-        <div class="tension-chips">
-          <div class="chip" data-evol="neg" onclick="toggleEvol2('neg')" style="color:var(--col-evol-neg);border-color:var(--col-evol-neg);background:#fef2f2">
-            <span class="dot" style="background:var(--col-evol-neg)"></span> &lt; −1 %
-          </div>
-          <div class="chip" data-evol="neu" onclick="toggleEvol2('neu')" style="color:var(--col-evol-neu);border-color:var(--col-evol-neu);background:#eff6ff">
-            <span class="dot" style="background:var(--col-evol-neu)"></span> ± 1 %
-          </div>
-          <div class="chip" data-evol="pos" onclick="toggleEvol2('pos')" style="color:var(--col-evol-pos);border-color:var(--col-evol-pos);background:#f0fdf4">
-            <span class="dot" style="background:var(--col-evol-pos)"></span> &gt; +1 %
-          </div>
-        </div>
+    <div class="filter-section">
+      <h2>Filières <span class="count-badge" id="sel-count-3">0</span></h2>
+      <div class="search-box" style="margin-bottom:8px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search-input-3" placeholder="Rechercher une filière…" oninput="filterSearch3(this.value)">
       </div>
-      <div class="filter-section">
-        <h2>Lignes de grille</h2>
-        <div class="grid-val-rows">
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">X (abscisses)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g2x" step="0.01" oninput="onManualGrid2('x')">
-            <span class="grid-val-unit">%</span>
-          </div>
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">Y (ordonnées)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g2y" step="0.01" oninput="onManualGrid2('y')">
-            <span class="grid-val-unit">%</span>
-          </div>
-        </div>
-        <button class="btn-bary" onclick="resetToBarycenter2()">♻️ Position par défaut (barycentre)</button>
+      <div class="filiere-actions">
+        <button class="btn-sm" onclick="selectAll3()">Tout sélect.</button>
+        <button class="btn-sm" onclick="selectNone3()">Tout désélect.</button>
       </div>
-      <div class="filter-section">
-        <h2>Filières <span class="count-badge" id="sel-count-2">0</span></h2>
-        <div class="search-box" style="margin-bottom:8px">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" id="search-input-2" placeholder="Rechercher une filière…" oninput="filterSearch2(this.value)">
-        </div>
-        <div class="filiere-actions">
-          <button class="btn-sm" onclick="selectAll2()">Tout sélect.</button>
-          <button class="btn-sm" onclick="selectNone2()">Tout désélect.</button>
-        </div>
-        <div class="filiere-list" id="filiere-list-2"></div>
-      </div>
-    </aside>
+      <div class="filiere-list" id="filiere-list-3"></div>
+    </div>
+  </aside>
 
-    <!-- CHART AREA 2 -->
-    <main class="chart-area">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Poids / Tension</div>
-          <div class="chart-subtitle">Tension (score) en abscisse · Poids de la filière en ordonnée · Taille = taux de recours · Couleur = évolution (vert >+1%, bleu ±1%, rouge &lt;−1%)</div>
+  <main class="chart-area">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
+        <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Hausse (&gt; +1%)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Évolution modérée (± 1%)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Baisse (&lt; −1%)</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <div class="legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-evol-pos)"></div>Évolution &gt; +1%</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-evol-neu)"></div>Évolution ±1%</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-evol-neg)"></div>Évolution &lt; −1%</div>
-          </div>
-          <div class="size-legend">
-            <span>Taux de recours :</span>
-            <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> faible</div>
-            <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
-            <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> élevé</div>
-          </div>
+        <div class="size-legend">
+          <span>Nb DPAE &gt; 1 mois :</span>
+          <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
+          <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
+          <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
         </div>
       </div>
-      <div class="chart-card" id="chart-card-2">
-        <svg class="chart-svg" id="chart-svg-2"></svg>
-        <button class="zoom-reset-btn" id="zoom-reset-2" onclick="resetZoom2()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Réinitialiser le zoom
-        </button>
-        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
-        <div class="empty-state" id="empty-state-2" style="display:none">
-          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
-          </svg>
-          <div>Aucune filière sélectionnée</div>
-        </div>
-      </div>
-      <div class="interp-block">
-        <div class="interp-label">💡 Exemple de lecture</div><br>
-        La bulle <strong>Hôtellerie et Restauration</strong> est positionnée dans la zone de tension moyenne (score ~0,50) et présente l'un des poids les plus élevés de toutes les filières (près de 1,6 million de DPAE sur 1 mois). Sa couleur <strong style="color:#2563eb">bleue</strong> indique une évolution modérée des recrutements (entre −1 % et +1 %). Sa taille relativement grande traduit un taux de recours assez élevé (~26 %).
-      </div>
-    </main>
-  </div>
-</div>
+    </div>
 
-<!-- ═══════════════════ TAB 3 ═══════════════════ -->
-<div class="tab-panel" id="tab3">
-  <div class="page">
+    <div class="chart-card" id="chart-card-3">
+      <svg class="chart-svg" id="chart-svg-3"></svg>
+      <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Réinitialiser le zoom
+      </button>
+      <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
+      <div class="empty-state" id="empty-state-3" style="display:none">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
+        </svg>
+        <div>Aucune filière sélectionnée</div>
+      </div>
+    </div>
 
-    <!-- SIDEBAR 3 -->
-    <aside class="sidebar">
-      <div class="filter-section">
-        <h2>Évolution DPAE &gt; 1 mois</h2>
-        <div class="tension-chips">
-          <div class="chip" data-e3="bas" onclick="toggleEvol3('bas')" style="color:var(--col-e3-bas);border-color:var(--col-e3-bas);background:#fef2f2">
-            <span class="dot" style="background:var(--col-e3-bas)"></span> Baisse (&lt; −1 %)
-          </div>
-          <div class="chip" data-e3="mid" onclick="toggleEvol3('mid')" style="color:#b45309;border-color:var(--col-e3-mid);background:#fffbeb">
-            <span class="dot" style="background:var(--col-e3-mid)"></span> Modérée (± 1 %)
-          </div>
-          <div class="chip" data-e3="haut" onclick="toggleEvol3('haut')" style="color:var(--col-e3-haut);border-color:var(--col-e3-haut);background:#f0fdf4">
-            <span class="dot" style="background:var(--col-e3-haut)"></span> Hausse (&gt; +1 %)
-          </div>
-        </div>
+    <div class="ns-panel hidden" id="ns-panel">
+      <div class="ns-panel-header">
+        <svg width="16" height="16" fill="none" stroke="#b45309" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="ns-panel-title">Filières sans résultats significatifs sur ce territoire</span>
+        <span class="ns-count" id="ns-count">0</span>
       </div>
-      <div class="filter-section">
-        <h2>Lignes de grille</h2>
-        <div class="grid-val-rows">
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">X (abscisses)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g3x" step="0.01" oninput="onManualGrid3('x')">
-            <span class="grid-val-unit">%</span>
-          </div>
-          <div class="grid-val-row">
-            <span class="grid-val-lbl">Y (ordonnées)</span>
-            <span class="grid-val-eq">=</span>
-            <input type="number" class="grid-val-inp" id="g3y" step="0.01" oninput="onManualGrid3('y')">
-            <span class="grid-val-unit">%</span>
-          </div>
-        </div>
-        <button class="btn-bary" onclick="resetToBarycenter3()">♻️ Position par défaut (barycentre)</button>
-      </div>
-      <div class="filter-section">
-        <h2>Filières <span class="count-badge" id="sel-count-3">0</span></h2>
-        <div class="search-box" style="margin-bottom:8px">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" id="search-input-3" placeholder="Rechercher une filière…" oninput="filterSearch3(this.value)">
-        </div>
-        <div class="filiere-actions">
-          <button class="btn-sm" onclick="selectAll3()">Tout sélect.</button>
-          <button class="btn-sm" onclick="selectNone3()">Tout désélect.</button>
-        </div>
-        <div class="filiere-list" id="filiere-list-3"></div>
-      </div>
-    </aside>
+      <div class="ns-list" id="ns-list"></div>
+    </div>
 
-    <!-- CHART AREA 3 -->
-    <main class="chart-area">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
-          <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois (baisse &lt;−1%, modérée ±1%, hausse &gt;+1%)</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <div class="legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Hausse (&gt; +1%)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Évolution modérée (± 1%)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Baisse (&lt; −1%)</div>
-          </div>
-          <div class="size-legend">
-            <span>Nb DPAE &gt; 1 mois :</span>
-            <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
-            <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
-            <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
-          </div>
-        </div>
-      </div>
-      <div class="chart-card" id="chart-card-3">
-        <svg class="chart-svg" id="chart-svg-3"></svg>
-        <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Réinitialiser le zoom
-        </button>
-        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
-        <div class="empty-state" id="empty-state-3" style="display:none">
-          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
-          </svg>
-          <div>Aucune filière sélectionnée</div>
-        </div>
-      </div>
-      <div class="interp-block">
-        <div class="interp-label">💡 Exemple de lecture</div><br>
-        La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse (−2,9 %, soit inférieure à −1 %). Sa grande taille traduit un volume de recrutements très élevé, avec plus d'1,5 million de DPAE sur 1 mois.
-      </div>
-    </main>
-  </div>
+    <div class="interp-block">
+      <div class="interp-label">💡 Exemple de lecture</div><br>
+      La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
+    </div>
+  </main>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ── DATA LOADING FROM JSON ────────────────────────────────────────────────────
-let RAW = [];
+// ── CONFIGURATION ─────────────────────────────────────────────────────────────
+// Chemin vers le fichier JSON (relatif à index.html dans le repo)
+const DATA_URL = 'Data_DEP_REG.json';
 
-const COL_TENSION  = { Faible:"#16a34a", Moyen:"#2563eb", Forte:"#dc2626" };
-const COL_EVOL3    = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
+// ── DONNÉES ───────────────────────────────────────────────────────────────────
+let SOURCE_DATA = [];   // données brutes chargées depuis le JSON
+let RAW = [];           // données du territoire sélectionné, après mapRow
 
-function evolColor(evol) {
-  if (evol < -0.01) return "#dc2626";
-  if (evol >  0.01) return "#16a34a";
-  return "#2563eb";
+const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
+
+function parseFr(str) {
+  if (typeof str === 'number') return str;
+  if (!str) return NaN;
+  return parseFloat(String(str).replace(',', '.'));
 }
 
 function mapRow(d) {
+  const diffRecruit = parseFr(d['Difficultés de recrutement']);
+  const ent         = parseFr(d['Taux de recours']);
+  const evol        = parseFr(d['Evolution DPAE > 1 mois']);
+  const poids       = +d['DPAE > 1 mois 2025'];
   return {
-    code:        d.code,
-    label:       d.label,
-    tension:     d.niveau_de_tension,        // texte Faible/Moyen/Forte
-    tensionVal:  +d.tension,                  // Difficultés de recrutement (0–1)
-    ent:         +d.taux_de_recours,           // Taux de recours (0–1)
-    evol:        +d.evolution_dpaep1m,         // Évolution DPAE > 1 mois
-    poids:       +d.dpae_1m,                   // Nb DPAE > 1 mois (taille bulle M1&M3)
-    evol6m:      +d.evolution_dpaep6m,         // Évolution DPAE > 6 mois
-    dpae6m:      +d.dpae_6m,                   // Nb DPAE > 6 mois
-    diffRecruit: +d.difficulte_recrutement,    // = tensionVal, axe X M3
-    evol3cat:    (+d.evolution_dpaep1m < -0.01) ? "bas" : (+d.evolution_dpaep1m > 0.01) ? "haut" : "mid",
+    code:        d['Filière'],
+    label:       d['Libellé Filière'],
+    diffRecruit,
+    ent,
+    evol,
+    poids,
+    evol3cat:    (evol < -0.01) ? 'bas' : (evol > 0.01) ? 'haut' : 'mid',
   };
 }
 
 async function loadData() {
-  // ── 1. Données injectées en ligne (ouverture fichier:// sans serveur) ──────
-  if (typeof INLINE_DATA !== 'undefined' && Array.isArray(INLINE_DATA) && INLINE_DATA.length > 0) {
-    RAW = INLINE_DATA.map(mapRow);
-    console.log(`✅ Données inline chargées : ${RAW.length} filières`);
-    return true;
-  }
-
-  // ── 2. Fallback : fetch data.json (serveur web) ───────────────────────────
   try {
-    const res = await fetch('data.json');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    RAW = json.map(mapRow);
-    console.log(`✅ data.json chargé : ${RAW.length} filières`);
-
-    // Vérification rapide des champs attendus
-    if (RAW.length > 0) {
-      const sample = RAW[0];
-      const missing = ['code','label','tension','tensionVal','ent','evol','poids']
-        .filter(k => sample[k] === undefined || (typeof sample[k] === 'number' && isNaN(sample[k])));
-      if (missing.length > 0) {
-        console.warn('⚠️ Champs manquants ou NaN dans data.json :', missing,
-          '\nVérifiez les noms de colonnes :', Object.keys(json[0]));
-      }
-    }
-  } catch(err) {
-    console.error('❌ Erreur chargement data.json :', err);
-    document.getElementById('loading-overlay').innerHTML =
-      '<div style="color:#dc2626;font-weight:600;font-size:14px;padding:24px;text-align:center">' +
-      '⚠️ Impossible de charger data.json.<br>' +
-      'Si vous ouvrez ce fichier directement (file://), intégrez vos données via <code>INLINE_DATA</code><br>' +
-      '(voir commentaire dans le &lt;head&gt; du HTML).</div>';
+    const res = await fetch(DATA_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
+    SOURCE_DATA = await res.json();
+    console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes`);
+    return true;
+  } catch (err) {
+    console.error('❌', err);
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('load-msg').style.display = 'none';
+    const overlay = document.getElementById('loading-overlay');
+    overlay.innerHTML += `<div class="load-err">
+      ⚠️ Impossible de charger <code>${DATA_URL}</code>.<br>
+      Vérifiez que le fichier est présent dans le repo et que le serveur est accessible.<br>
+      <small style="opacity:.7">${err.message}</small>
+    </div>`;
     return false;
   }
-  return true;
 }
 
-// ── TAB SWITCH ────────────────────────────────────────────────────────────────
-let activeTab = 'tab1';
-function switchTab(id) {
-  activeTab = id;
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === id));
-  document.querySelectorAll('.tab-btn').forEach((b,i) =>
-    b.classList.toggle('active', (i===0&&id==='tab1')||(i===1&&id==='tab2')||(i===2&&id==='tab3')));
-  if (id === 'tab1')      setTimeout(initChart1, 50);
-  else if (id === 'tab2') setTimeout(initChart2, 50);
-  else                    setTimeout(initChart3, 50);
+function loadTerritoryData(code, niveau) {
+  const territoryRows = SOURCE_DATA.filter(d =>
+    d['Code'] === code && d['Niveau'] === niveau
+  );
+  RAW = territoryRows.map(mapRow);
+
+  // Filières absentes du territoire = non significatives
+  const presentCodes = new Set(RAW.map(d => d.code));
+  const absent = Object.entries(ALL_FILIERES)
+    .filter(([c]) => !presentCodes.has(c))
+    .map(([c, label]) => ({ code: c, label }));
+  updateNsPanel(absent);
+}
+
+function updateNsPanel(absent) {
+  const panel = document.getElementById('ns-panel');
+  const list  = document.getElementById('ns-list');
+  const count = document.getElementById('ns-count');
+  if (absent.length === 0) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+  count.textContent = absent.length;
+  list.innerHTML = absent
+    .map(f => `<span class="ns-tag" title="${f.code}">${f.code} – ${f.label}</span>`)
+    .join('');
+}
+
+function onTerritoryChange(value) {
+  const [code, niveau] = value.split('|');
+  const sel = document.getElementById('territory-select');
+  const opt = sel.options[sel.selectedIndex];
+  const badge = document.getElementById('territory-badge');
+  const emoji = niveau === 'National' ? '🇫🇷' : niveau === 'Régional' ? '🗺️' : '📍';
+  badge.textContent = emoji + ' ' + opt.text;
+
+  loadTerritoryData(code, niveau);
+
+  // Réinitialise l'état
+  state3.selectedCodes = new Set(RAW.map(d => d.code));
+  state3.activeEvol3   = new Set(['bas', 'mid', 'haut']);
+  document.querySelectorAll('.chip[data-e3]').forEach(c => c.classList.remove('inactive'));
+  document.getElementById('search-input-3').value = '';
+  gridState3.x = null; gridState3.y = null;
+
+  buildSidebar3();
+  initChart3();
 }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const state1 = { selectedCodes: new Set(), activeTensions: new Set(["Faible","Moyen","Forte"]) };
-const state2 = { selectedCodes: new Set(), activeEvols: new Set(["neg","neu","pos"]) };
-const state3 = { selectedCodes: new Set(), activeEvol3: new Set(["bas","mid","haut"]) };
-
-// ── GRID LINES STATE (barycentre pondéré) ─────────────────────────────────────
-// x / y : valeur en espace données (null = utiliser le barycentre calculé)
-// bx / by : barycentre calculé à chaque updateChart
-const gridState1 = { x: null, y: null, bx: 0, by: 0 };
-const gridState2 = { x: null, y: null, bx: 0, by: 0 };
+const state3    = { selectedCodes: new Set(), activeEvol3: new Set(['bas','mid','haut']) };
 const gridState3 = { x: null, y: null, bx: 0, by: 0 };
 
-// Calcule le barycentre pondéré d'un jeu de données
 function computeBarycenter(data, xAcc, yAcc, wAcc) {
   const totalW = d3.sum(data, wAcc);
   if (!totalW) return { x: d3.mean(data, xAcc) || 0, y: d3.mean(data, yAcc) || 0 };
@@ -895,53 +732,16 @@ function computeBarycenter(data, xAcc, yAcc, wAcc) {
   };
 }
 
-// Valeur effective de la ligne (custom ou barycentre)
-function getGridX1() { return gridState1.x !== null ? gridState1.x : gridState1.bx; }
-function getGridY1() { return gridState1.y !== null ? gridState1.y : gridState1.by; }
-function getGridX2() { return gridState2.x !== null ? gridState2.x : gridState2.bx; }
-function getGridY2() { return gridState2.y !== null ? gridState2.y : gridState2.by; }
 function getGridX3() { return gridState3.x !== null ? gridState3.x : gridState3.bx; }
 function getGridY3() { return gridState3.y !== null ? gridState3.y : gridState3.by; }
 
-// Met à jour les inputs de la sidebar depuis l'état courant
-function syncGridInputs1() {
-  const xi = document.getElementById("g1x");
-  const yi = document.getElementById("g1y");
-  if (xi) xi.value = (getGridX1() * 100).toFixed(2);
-  if (yi) yi.value = (getGridY1() * 100).toFixed(2);
-}
-function syncGridInputs2() {
-  const xi = document.getElementById("g2x");
-  const yi = document.getElementById("g2y");
-  if (xi) xi.value = (getGridX2() * 100).toFixed(2);
-  if (yi) yi.value = (getGridY2() * 100).toFixed(2);
-}
 function syncGridInputs3() {
-  const xi = document.getElementById("g3x");
-  const yi = document.getElementById("g3y");
+  const xi = document.getElementById('g3x');
+  const yi = document.getElementById('g3y');
   if (xi) xi.value = (getGridX3() * 100).toFixed(2);
   if (yi) yi.value = (getGridY3() * 100).toFixed(2);
 }
 
-// Saisie manuelle depuis la sidebar
-function onManualGrid1(axis) {
-  const el = document.getElementById(axis === 'x' ? 'g1x' : 'g1y');
-  const v = parseFloat(el.value);
-  if (!isNaN(v)) {
-    if (axis === 'x') gridState1.x = v / 100;
-    else              gridState1.y = v / 100;
-    if (chart1.g) redrawChart1(false);
-  }
-}
-function onManualGrid2(axis) {
-  const el = document.getElementById(axis === 'x' ? 'g2x' : 'g2y');
-  const v = parseFloat(el.value);
-  if (!isNaN(v)) {
-    if (axis === 'x') gridState2.x = v / 100;
-    else              gridState2.y = v / 100;
-    if (chart2.g) redrawChart2(false);
-  }
-}
 function onManualGrid3(axis) {
   const el = document.getElementById(axis === 'x' ? 'g3x' : 'g3y');
   const v = parseFloat(el.value);
@@ -952,591 +752,97 @@ function onManualGrid3(axis) {
   }
 }
 
-function resetToBarycenter1() {
-  gridState1.x = null; gridState1.y = null;
-  syncGridInputs1();
-  if (chart1.g) redrawChart1(false);
-}
-function resetToBarycenter2() {
-  gridState2.x = null; gridState2.y = null;
-  syncGridInputs2();
-  if (chart2.g) redrawChart2(false);
-}
 function resetToBarycenter3() {
   gridState3.x = null; gridState3.y = null;
   syncGridInputs3();
   if (chart3.g) redrawChart3(false);
 }
 
-// Catégorie d'évolution d'un point
-function evolCat(evol) {
-  if (evol < -0.01) return "neg";
-  if (evol >  0.01) return "pos";
-  return "neu";
-}
-
-// ── SIDEBAR BUILD ─────────────────────────────────────────────────────────────
-function buildSidebar(listId, stateObj, onChangeFn, dotColorFn) {
-  const list = document.getElementById(listId);
-  list.innerHTML = "";
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function buildSidebar3() {
+  const list = document.getElementById('filiere-list-3');
+  list.innerHTML = '';
   RAW.forEach(d => {
-    const item = document.createElement("div");
-    item.className = "filiere-item";
-    item.dataset.code = d.code;
+    const item = document.createElement('div');
+    item.className = 'filiere-item';
+    item.dataset.code  = d.code;
     item.dataset.label = d.label.toLowerCase();
-    const cbId = `cb-${listId}-${d.code}`;
-    const dotColor = dotColorFn(d);
+    const cbId = `cb-3-${d.code}`;
     item.innerHTML = `
       <input type="checkbox" id="${cbId}" checked>
       <label for="${cbId}">${d.label}</label>
-      <span class="tension-dot" style="background:${dotColor}"></span>
+      <span class="tension-dot" style="background:${COL_EVOL3[d.evol3cat]}"></span>
     `;
-    item.querySelector("input").addEventListener("change", e => {
-      if (e.target.checked) stateObj.selectedCodes.add(d.code);
-      else stateObj.selectedCodes.delete(d.code);
-      onChangeFn();
+    item.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) state3.selectedCodes.add(d.code);
+      else state3.selectedCodes.delete(d.code);
+      updateChart3();
+      document.getElementById('sel-count-3').textContent = filteredData3().length;
     });
     list.appendChild(item);
   });
+  document.getElementById('sel-count-3').textContent = RAW.length;
 }
 
-function filterSearch(listId, q, stateObj, onChangeFn) {
+function filterSearch3(q) {
   const low = q.toLowerCase().trim();
-  document.querySelectorAll(`#${listId} .filiere-item`).forEach(el => {
-    el.classList.toggle("hidden", low && !el.dataset.label.includes(low));
+  document.querySelectorAll('#filiere-list-3 .filiere-item').forEach(el => {
+    el.classList.toggle('hidden', low && !el.dataset.label.includes(low));
   });
 }
 
-function selectAll(listId, stateObj, onChangeFn) {
+function selectAll3() {
   RAW.forEach(d => {
-    const item = document.querySelector(`#${listId} .filiere-item[data-code="${d.code}"]`);
-    if (item && !item.classList.contains("hidden")) {
-      item.querySelector("input").checked = true;
-      stateObj.selectedCodes.add(d.code);
+    const item = document.querySelector(`#filiere-list-3 .filiere-item[data-code="${d.code}"]`);
+    if (item && !item.classList.contains('hidden')) {
+      item.querySelector('input').checked = true;
+      state3.selectedCodes.add(d.code);
     }
   });
-  onChangeFn();
+  updateChart3();
+  document.getElementById('sel-count-3').textContent = filteredData3().length;
 }
 
-function selectNone(listId, stateObj, onChangeFn) {
+function selectNone3() {
   RAW.forEach(d => {
-    const item = document.querySelector(`#${listId} .filiere-item[data-code="${d.code}"]`);
-    if (item && !item.classList.contains("hidden")) {
-      item.querySelector("input").checked = false;
-      stateObj.selectedCodes.delete(d.code);
+    const item = document.querySelector(`#filiere-list-3 .filiere-item[data-code="${d.code}"]`);
+    if (item && !item.classList.contains('hidden')) {
+      item.querySelector('input').checked = false;
+      state3.selectedCodes.delete(d.code);
     }
   });
-  onChangeFn();
+  updateChart3();
+  document.getElementById('sel-count-3').textContent = filteredData3().length;
 }
 
-// ── TAB 1 CALLBACKS ───────────────────────────────────────────────────────────
-function filterSearch1(q) { filterSearch("filiere-list-1", q, state1, updateChart1); }
-function selectAll1()     { selectAll("filiere-list-1", state1, updateChart1); }
-function selectNone1()    { selectNone("filiere-list-1", state1, updateChart1); }
-function toggleTension1(t) {
-  if (state1.activeTensions.has(t)) state1.activeTensions.delete(t);
-  else state1.activeTensions.add(t);
-  document.querySelector(`#tab1 .chip[data-tension="${t}"]`).classList.toggle("inactive", !state1.activeTensions.has(t));
-  updateChart1();
-}
-function filteredData1() {
-  return RAW.filter(d => state1.selectedCodes.has(d.code) && state1.activeTensions.has(d.tension));
-}
-
-// ── TAB 2 CALLBACKS ───────────────────────────────────────────────────────────
-function filterSearch2(q) { filterSearch("filiere-list-2", q, state2, updateChart2); }
-function selectAll2()     { selectAll("filiere-list-2", state2, updateChart2); }
-function selectNone2()    { selectNone("filiere-list-2", state2, updateChart2); }
-function toggleEvol2(cat) {
-  if (state2.activeEvols.has(cat)) state2.activeEvols.delete(cat);
-  else state2.activeEvols.add(cat);
-  document.querySelector(`#tab2 .chip[data-evol="${cat}"]`).classList.toggle("inactive", !state2.activeEvols.has(cat));
-  updateChart2();
-}
-function filteredData2() {
-  return RAW.filter(d => state2.selectedCodes.has(d.code) && state2.activeEvols.has(evolCat(d.evol)));
-}
-
-// ── TAB 3 CALLBACKS ───────────────────────────────────────────────────────────
-function filterSearch3(q) { filterSearch("filiere-list-3", q, state3, updateChart3); }
-function selectAll3()     { selectAll("filiere-list-3", state3, updateChart3); }
-function selectNone3()    { selectNone("filiere-list-3", state3, updateChart3); }
 function toggleEvol3(cat) {
   if (state3.activeEvol3.has(cat)) state3.activeEvol3.delete(cat);
   else state3.activeEvol3.add(cat);
-  document.querySelector(`#tab3 .chip[data-e3="${cat}"]`).classList.toggle("inactive", !state3.activeEvol3.has(cat));
+  document.querySelector(`.chip[data-e3="${cat}"]`).classList.toggle('inactive', !state3.activeEvol3.has(cat));
   updateChart3();
 }
+
 function filteredData3() {
   return RAW.filter(d => state3.selectedCodes.has(d.code) && state3.activeEvol3.has(d.evol3cat));
 }
 
-// ── HELPERS : domaine avec marge ─────────────────────────────────────────────
-function paddedExtent(data, accessor, paddingRatio = 0.12, forceZeroMin = false) {
-  let [lo, hi] = d3.extent(data, accessor);
-  if (lo === undefined) return [0, 1];
-  const span = hi - lo || Math.abs(hi) || 1;
-  lo = forceZeroMin ? 0 : lo - span * paddingRatio;
-  hi = hi + span * paddingRatio;
-  return [lo, hi];
-}
-
-// ── CHART 1 (Taux de recours / Evolution) ────────────────────────────────────
+// ── CHART 3 ───────────────────────────────────────────────────────────────────
 const R_MIN = 5, R_MAX = 35;
-let chart1 = {};
-
-function initChart1() {
-  const svg = d3.select("#chart-svg-1");
-  svg.selectAll("*").remove();
-  const card = document.getElementById("chart-card-1");
-  const W = card.clientWidth || 800;
-  const H = Math.max(500, Math.round(W * 0.6));
-  const m = { top:28, right:30, bottom:56, left:66 };
-  const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
-  svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
-  const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
-
-  // Clip path to keep bubbles inside chart area
-  svg.append("defs").append("clipPath").attr("id","clip1")
-    .append("rect").attr("width", iW).attr("height", iH);
-
-  chart1 = {
-    svg, g, iW, iH,
-    xScaleBase: d3.scaleLinear().range([0, iW]),
-    yScaleBase: d3.scaleLinear().range([iH, 0]),
-    xScale:     d3.scaleLinear().range([0, iW]),
-    yScale:     d3.scaleLinear().range([iH, 0]),
-    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids)]).range([R_MIN, R_MAX]),
-  };
-
-  g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
-  g.append("g").attr("class","grid-y");
-  g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","zone-lines");
-  g.append("g").attr("class","zone-lines-y");
-  g.append("line").attr("class","refline").attr("x1",0).attr("x2",iW);
-  g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","axis axis-y");
-  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Taux de recours (%)");
-  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Évolution DPAE > 1 mois (%)");
-
-  // Zoom
-  chart1.zoom = d3.zoom()
-    .scaleExtent([1, 12])
-    .translateExtent([[0,0],[iW,iH]])
-    .on("zoom", (event) => {
-      chart1.xScale = event.transform.rescaleX(chart1.xScaleBase);
-      chart1.yScale = event.transform.rescaleY(chart1.yScaleBase);
-      redrawChart1();
-      // Show reset button only when zoomed
-      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
-      document.getElementById("zoom-reset-1").classList.toggle("visible", isZoomed);
-    });
-
-  // Transparent overlay to capture zoom events
-  g.append("rect").attr("class","zoom-rect")
-    .attr("width",iW).attr("height",iH)
-    .attr("fill","transparent")
-    .call(chart1.zoom);
-
-  // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
-  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip1)");
-  // Drag handles for grid lines — above bubbles so they intercept pointer events
-  g.append("g").attr("class","drag-handles-x");
-  g.append("g").attr("class","drag-handles-y");
-
-  updateChart1();
-}
-
-// Redraws axes, grid, zone lines, refline, bubbles from current xScale/yScale
-function redrawChart1(useTransition = false) {
-  const { g, iW, iH, xScale, yScale, rScale } = chart1;
-  const dur = useTransition ? 400 : 0;
-  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
-  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
-
-  const xFmt = d3.format(".0%"), yFmt = d3.format("+.0%");
-
-  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-
-  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-
-  // ── Zone lines (1 vertical + 1 horizontal au barycentre) ──────────────────
-  const gxVal = getGridX1(), gyVal = getGridY1();
-
-  g.select(".zone-lines").selectAll("line").data([gxVal])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH);
-
-  g.select(".zone-lines-y").selectAll("line").data([gyVal])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
-
-  // ── Drag handles (bandes transparentes au-dessus des bulles) ───────────────
-  const dragX1 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
-      const [xmin, xmax] = chart1.xScale.domain();
-      gridState1.x = Math.max(xmin, Math.min(xmax, chart1.xScale.invert(event.x)));
-      syncGridInputs1();
-      redrawChart1(false);
-    });
-
-  g.select(".drag-handles-x").selectAll("line").data([gxVal])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH)
-    .call(dragX1);
-
-  const dragY1 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
-      const [ymin, ymax] = chart1.yScale.domain();
-      gridState1.y = Math.max(ymin, Math.min(ymax, chart1.yScale.invert(event.y)));
-      syncGridInputs1();
-      redrawChart1(false);
-    });
-
-  g.select(".drag-handles-y").selectAll("line").data([gyVal])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
-    .call(dragY1);
-
-  const zeroY = (yScale.domain()[0] <= 0 && yScale.domain()[1] >= 0) ? yScale(0) : -999;
-  T(g.select(".refline")).attr("y1", zeroY).attr("y2", zeroY);
-
-  // Transition nommée "bubble" — n'interrompt pas "bubble-exit" ni les transitions entrantes
-  Tbub(g.select(".bubbles").selectAll(".bubble"))
-    .attr("cx", d => xScale(d.ent))
-    .attr("cy", d => yScale(d.evol))
-    .attr("r",  d => chart1.rScale(d.poids));
-}
-
-function updateChart1() {
-  if (!chart1.g) return;
-  const data = filteredData1();
-  document.getElementById("empty-state-1").style.display = data.length === 0 ? "flex" : "none";
-  document.getElementById("sel-count-1").textContent = data.length;
-
-  // Reset zoom to identity on filter change
-  chart1.svg.select(".zoom-rect").call(chart1.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-1").classList.remove("visible");
-
-  if (data.length > 0) {
-    // Padding adaptatif : marge proportionnelle au rayon max des bulles pour éviter la troncature
-    const [entMin, entMax] = d3.extent(data, d => d.ent);
-    const entSpan = (entMax - entMin) || Math.abs(entMax) || 1;
-    const radiusPadX = (R_MAX / chart1.iW) * entSpan * 2;
-    chart1.xScaleBase.domain([entMin - radiusPadX, entMax + radiusPadX]).nice();
-
-    const [evolMin, evolMax] = d3.extent(data, d => d.evol);
-    const evolSpan = (evolMax - evolMin) || Math.abs(evolMax) || 1;
-    const radiusPadY = (R_MAX / chart1.iH) * evolSpan * 2;
-    chart1.yScaleBase.domain([evolMin - radiusPadY, evolMax + radiusPadY]).nice();
-
-    chart1.xScale = chart1.xScaleBase.copy();
-    chart1.yScale = chart1.yScaleBase.copy();
-
-    // Barycentre pondéré par le poids de la filière
-    const bary = computeBarycenter(data, d => d.ent, d => d.evol, d => d.poids);
-    gridState1.bx = bary.x;
-    gridState1.by = bary.y;
-    syncGridInputs1();
-  }
-
-  const tooltip = document.getElementById("tooltip");
-  const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
-  const { g, xScale, yScale, rScale } = chart1;
-
-  const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
-  const enter = bubbles.enter().append("circle")
-    .attr("class","bubble")
-    .attr("cx", d => xScale(d.ent))
-    .attr("cy", d => yScale(d.evol))
-    .attr("r", 0)
-    .attr("fill", d => COL_TENSION[d.tension])
-    .attr("fill-opacity", 0.55)
-    .attr("stroke", d => COL_TENSION[d.tension])
-    .attr("stroke-width", 1.2)
-    .attr("stroke-opacity", 0.8);
-
-  enter.merge(bubbles)
-    .on("mousemove", function(event, d) {
-      tooltip.style.opacity = "1";
-      tooltip.style.left = (event.clientX+16)+"px";
-      tooltip.style.top  = (event.clientY-10)+"px";
-      tooltip.innerHTML = `
-        <div class="tt-title">${d.label}</div>
-        <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
-        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.tensionVal)}</span></div>
-        <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
-        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val">${fmtEvol(d.evol)}</span></div>
-        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
-      `;
-      d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
-    })
-    .on("mouseleave", function() {
-      tooltip.style.opacity = "0";
-      d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
-    })
-    .transition("bubble").duration(400)
-    .attr("cx", d => xScale(d.ent))
-    .attr("cy", d => yScale(d.evol))
-    .attr("r",  d => rScale(d.poids));
-
-  redrawChart1(true);
-}
-
-function resetZoom1() {
-  chart1.xScale = chart1.xScaleBase.copy();
-  chart1.yScale = chart1.yScaleBase.copy();
-  chart1.svg.select(".zoom-rect")
-    .transition().duration(400)
-    .call(chart1.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-1").classList.remove("visible");
-}
-
-// ── CHART 2 (Poids / Tension) ─────────────────────────────────────────────────
-let chart2 = {};
-
-function initChart2() {
-  const svg = d3.select("#chart-svg-2");
-  svg.selectAll("*").remove();
-  const card = document.getElementById("chart-card-2");
-  const W = card.clientWidth || 800;
-  const H = Math.max(500, Math.round(W * 0.6));
-  const m = { top:28, right:30, bottom:56, left:72 };
-  const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
-  svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
-  const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
-
-  svg.append("defs").append("clipPath").attr("id","clip2")
-    .append("rect").attr("width", iW).attr("height", iH);
-
-  chart2 = {
-    svg, g, iW, iH,
-    xScaleBase: d3.scaleLinear().range([0, iW]),
-    yScaleBase: d3.scaleLinear().range([iH, 0]),
-    xScale:     d3.scaleLinear().range([0, iW]),
-    yScale:     d3.scaleLinear().range([iH, 0]),
-    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.ent)]).range([R_MIN, R_MAX]),
-  };
-
-  g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
-  g.append("g").attr("class","grid-y");
-  g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","zone-lines");
-  g.append("g").attr("class","zone-lines-y");
-  g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","axis axis-y");
-  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Difficultés de recrutement (score)");
-  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-58).attr("text-anchor","middle").text("Nb DPAE > 1 mois");
-
-  chart2.zoom = d3.zoom()
-    .scaleExtent([1, 12])
-    .translateExtent([[0,0],[iW,iH]])
-    .on("zoom", (event) => {
-      chart2.xScale = event.transform.rescaleX(chart2.xScaleBase);
-      chart2.yScale = event.transform.rescaleY(chart2.yScaleBase);
-      redrawChart2();
-      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
-      document.getElementById("zoom-reset-2").classList.toggle("visible", isZoomed);
-    });
-
-  g.append("rect").attr("class","zoom-rect")
-    .attr("width",iW).attr("height",iH)
-    .attr("fill","transparent")
-    .call(chart2.zoom);
-
-  // Bubbles appended LAST so they sit above the zoom-rect and receive mouse events
-  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip2)");
-  // Drag handles for grid lines — above bubbles
-  g.append("g").attr("class","drag-handles-x");
-  g.append("g").attr("class","drag-handles-y");
-
-  updateChart2();
-}
-
-function redrawChart2(useTransition = false) {
-  const { g, iW, iH, xScale, yScale } = chart2;
-  const dur = useTransition ? 400 : 0;
-  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
-  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
-
-  const xFmt = d3.format(".0%"), yFmt = v => v >= 1e6 ? d3.format(".2s")(v).replace('G','Md') : d3.format(",.0f")(v);
-
-  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-
-  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-
-  // ── Zone lines (1 vertical + 1 horizontal au barycentre) ──────────────────
-  const gxVal2 = getGridX2(), gyVal2 = getGridY2();
-
-  g.select(".zone-lines").selectAll("line").data([gxVal2])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH);
-
-  g.select(".zone-lines-y").selectAll("line").data([gyVal2])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
-
-  // ── Drag handles ───────────────────────────────────────────────────────────
-  const dragX2 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
-      const [xmin, xmax] = chart2.xScale.domain();
-      gridState2.x = Math.max(xmin, Math.min(xmax, chart2.xScale.invert(event.x)));
-      syncGridInputs2();
-      redrawChart2(false);
-    });
-
-  g.select(".drag-handles-x").selectAll("line").data([gxVal2])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH)
-    .call(dragX2);
-
-  const dragY2 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
-      const [ymin, ymax] = chart2.yScale.domain();
-      gridState2.y = Math.max(ymin, Math.min(ymax, chart2.yScale.invert(event.y)));
-      syncGridInputs2();
-      redrawChart2(false);
-    });
-
-  g.select(".drag-handles-y").selectAll("line").data([gyVal2])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
-    .call(dragY2);
-
-  Tbub(g.select(".bubbles").selectAll(".bubble"))
-    .attr("cx", d => xScale(d.tensionVal))
-    .attr("cy", d => yScale(d.poids))
-    .attr("r",  d => chart2.rScale(d.ent));
-}
-
-function updateChart2() {
-  if (!chart2.g) return;
-  const data = filteredData2();
-  document.getElementById("empty-state-2").style.display = data.length === 0 ? "flex" : "none";
-  document.getElementById("sel-count-2").textContent = data.length;
-
-  chart2.svg.select(".zoom-rect").call(chart2.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-2").classList.remove("visible");
-
-  if (data.length > 0) {
-    chart2.xScaleBase.domain(paddedExtent(data, d => d.tensionVal)).nice();
-    const [poidsMin, poidsMax] = d3.extent(data, d => d.poids);
-    const poidsSpan = (poidsMax - poidsMin) || poidsMax || 1;
-    const radiusPad = (R_MAX / chart2.iH) * poidsSpan * 2;
-    chart2.yScaleBase.domain([Math.max(0, poidsMin - radiusPad), poidsMax + radiusPad * 0.5]).nice();
-    chart2.xScale = chart2.xScaleBase.copy();
-    chart2.yScale = chart2.yScaleBase.copy();
-
-    // Barycentre pondéré par le taux de recours (taille des bulles de la matrice 2)
-    const bary2 = computeBarycenter(data, d => d.tensionVal, d => d.poids, d => d.ent);
-    gridState2.bx = bary2.x;
-    gridState2.by = bary2.y;
-    syncGridInputs2();
-  }
-
-  const tooltip = document.getElementById("tooltip");
-  const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
-  const { g, xScale, yScale, rScale } = chart2;
-
-  const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
-  const enter = bubbles.enter().append("circle")
-    .attr("class","bubble")
-    .attr("cx", d => xScale(d.tensionVal))
-    .attr("cy", d => yScale(d.poids))
-    .attr("r", 0)
-    .attr("fill", d => evolColor(d.evol))
-    .attr("fill-opacity", 0.55)
-    .attr("stroke", d => evolColor(d.evol))
-    .attr("stroke-width", 1.2)
-    .attr("stroke-opacity", 0.8);
-
-  enter.merge(bubbles)
-    .on("mousemove", function(event, d) {
-      tooltip.style.opacity = "1";
-      tooltip.style.left = (event.clientX+16)+"px";
-      tooltip.style.top  = (event.clientY-10)+"px";
-      tooltip.innerHTML = `
-        <div class="tt-title">${d.label}</div>
-        <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
-        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.tensionVal)}</span></div>
-        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
-        <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
-        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${evolColor(d.evol)}">${fmtEvol(d.evol)}</span></div>
-      `;
-      d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
-    })
-    .on("mouseleave", function() {
-      tooltip.style.opacity = "0";
-      d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
-    })
-    .transition("bubble").duration(400)
-    .attr("cx", d => xScale(d.tensionVal))
-    .attr("cy", d => yScale(d.poids))
-    .attr("r",  d => rScale(d.ent));
-
-  redrawChart2(true);
-}
-
-function resetZoom2() {
-  chart2.xScale = chart2.xScaleBase.copy();
-  chart2.yScale = chart2.yScaleBase.copy();
-  chart2.svg.select(".zoom-rect")
-    .transition().duration(400)
-    .call(chart2.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-2").classList.remove("visible");
-}
-
-// ── CHART 3 (Difficultés de recrutement / Taux de recours) ───────────────────
 let chart3 = {};
 
 function initChart3() {
-  const svg = d3.select("#chart-svg-3");
-  svg.selectAll("*").remove();
-  const card = document.getElementById("chart-card-3");
+  const svg = d3.select('#chart-svg-3');
+  svg.selectAll('*').remove();
+  const card = document.getElementById('chart-card-3');
   const W = card.clientWidth || 800;
   const H = Math.max(500, Math.round(W * 0.6));
   const m = { top:28, right:30, bottom:56, left:66 };
   const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
-  svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
-  const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
-  svg.append("defs").append("clipPath").attr("id","clip3")
-    .append("rect").attr("width", iW).attr("height", iH);
+  svg.append('defs').append('clipPath').attr('id','clip3')
+    .append('rect').attr('width', iW).attr('height', iH);
 
   chart3 = {
     svg, g, iW, iH,
@@ -1544,184 +850,172 @@ function initChart3() {
     yScaleBase: d3.scaleLinear().range([iH, 0]),
     xScale:     d3.scaleLinear().range([0, iW]),
     yScale:     d3.scaleLinear().range([iH, 0]),
-    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids)]).range([R_MIN, R_MAX]),
+    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids) || 1]).range([R_MIN, R_MAX]),
   };
 
-  g.append("rect").attr("width",iW).attr("height",iH).attr("fill","#f9fafb").attr("rx",4);
-  g.append("g").attr("class","grid-y");
-  g.append("g").attr("class","grid-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","zone-lines");
-  g.append("g").attr("class","zone-lines-y");
-  g.append("g").attr("class","axis axis-x").attr("transform",`translate(0,${iH})`);
-  g.append("g").attr("class","axis axis-y");
-  g.append("text").attr("class","axis-label").attr("x",iW/2).attr("y",iH+46).attr("text-anchor","middle").text("Difficultés de recrutement (score)");
-  g.append("text").attr("class","axis-label").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-52).attr("text-anchor","middle").text("Taux de recours (%)");
+  g.append('rect').attr('width',iW).attr('height',iH).attr('fill','#f9fafb').attr('rx',4);
+  g.append('g').attr('class','grid-y');
+  g.append('g').attr('class','grid-x').attr('transform',`translate(0,${iH})`);
+  g.append('g').attr('class','zone-lines');
+  g.append('g').attr('class','zone-lines-y');
+  g.append('g').attr('class','axis axis-x').attr('transform',`translate(0,${iH})`);
+  g.append('g').attr('class','axis axis-y');
+  g.append('text').attr('class','axis-label').attr('x',iW/2).attr('y',iH+46).attr('text-anchor','middle').text('Difficultés de recrutement (%)');
+  g.append('text').attr('class','axis-label').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-52).attr('text-anchor','middle').text('Taux de recours (%)');
 
   chart3.zoom = d3.zoom()
     .scaleExtent([1, 12])
     .translateExtent([[0,0],[iW,iH]])
-    .on("zoom", (event) => {
+    .on('zoom', (event) => {
       chart3.xScale = event.transform.rescaleX(chart3.xScaleBase);
       chart3.yScale = event.transform.rescaleY(chart3.yScaleBase);
       redrawChart3();
       const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
-      document.getElementById("zoom-reset-3").classList.toggle("visible", isZoomed);
+      document.getElementById('zoom-reset-3').classList.toggle('visible', isZoomed);
     });
 
-  g.append("rect").attr("class","zoom-rect")
-    .attr("width",iW).attr("height",iH)
-    .attr("fill","transparent")
+  g.append('rect').attr('class','zoom-rect')
+    .attr('width',iW).attr('height',iH)
+    .attr('fill','transparent')
     .call(chart3.zoom);
 
-  g.append("g").attr("class","bubbles").attr("clip-path","url(#clip3)");
-  g.append("g").attr("class","drag-handles-x");
-  g.append("g").attr("class","drag-handles-y");
+  g.append('g').attr('class','bubbles').attr('clip-path','url(#clip3)');
+  g.append('g').attr('class','drag-handles-x');
+  g.append('g').attr('class','drag-handles-y');
 
   updateChart3();
 }
 
 function redrawChart3(useTransition = false) {
-  const { g, iW, iH, xScale, yScale, rScale } = chart3;
+  const { g, iW, iH, xScale, yScale } = chart3;
   const dur = useTransition ? 400 : 0;
-  const T    = dur > 0 ? (sel) => sel.transition("redraw").duration(dur) : (sel) => sel;
-  const Tbub = dur > 0 ? (sel) => sel.transition("bubble").duration(dur) : (sel) => sel;
+  const T    = dur > 0 ? (sel) => sel.transition('redraw').duration(dur) : (sel) => sel;
+  const Tbub = dur > 0 ? (sel) => sel.transition('bubble').duration(dur) : (sel) => sel;
+  const xFmt = d3.format('.0%'), yFmt = d3.format('.0%');
 
-  const xFmt = d3.format(".0%"), yFmt = d3.format(".0%");
+  T(g.select('.axis-x')).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
+    .call(ax => { ax.select('.domain').attr('stroke','#d1d9ee'); ax.selectAll('line').attr('stroke','#d1d9ee'); });
+  T(g.select('.axis-y')).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
+    .call(ax => { ax.select('.domain').attr('stroke','#d1d9ee'); ax.selectAll('line').attr('stroke','#d1d9ee'); });
 
-  T(g.select(".axis-x")).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-  T(g.select(".axis-y")).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
-    .call(ax => { ax.select(".domain").attr("stroke","#d1d9ee"); ax.selectAll("line").attr("stroke","#d1d9ee"); });
-
-  T(g.select(".grid-y")).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
-  T(g.select(".grid-x")).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(""))
-    .call(ax => { ax.select(".domain").remove(); ax.selectAll("line").attr("stroke","#e9ecf4").attr("stroke-width",1); });
+  T(g.select('.grid-y')).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(''))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').attr('stroke','#e9ecf4').attr('stroke-width',1); });
+  T(g.select('.grid-x')).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(''))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').attr('stroke','#e9ecf4').attr('stroke-width',1); });
 
   const gxVal3 = getGridX3(), gyVal3 = getGridY3();
 
-  g.select(".zone-lines").selectAll("line").data([gxVal3])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH);
-
-  g.select(".zone-lines-y").selectAll("line").data([gyVal3])
-    .join("line").attr("class","grid-zone-line")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v));
+  g.select('.zone-lines').selectAll('line').data([gxVal3])
+    .join('line').attr('class','grid-zone-line')
+    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
+    .attr('y1', 0).attr('y2', iH);
+  g.select('.zone-lines-y').selectAll('line').data([gyVal3])
+    .join('line').attr('class','grid-zone-line')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', v => yScale(v)).attr('y2', v => yScale(v));
 
   const dragX3 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
+    .on('start', (e) => { e.sourceEvent.stopPropagation(); })
+    .on('drag',  (e) => {
       const [xmin, xmax] = chart3.xScale.domain();
-      gridState3.x = Math.max(xmin, Math.min(xmax, chart3.xScale.invert(event.x)));
-      syncGridInputs3();
-      redrawChart3(false);
+      gridState3.x = Math.max(xmin, Math.min(xmax, chart3.xScale.invert(e.x)));
+      syncGridInputs3(); redrawChart3(false);
     });
-
-  g.select(".drag-handles-x").selectAll("line").data([gxVal3])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ew-resize")
-    .attr("x1", v => xScale(v)).attr("x2", v => xScale(v))
-    .attr("y1", 0).attr("y2", iH)
+  g.select('.drag-handles-x').selectAll('line').data([gxVal3])
+    .join('line')
+    .attr('stroke','transparent').attr('stroke-width',16)
+    .attr('pointer-events','stroke').style('cursor','ew-resize')
+    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
+    .attr('y1', 0).attr('y2', iH)
     .call(dragX3);
 
   const dragY3 = d3.drag()
-    .on("start", (event) => { event.sourceEvent.stopPropagation(); })
-    .on("drag",  (event) => {
+    .on('start', (e) => { e.sourceEvent.stopPropagation(); })
+    .on('drag',  (e) => {
       const [ymin, ymax] = chart3.yScale.domain();
-      gridState3.y = Math.max(ymin, Math.min(ymax, chart3.yScale.invert(event.y)));
-      syncGridInputs3();
-      redrawChart3(false);
+      gridState3.y = Math.max(ymin, Math.min(ymax, chart3.yScale.invert(e.y)));
+      syncGridInputs3(); redrawChart3(false);
     });
-
-  g.select(".drag-handles-y").selectAll("line").data([gyVal3])
-    .join("line")
-    .attr("stroke", "transparent").attr("stroke-width", 16)
-    .attr("pointer-events", "stroke").style("cursor", "ns-resize")
-    .attr("x1", 0).attr("x2", iW)
-    .attr("y1", v => yScale(v)).attr("y2", v => yScale(v))
+  g.select('.drag-handles-y').selectAll('line').data([gyVal3])
+    .join('line')
+    .attr('stroke','transparent').attr('stroke-width',16)
+    .attr('pointer-events','stroke').style('cursor','ns-resize')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', v => yScale(v)).attr('y2', v => yScale(v))
     .call(dragY3);
 
-  Tbub(g.select(".bubbles").selectAll(".bubble"))
-    .attr("cx", d => xScale(d.diffRecruit))
-    .attr("cy", d => yScale(d.ent))
-    .attr("r",  d => rScale(d.poids));
+  Tbub(g.select('.bubbles').selectAll('.bubble'))
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r',  d => chart3.rScale(d.poids));
 }
 
 function updateChart3() {
   if (!chart3.g) return;
   const data = filteredData3();
-  document.getElementById("empty-state-3").style.display = data.length === 0 ? "flex" : "none";
-  document.getElementById("sel-count-3").textContent = data.length;
+  document.getElementById('empty-state-3').style.display = data.length === 0 ? 'flex' : 'none';
+  document.getElementById('sel-count-3').textContent = data.length;
 
-  chart3.svg.select(".zoom-rect").call(chart3.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-3").classList.remove("visible");
+  chart3.svg.select('.zoom-rect').call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById('zoom-reset-3').classList.remove('visible');
 
   if (data.length > 0) {
     const [xMin, xMax] = d3.extent(data, d => d.diffRecruit);
     const xSpan = (xMax - xMin) || Math.abs(xMax) || 1;
-    const xPad = (R_MAX / chart3.iW) * xSpan * 2;
-    chart3.xScaleBase.domain([xMin - xPad, xMax + xPad]).nice();
+    chart3.xScaleBase.domain([xMin - (R_MAX/chart3.iW)*xSpan*2, xMax + (R_MAX/chart3.iW)*xSpan*2]).nice();
 
     const [yMin, yMax] = d3.extent(data, d => d.ent);
     const ySpan = (yMax - yMin) || Math.abs(yMax) || 1;
-    const yPad = (R_MAX / chart3.iH) * ySpan * 2;
-    chart3.yScaleBase.domain([yMin - yPad, yMax + yPad]).nice();
+    chart3.yScaleBase.domain([yMin - (R_MAX/chart3.iH)*ySpan*2, yMax + (R_MAX/chart3.iH)*ySpan*2]).nice();
 
     chart3.xScale = chart3.xScaleBase.copy();
     chart3.yScale = chart3.yScaleBase.copy();
 
-    // Barycentre pondéré par le nombre de DPAE > 1 mois (taille des bulles)
-    const bary3 = computeBarycenter(data, d => d.diffRecruit, d => d.ent, d => d.poids);
-    gridState3.bx = bary3.x;
-    gridState3.by = bary3.y;
+    const bary = computeBarycenter(data, d => d.diffRecruit, d => d.ent, d => d.poids);
+    gridState3.bx = bary.x; gridState3.by = bary.y;
     syncGridInputs3();
   }
 
-  const tooltip = document.getElementById("tooltip");
-  const fmt = d3.format(".1%"), fmtEvol = d3.format("+.1%");
-  const { g, xScale, yScale, rScale } = chart3;
+  const tooltip = document.getElementById('tooltip');
+  const fmt = d3.format('.1%'), fmtEvol = d3.format('+.1%');
+  const { g, xScale, yScale } = chart3;
+  const EVOL3_LABEL = { bas:'Baisse', mid:'Évolution modérée', haut:'Hausse' };
 
-  const bubbles = g.select(".bubbles").selectAll(".bubble").data(data, d => d.code);
-  bubbles.exit().transition("bubble-exit").duration(200).attr("r",0).remove();
-  const enter = bubbles.enter().append("circle")
-    .attr("class","bubble")
-    .attr("cx", d => xScale(d.diffRecruit))
-    .attr("cy", d => yScale(d.ent))
-    .attr("r", 0)
-    .attr("fill", d => COL_EVOL3[d.evol3cat])
-    .attr("fill-opacity", 0.55)
-    .attr("stroke", d => COL_EVOL3[d.evol3cat])
-    .attr("stroke-width", 1.2)
-    .attr("stroke-opacity", 0.8);
+  const bubbles = g.select('.bubbles').selectAll('.bubble').data(data, d => d.code);
+  bubbles.exit().transition('exit').duration(200).attr('r',0).remove();
 
-  const EVOL3_LABEL = { bas:"Baisse", mid:"Évolution modérée", haut:"Hausse" };
-
-  enter.merge(bubbles)
-    .on("mousemove", function(event, d) {
-      tooltip.style.opacity = "1";
-      tooltip.style.left = (event.clientX+16)+"px";
-      tooltip.style.top  = (event.clientY-10)+"px";
+  bubbles.enter().append('circle')
+    .attr('class','bubble')
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r', 0)
+    .attr('fill', d => COL_EVOL3[d.evol3cat])
+    .attr('fill-opacity', 0.55)
+    .attr('stroke', d => COL_EVOL3[d.evol3cat])
+    .attr('stroke-width', 1.2)
+    .attr('stroke-opacity', 0.8)
+    .on('mousemove', function(event, d) {
+      tooltip.style.opacity = '1';
+      tooltip.style.left = (event.clientX+16)+'px';
+      tooltip.style.top  = (event.clientY-10)+'px';
       tooltip.innerHTML = `
         <div class="tt-title">${d.label}</div>
-        <div class="tt-row"><span>Niveau de tension</span><span class="tt-val" style="color:${COL_TENSION[d.tension]}">${d.tension}</span></div>
         <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.diffRecruit)}</span></div>
         <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
         <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
         <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${COL_EVOL3[d.evol3cat]}">${fmtEvol(d.evol)} (${EVOL3_LABEL[d.evol3cat]})</span></div>
       `;
-      d3.select(this).attr("stroke-width",2.5).attr("fill-opacity",0.8);
+      d3.select(this).attr('stroke-width',2.5).attr('fill-opacity',0.8);
     })
-    .on("mouseleave", function() {
-      tooltip.style.opacity = "0";
-      d3.select(this).attr("stroke-width",1.2).attr("fill-opacity",0.55);
+    .on('mouseleave', function() {
+      tooltip.style.opacity = '0';
+      d3.select(this).attr('stroke-width',1.2).attr('fill-opacity',0.55);
     })
-    .transition("bubble").duration(400)
-    .attr("cx", d => xScale(d.diffRecruit))
-    .attr("cy", d => yScale(d.ent))
-    .attr("r",  d => rScale(d.poids));
+    .merge(bubbles)
+    .transition('bubble').duration(400)
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r',  d => chart3.rScale(d.poids));
 
   redrawChart3(true);
 }
@@ -1729,41 +1023,26 @@ function updateChart3() {
 function resetZoom3() {
   chart3.xScale = chart3.xScaleBase.copy();
   chart3.yScale = chart3.yScaleBase.copy();
-  chart3.svg.select(".zoom-rect")
-    .transition().duration(400)
-    .call(chart3.zoom.transform, d3.zoomIdentity);
-  document.getElementById("zoom-reset-3").classList.remove("visible");
+  chart3.svg.select('.zoom-rect').transition().duration(400).call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById('zoom-reset-3').classList.remove('visible');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (async () => {
   const ok = await loadData();
-  document.getElementById("loading-overlay").style.display = "none";
+  document.getElementById('loading-overlay').style.display = 'none';
   if (!ok) return;
 
-  RAW.forEach(d => {
-    state1.selectedCodes.add(d.code);
-    state2.selectedCodes.add(d.code);
-    state3.selectedCodes.add(d.code);
-  });
+  loadTerritoryData('00', 'National');
 
-  buildSidebar("filiere-list-1", state1, () => { updateChart1(); document.getElementById("sel-count-1").textContent = filteredData1().length; },
-    d => COL_TENSION[d.tension]);
-  buildSidebar("filiere-list-2", state2, () => { updateChart2(); document.getElementById("sel-count-2").textContent = filteredData2().length; },
-    d => evolColor(d.evol));
-  buildSidebar("filiere-list-3", state3, () => { updateChart3(); document.getElementById("sel-count-3").textContent = filteredData3().length; },
-    d => COL_EVOL3[d.evol3cat]);
-
-  initChart1();
+  state3.selectedCodes = new Set(RAW.map(d => d.code));
+  buildSidebar3();
+  initChart3();
 
   let resizeTimer;
-  window.addEventListener("resize", () => {
+  window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      if (activeTab === 'tab1')      initChart1();
-      else if (activeTab === 'tab2') initChart2();
-      else                           initChart3();
-    }, 120);
+    resizeTimer = setTimeout(initChart3, 120);
   });
 })();
 </script>
