@@ -856,6 +856,7 @@ function initChart3() {
   g.append('rect').attr('width',iW).attr('height',iH).attr('fill','#f9fafb').attr('rx',4);
   g.append('g').attr('class','grid-y');
   g.append('g').attr('class','grid-x').attr('transform',`translate(0,${iH})`);
+  g.append('g').attr('class','zone-labels');
   g.append('g').attr('class','zone-lines');
   g.append('g').attr('class','zone-lines-y');
   g.append('g').attr('class','axis axis-x').attr('transform',`translate(0,${iH})`);
@@ -913,6 +914,40 @@ function redrawChart3(useTransition = false) {
     .join('line').attr('class','grid-zone-line')
     .attr('x1', 0).attr('x2', iW)
     .attr('y1', v => yScale(v)).attr('y2', v => yScale(v));
+
+  // ── ZONE BACKGROUND LABELS ────────────────────────────────────────────────
+  const gxPx = xScale(gxVal3), gyPx = yScale(gyVal3);
+  const ZONE_DEFS = [
+    { x: gxPx / 2,       y: gyPx / 2,       color:'#16a34a',
+      lines:['A consolider,','maintenir un partenariat efficace'] },
+    { x:(gxPx+iW)/2,     y: gyPx / 2,       color:'#dc2626',
+      lines:['Proposer des services adaptés','pour réduire les tensions'] },
+    { x: gxPx / 2,       y:(gyPx+iH)/2,     color:'#d97706',
+      lines:['Chercher des opportunités de partenariats','pour certains recrutements'] },
+    { x:(gxPx+iW)/2,     y:(gyPx+iH)/2,     color:'#dc2626',
+      lines:["\u00c0 prioriser dans l\u2019\u00ab\u202faller vers\u202f\u00bb,","pour proposer des solutions","visant \u00e0 r\u00e9duire les tensions"] },
+  ];
+  const zg = g.select('.zone-labels');
+  zg.selectAll('*').remove();
+  ZONE_DEFS.forEach(zone => {
+    const n = zone.lines.length;
+    const t = zg.append('text')
+      .attr('text-anchor','middle')
+      .attr('x', zone.x).attr('y', zone.y)
+      .attr('fill', zone.color)
+      .attr('opacity', 0.22)
+      .attr('font-size','11')
+      .attr('font-family',"'DM Sans',sans-serif")
+      .attr('font-weight','700')
+      .attr('pointer-events','none');
+    zone.lines.forEach((line,i) => {
+      t.append('tspan')
+        .attr('x', zone.x)
+        .attr('dy', i===0 ? `${-(n-1)*0.65}em` : '1.3em')
+        .text(line);
+    });
+  });
+  // ─────────────────────────────────────────────────────────────────────────
 
   const dragX3 = d3.drag()
     .on('start', (e) => { e.sourceEvent.stopPropagation(); })
