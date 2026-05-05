@@ -1,0 +1,4058 @@
+[
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.11Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de céréales (à l'exception du riz), de légumineuses et de graines oléagineuses"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.12Z",
+        "Libellé NAF 2008 - Niv 5":"Culture du riz"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.13Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de légumes, de melons, de racines et de tubercules"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.14Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de la canne à sucre"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.15Z",
+        "Libellé NAF 2008 - Niv 5":"Culture du tabac"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.16Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de plantes à fibres"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.19Z",
+        "Libellé NAF 2008 - Niv 5":"Autres cultures non permanentes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.21Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de la vigne"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.22Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de fruits tropicaux et subtropicaux"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.23Z",
+        "Libellé NAF 2008 - Niv 5":"Culture d'agrumes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.24Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de fruits à pépins et à noyau"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.25Z",
+        "Libellé NAF 2008 - Niv 5":"Culture d'autres fruits d'arbres ou d'arbustes et de fruits à coque"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.26Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de fruits oléagineux"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.27Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de plantes à boissons"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.28Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de plantes à épices, aromatiques, médicinales et pharmaceutiques"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.29Z",
+        "Libellé NAF 2008 - Niv 5":"Autres cultures permanentes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.30Z",
+        "Libellé NAF 2008 - Niv 5":"Reproduction de plantes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.41Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage de vaches laitières"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.42Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage d'autres bovins et de buffles"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.43Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage de chevaux et d'autres équidés"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.44Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage de chameaux et d'autres camélidés"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.45Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage d'ovins et de caprins"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.46Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage de porcins"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.47Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage de volailles"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.49Z",
+        "Libellé NAF 2008 - Niv 5":"Élevage d'autres animaux"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.50Z",
+        "Libellé NAF 2008 - Niv 5":"Culture et élevage associés"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.61Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de soutien aux cultures"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.62Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de soutien à la production animale"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.63Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement primaire des récoltes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.64Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement des semences"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"01.70Z",
+        "Libellé NAF 2008 - Niv 5":"Chasse, piégeage et services annexes"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"02.10Z",
+        "Libellé NAF 2008 - Niv 5":"Sylviculture et autres activités forestières"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"02.20Z",
+        "Libellé NAF 2008 - Niv 5":"Exploitation forestière"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"02.30Z",
+        "Libellé NAF 2008 - Niv 5":"Récolte de produits forestiers non ligneux poussant à l'état sauvage"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"02.40Z",
+        "Libellé NAF 2008 - Niv 5":"Services de soutien à l'exploitation forestière"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"03.11Z",
+        "Libellé NAF 2008 - Niv 5":"Pêche en mer"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"03.12Z",
+        "Libellé NAF 2008 - Niv 5":"Pêche en eau douce"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"03.21Z",
+        "Libellé NAF 2008 - Niv 5":"Aquaculture en mer"
+    },
+    {
+        "Code filière":"FIL01",
+        "Libellé filière majuscule":"AGRICULTURE, ÉLEVAGE ET PÊCHE",
+        "Code NAF 2008 - Niv 5":"03.22Z",
+        "Libellé NAF 2008 - Niv 5":"Aquaculture en eau douce"
+    },
+    {
+        "Code filière":"FIL02",
+        "Libellé filière majuscule":"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+        "Code NAF 2008 - Niv 5":"20.51Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits explosifs"
+    },
+    {
+        "Code filière":"FIL02",
+        "Libellé filière majuscule":"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+        "Code NAF 2008 - Niv 5":"30.40Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de véhicules militaires de combat"
+    },
+    {
+        "Code filière":"FIL02",
+        "Libellé filière majuscule":"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+        "Code NAF 2008 - Niv 5":"84.22Z",
+        "Libellé NAF 2008 - Niv 5":"Défense"
+    },
+    {
+        "Code filière":"FIL02",
+        "Libellé filière majuscule":"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+        "Code NAF 2008 - Niv 5":"84.24Z",
+        "Libellé NAF 2008 - Niv 5":"Activités d’ordre public et de sécurité"
+    },
+    {
+        "Code filière":"FIL02",
+        "Libellé filière majuscule":"ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE",
+        "Code NAF 2008 - Niv 5":"84.25Z",
+        "Libellé NAF 2008 - Niv 5":"Services du feu et de secours"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"41.10A",
+        "Libellé NAF 2008 - Niv 5":"Promotion immobilière de logements"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"41.10B",
+        "Libellé NAF 2008 - Niv 5":"Promotion immobilière de bureaux"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"41.10C",
+        "Libellé NAF 2008 - Niv 5":"Promotion immobilière d'autres bâtiments"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"41.10D",
+        "Libellé NAF 2008 - Niv 5":"Supports juridiques de programmes"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"64.19Z",
+        "Libellé NAF 2008 - Niv 5":"Autres intermédiations monétaires"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"64.91Z",
+        "Libellé NAF 2008 - Niv 5":"Crédit-bail"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"64.92Z",
+        "Libellé NAF 2008 - Niv 5":"Autre distribution de crédit"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"64.99Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités des services financiers, hors assurance et caisses de retraite, n.c.a."
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"65.11Z",
+        "Libellé NAF 2008 - Niv 5":"Assurance vie"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"65.12Z",
+        "Libellé NAF 2008 - Niv 5":"Autres assurances"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"65.20Z",
+        "Libellé NAF 2008 - Niv 5":"Réassurance"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"65.30Z",
+        "Libellé NAF 2008 - Niv 5":"Caisses de retraite"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.11Z",
+        "Libellé NAF 2008 - Niv 5":"Administration de marchés financiers"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.12Z",
+        "Libellé NAF 2008 - Niv 5":"Courtage de valeurs mobilières et de marchandises"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.19B",
+        "Libellé NAF 2008 - Niv 5":"Autres activités auxiliaires de services financiers, hors assurance et caisses de retraite, n.c.a."
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.21Z",
+        "Libellé NAF 2008 - Niv 5":"Évaluation des risques et dommages"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.22Z",
+        "Libellé NAF 2008 - Niv 5":"Activités des agents et courtiers d'assurances"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.29Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités auxiliaires d'assurance et de caisses de retraite"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"66.30Z",
+        "Libellé NAF 2008 - Niv 5":"Gestion de fonds"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"68.10Z",
+        "Libellé NAF 2008 - Niv 5":"Activités des marchands de biens immobiliers"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"68.20B",
+        "Libellé NAF 2008 - Niv 5":"Location de terrains et d'autres biens immobiliers"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"68.31Z",
+        "Libellé NAF 2008 - Niv 5":"Agences immobilières"
+    },
+    {
+        "Code filière":"FIL03",
+        "Libellé filière majuscule":"BANQUES ASSURANCES IMMOBILIER",
+        "Code NAF 2008 - Niv 5":"68.32A",
+        "Libellé NAF 2008 - Niv 5":"Administration d'immeubles et autres biens immobiliers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.11Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires du commerce en matières premières agricoles, animaux vivants, matières premières textiles et produits semi-finis"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.12B",
+        "Libellé NAF 2008 - Niv 5":"Autres intermédiaires du commerce en combustibles, métaux, minéraux et produits chimiques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.13Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires du commerce en bois et matériaux de construction"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.14Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires du commerce en machines, équipements industriels, navires et avions"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.15Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires du commerce en meubles, articles de ménage et quincaillerie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.16Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires du commerce en textiles, habillement, fourrures, chaussures et articles en cuir"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.17A",
+        "Libellé NAF 2008 - Niv 5":"Centrales d'achat alimentaires"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.17B",
+        "Libellé NAF 2008 - Niv 5":"Autres intermédiaires du commerce en denrées, boissons et tabac"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.18Z",
+        "Libellé NAF 2008 - Niv 5":"Intermédiaires spécialisés dans le commerce d'autres produits spécifiques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.19A",
+        "Libellé NAF 2008 - Niv 5":"Centrales d'achat non alimentaires"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.19B",
+        "Libellé NAF 2008 - Niv 5":"Autres intermédiaires du commerce en produits divers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.21Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de céréales, de tabac non manufacturé, de semences et d'aliments pour le bétail"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.22Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de fleurs et plantes"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.23Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'animaux vivants"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.24Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de cuirs et peaux"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.31Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de fruits et légumes"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.32A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de viandes de boucherie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.32B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits à base de viande"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.32C",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de volailles et gibier"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.33Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits laitiers, œufs, huiles et matières grasses comestibles"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.34Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de boissons"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.35Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits à base de tabac"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.36Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de sucre, chocolat et confiserie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.37Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de café, thé, cacao et épices"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.38A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de poissons, crustacés et mollusques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.38B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) alimentaire spécialisé divers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.39A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits surgelés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.39B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) alimentaire non spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.41Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de textiles"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.42Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'habillement et de chaussures"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.43Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'appareils électroménagers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.44Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de vaisselle, verrerie et produits d'entretien"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.45Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de parfumerie et de produits de beauté"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.46Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits pharmaceutiques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.47Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de meubles, de tapis et d'appareils d'éclairage"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.48Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'articles d'horlogerie et de bijouterie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.49Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'autres biens domestiques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.51Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'ordinateurs, d'équipements informatiques périphériques et de logiciels"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.52Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de composants et d'équipements électroniques et de télécommunication"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.61Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de matériel agricole"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.62Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de machines-outils"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.63Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de machines pour l'extraction, la construction et le génie civil"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.64Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de machines pour l'industrie textile et l'habillement"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.65Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de mobilier de bureau"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.66Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'autres machines et équipements de bureau"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.69A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de matériel électrique"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.69B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de fournitures et équipements industriels divers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.69C",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de fournitures et équipements divers pour le commerce et les services"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.71Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de combustibles et de produits annexes"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.72Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de minerais et métaux"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.73B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'appareils sanitaires et de produits de décoration"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.74A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de quincaillerie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.74B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de fournitures pour la plomberie et le chauffage"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.75Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits chimiques"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.76Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) d'autres produits intermédiaires"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"46.90Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) non spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de produits surgelés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11B",
+        "Libellé NAF 2008 - Niv 5":"Commerce d'alimentation générale"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11C",
+        "Libellé NAF 2008 - Niv 5":"Supérettes"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11D",
+        "Libellé NAF 2008 - Niv 5":"Supermarchés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11E",
+        "Libellé NAF 2008 - Niv 5":"Magasins multi-commerces"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.11F",
+        "Libellé NAF 2008 - Niv 5":"Hypermarchés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.19A",
+        "Libellé NAF 2008 - Niv 5":"Grands magasins"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.19B",
+        "Libellé NAF 2008 - Niv 5":"Autres commerces de détail en magasin non spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.21Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de fruits et légumes en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.22Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de viandes et de produits à base de viande en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.23Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de poissons, crustacés et mollusques en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.24Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.25Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de boissons en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.26Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de produits à base de tabac en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.29Z",
+        "Libellé NAF 2008 - Niv 5":"Autres commerces de détail alimentaires en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.30Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de carburants en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.41Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.42Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de matériels de télécommunication en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.43Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de matériels audio et vidéo en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.51Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de textiles en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.52A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de quincaillerie, peintures et verres en petites surfaces (moins de 400 m2)"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.52B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de quincaillerie, peintures et verres en grandes surfaces (400 m2et plus)"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.53Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de tapis, moquettes et revêtements de murs et de sols en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.54Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'appareils électroménagers en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.59A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de meubles"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.59B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'autres équipements du foyer"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.61Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de livres en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.62Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de journaux et papeterie en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.63Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'enregistrements musicaux et vidéo en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.64Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'articles de sport en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.65Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de jeux et jouets en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.71Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'habillement en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.72A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de la chaussure"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.72B",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de maroquinerie et d'articles de voyage"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.73Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de produits pharmaceutiques en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.74Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'articles médicaux et orthopédiques en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.75Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de parfumerie et de produits de beauté en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.76Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de fleurs, plantes, graines, engrais, animaux de compagnie et aliments pour ces animaux en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.77Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'articles d'horlogerie et de bijouterie en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.78A",
+        "Libellé NAF 2008 - Niv 5":"Commerces de détail d'optique"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.78B",
+        "Libellé NAF 2008 - Niv 5":"Commerces de détail de charbons et combustibles"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.78C",
+        "Libellé NAF 2008 - Niv 5":"Autres commerces de détail spécialisés divers"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.81Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail alimentaire sur éventaires et marchés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.82Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de textiles, d'habillement et de chaussures sur éventaires et marchés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.89Z",
+        "Libellé NAF 2008 - Niv 5":"Autres commerces de détail sur éventaires et marchés"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.91A",
+        "Libellé NAF 2008 - Niv 5":"Vente à distance sur catalogue général"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.91B",
+        "Libellé NAF 2008 - Niv 5":"Vente à distance sur catalogue spécialisé"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.99A",
+        "Libellé NAF 2008 - Niv 5":"Vente à domicile"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"47.99B",
+        "Libellé NAF 2008 - Niv 5":"Vente par automates et autres commerces de détail hors magasin, éventaires ou marchés n.c.a."
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"95.23Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de chaussures et d'articles en cuir"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"96.01B",
+        "Libellé NAF 2008 - Niv 5":"Blanchisserie-teinturerie de détail"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"96.02A",
+        "Libellé NAF 2008 - Niv 5":"Coiffure"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"96.02B",
+        "Libellé NAF 2008 - Niv 5":"Soins de beauté"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"96.03Z",
+        "Libellé NAF 2008 - Niv 5":"Services funéraires"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"96.04Z",
+        "Libellé NAF 2008 - Niv 5":"Entretien corporel"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.51Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de ciment"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.52Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de chaux et plâtre"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.61Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'éléments en béton pour la construction"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.62Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'éléments en plâtre pour la construction"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.63Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de béton prêt à l'emploi"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.64Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de mortiers et bétons secs"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.65Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'ouvrages en fibre-ciment"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"23.69Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres ouvrages en béton, en ciment ou en plâtre"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"41.20A",
+        "Libellé NAF 2008 - Niv 5":"Construction de maisons individuelles"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"41.20B",
+        "Libellé NAF 2008 - Niv 5":"Construction d'autres bâtiments"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.11Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de routes et autoroutes"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.12Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de voies ferrées de surface et souterraines"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.13A",
+        "Libellé NAF 2008 - Niv 5":"Construction d'ouvrages d'art"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.13B",
+        "Libellé NAF 2008 - Niv 5":"Construction et entretien de tunnels"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.21Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de réseaux pour fluides"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.22Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de réseaux électriques et de télécommunications"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.91Z",
+        "Libellé NAF 2008 - Niv 5":"Construction d'ouvrages maritimes et fluviaux"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"42.99Z",
+        "Libellé NAF 2008 - Niv 5":"Construction d'autres ouvrages de génie civil n.c.a."
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.11Z",
+        "Libellé NAF 2008 - Niv 5":"Travaux de démolition"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.12A",
+        "Libellé NAF 2008 - Niv 5":"Travaux de terrassement courants et travaux préparatoires"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.12B",
+        "Libellé NAF 2008 - Niv 5":"Travaux de terrassement spécialisés ou de grande masse"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.13Z",
+        "Libellé NAF 2008 - Niv 5":"Forages et sondages"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.21A",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'installation électrique dans tous locaux"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.21B",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'installation électrique sur la voie publique"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.22A",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'installation d'eau et de gaz en tous locaux"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.22B",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'installation d'équipements thermiques et de climatisation"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.29A",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'isolation"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.29B",
+        "Libellé NAF 2008 - Niv 5":"Autres travaux d'installation n.c.a."
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.31Z",
+        "Libellé NAF 2008 - Niv 5":"Travaux de plâtrerie"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.32A",
+        "Libellé NAF 2008 - Niv 5":"Travaux de menuiserie bois et PVC"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.32B",
+        "Libellé NAF 2008 - Niv 5":"Travaux de menuiserie métallique et serrurerie"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.32C",
+        "Libellé NAF 2008 - Niv 5":"Agencement de lieux de vente"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.33Z",
+        "Libellé NAF 2008 - Niv 5":"Travaux de revêtement des sols et des murs"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.34Z",
+        "Libellé NAF 2008 - Niv 5":"Travaux de peinture et vitrerie"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.39Z",
+        "Libellé NAF 2008 - Niv 5":"Autres travaux de finition"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.91A",
+        "Libellé NAF 2008 - Niv 5":"Travaux de charpente"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.91B",
+        "Libellé NAF 2008 - Niv 5":"Travaux de couverture par éléments"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.99A",
+        "Libellé NAF 2008 - Niv 5":"Travaux d'étanchéification"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.99B",
+        "Libellé NAF 2008 - Niv 5":"Travaux de montage de structures métalliques"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.99C",
+        "Libellé NAF 2008 - Niv 5":"Travaux de maçonnerie générale et gros œuvre de bâtiment"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.99D",
+        "Libellé NAF 2008 - Niv 5":"Autres travaux spécialisés de construction"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"43.99E",
+        "Libellé NAF 2008 - Niv 5":"Location avec opérateur de matériel de construction"
+    },
+    {
+        "Code filière":"FIL05",
+        "Libellé filière majuscule":"CONSTRUCTION (BTP ET MATÉRIAUX)",
+        "Code NAF 2008 - Niv 5":"46.73A",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de bois et de matériaux de construction"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"59.11A",
+        "Libellé NAF 2008 - Niv 5":"Production de films et de programmes pour la télévision"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"59.11B",
+        "Libellé NAF 2008 - Niv 5":"Production de films institutionnels et publicitaires"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"59.11C",
+        "Libellé NAF 2008 - Niv 5":"Production de films pour le cinéma"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"59.12Z",
+        "Libellé NAF 2008 - Niv 5":"Post-production de films cinématographiques, de vidéo et de programmes de télévision"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"60.10Z",
+        "Libellé NAF 2008 - Niv 5":"Édition et diffusion de programmes radio"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"60.20A",
+        "Libellé NAF 2008 - Niv 5":"Edition de chaînes généralistes"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"60.20B",
+        "Libellé NAF 2008 - Niv 5":"Edition de chaînes thématiques"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"90.01Z",
+        "Libellé NAF 2008 - Niv 5":"Arts du spectacle vivant"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"90.02Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de soutien au spectacle vivant"
+    },
+    {
+        "Code filière":"FIL06",
+        "Libellé filière majuscule":"CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL",
+        "Code NAF 2008 - Niv 5":"90.04Z",
+        "Libellé NAF 2008 - Niv 5":"Gestion de salles de spectacles"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"84.11Z",
+        "Libellé NAF 2008 - Niv 5":"Administration publique générale"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"84.12Z",
+        "Libellé NAF 2008 - Niv 5":"Administration publique (tutelle) de la santé, de la formation, de la culture et des services sociaux, autre que sécurité sociale"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"84.13Z",
+        "Libellé NAF 2008 - Niv 5":"Administration publique (tutelle) des activités économiques"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"84.21Z",
+        "Libellé NAF 2008 - Niv 5":"Affaires étrangères"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"84.23Z",
+        "Libellé NAF 2008 - Niv 5":"Justice"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.10Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement pré-primaire"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.20Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement primaire"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.31Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement secondaire général"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.32Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement secondaire technique ou professionnel"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.41Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement post-secondaire non supérieur"
+    },
+    {
+        "Code filière":"FIL07",
+        "Libellé filière majuscule":"EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)",
+        "Code NAF 2008 - Niv 5":"85.42Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement supérieur"
+    },
+    {
+        "Code filière":"FIL08",
+        "Libellé filière majuscule":"ENERGIES (RENOUVELABLES ET RÉSEAUX)",
+        "Code NAF 2008 - Niv 5":"35.11Z",
+        "Libellé NAF 2008 - Niv 5":"Production d'électricité"
+    },
+    {
+        "Code filière":"FIL08",
+        "Libellé filière majuscule":"ENERGIES (RENOUVELABLES ET RÉSEAUX)",
+        "Code NAF 2008 - Niv 5":"35.12Z",
+        "Libellé NAF 2008 - Niv 5":"Transport d'électricité"
+    },
+    {
+        "Code filière":"FIL08",
+        "Libellé filière majuscule":"ENERGIES (RENOUVELABLES ET RÉSEAUX)",
+        "Code NAF 2008 - Niv 5":"35.21Z",
+        "Libellé NAF 2008 - Niv 5":"Production de combustibles gazeux"
+    },
+    {
+        "Code filière":"FIL08",
+        "Libellé filière majuscule":"ENERGIES (RENOUVELABLES ET RÉSEAUX)",
+        "Code NAF 2008 - Niv 5":"35.22Z",
+        "Libellé NAF 2008 - Niv 5":"Distribution de combustibles gazeux par conduites"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"02.10Z",
+        "Libellé NAF 2008 - Niv 5":"Sylviculture et autres activités forestières"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"02.20Z",
+        "Libellé NAF 2008 - Niv 5":"Exploitation forestière"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"02.30Z",
+        "Libellé NAF 2008 - Niv 5":"Récolte de produits forestiers non ligneux poussant à l'état sauvage"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"02.40Z",
+        "Libellé NAF 2008 - Niv 5":"Services de soutien à l'exploitation forestière"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.10A",
+        "Libellé NAF 2008 - Niv 5":"Sciage et rabotage du bois, hors imprégnation"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.10B",
+        "Libellé NAF 2008 - Niv 5":"Imprégnation du bois"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.21Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de placage et de panneaux de bois"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.22Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de parquets assemblés"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.23Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de charpentes et d'autres menuiseries"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.24Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'emballages en bois"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"16.29Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'objets divers en bois ; fabrication d'objets en liège, vannerie et sparterie"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de pâte à papier"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de papier et de carton"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.21A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de carton ondulé"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.21B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de cartonnages"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.21C",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'emballages en papier"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.22Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles en papier à usage sanitaire ou domestique"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.23Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles de papeterie"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.24Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de papiers peints"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"17.29Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres articles en papier ou en carton"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"28.24Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'outillage portatif à moteur incorporé"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"28.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines agricoles et forestières"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"28.95Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour les industries du papier et du carton"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"31.01Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de meubles de bureau et de magasin"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"31.02Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de meubles de cuisine"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"31.09A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de sièges d'ameublement d'intérieur"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"31.09B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d’autres meubles et industries connexes de l’ameublement"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"43.32A",
+        "Libellé NAF 2008 - Niv 5":"Travaux de menuiserie bois et PVC"
+    },
+    {
+        "Code filière":"FIL09",
+        "Libellé filière majuscule":"FILIÈRE BOIS",
+        "Code NAF 2008 - Niv 5":"43.91A",
+        "Libellé NAF 2008 - Niv 5":"Travaux de charpente"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"55.10Z",
+        "Libellé NAF 2008 - Niv 5":"Hôtels et hébergement similaire"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"55.20Z",
+        "Libellé NAF 2008 - Niv 5":"Hébergement touristique et autre hébergement de courte durée"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"55.30Z",
+        "Libellé NAF 2008 - Niv 5":"Terrains de camping et parcs pour caravanes ou véhicules de loisirs"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"55.90Z",
+        "Libellé NAF 2008 - Niv 5":"Autres hébergements"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.10A",
+        "Libellé NAF 2008 - Niv 5":"Restauration traditionnelle"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.10B",
+        "Libellé NAF 2008 - Niv 5":"Cafétérias et autres libres-services"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.10C",
+        "Libellé NAF 2008 - Niv 5":"Restauration de type rapide"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.21Z",
+        "Libellé NAF 2008 - Niv 5":"Services des traiteurs"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.29A",
+        "Libellé NAF 2008 - Niv 5":"Restauration collective sous contrat"
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.29B",
+        "Libellé NAF 2008 - Niv 5":"Autres services de restauration n.c.a."
+    },
+    {
+        "Code filière":"FIL10",
+        "Libellé filière majuscule":"HÔTELLERIE ET RESTAURATIONS (HCRB)",
+        "Code NAF 2008 - Niv 5":"56.30Z",
+        "Libellé NAF 2008 - Niv 5":"Débits de boissons"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.11Z",
+        "Libellé NAF 2008 - Niv 5":"Transformation et conservation de la viande de boucherie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.12Z",
+        "Libellé NAF 2008 - Niv 5":"Transformation et conservation de la viande de volaille"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.13A",
+        "Libellé NAF 2008 - Niv 5":"Préparation industrielle de produits à base de viande"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.13B",
+        "Libellé NAF 2008 - Niv 5":"Charcuterie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.20Z",
+        "Libellé NAF 2008 - Niv 5":"Transformation et conservation de poisson, de crustacés et de mollusques"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.31Z",
+        "Libellé NAF 2008 - Niv 5":"Transformation et conservation de pommes de terre"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.32Z",
+        "Libellé NAF 2008 - Niv 5":"Préparation de jus de fruits et légumes"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.39A",
+        "Libellé NAF 2008 - Niv 5":"Autre transformation et conservation de légumes"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.39B",
+        "Libellé NAF 2008 - Niv 5":"Transformation et conservation de fruits"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.41A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'huiles et graisses brutes"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.41B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'huiles et graisses raffinées"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.42Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de margarine et graisses comestibles similaires"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.51A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de lait liquide et de produits frais"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.51B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de beurre"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.51C",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de fromage"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.51D",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres produits laitiers"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.52Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de glaces et sorbets"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.61A",
+        "Libellé NAF 2008 - Niv 5":"Meunerie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.61B",
+        "Libellé NAF 2008 - Niv 5":"Autres activités du travail des grains"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.62Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits amylacés"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.71A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication industrielle de pain et de pâtisserie fraîche"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"10.71C",
+        "Libellé NAF 2008 - Niv 5":"Boulangerie et boulangerie-pâtisserie"
+    },
+    {
+        "Code filière":"FIL04",
+        "Libellé filière majuscule":"COMMERCE ET DISTRIBUTION",
+        "Code NAF 2008 - Niv 5":"10.71D",
+        "Libellé NAF 2008 - Niv 5":"Pâtisserie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.72Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de biscuits, biscottes et pâtisseries de conservation"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.73Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de pâtes alimentaires"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.81Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de sucre"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.82Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de cacao, chocolat et de produits de confiserie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.83Z",
+        "Libellé NAF 2008 - Niv 5":"Transformation du thé et du café"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.84Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de condiments et assaisonnements"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.85Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de plats préparés"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.86Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'aliments homogénéisés et diététiques"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.89Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres produits alimentaires n.c.a."
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.91Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'aliments pour animaux de ferme"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"10.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'aliments pour animaux de compagnie"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.01Z",
+        "Libellé NAF 2008 - Niv 5":"Production de boissons alcooliques distillées"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.02A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vins effervescents"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.02B",
+        "Libellé NAF 2008 - Niv 5":"Vinification"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.03Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de cidre et de vins de fruits"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.04Z",
+        "Libellé NAF 2008 - Niv 5":"Production d'autres boissons fermentées non distillées"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.05Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de bière"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.06Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de malt"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.07A",
+        "Libellé NAF 2008 - Niv 5":"Industrie des eaux de table"
+    },
+    {
+        "Code filière":"FIL11",
+        "Libellé filière majuscule":"INDUSTRIE AGROALIMENTAIRE",
+        "Code NAF 2008 - Niv 5":"11.07B",
+        "Libellé NAF 2008 - Niv 5":"Production de boissons rafraîchissantes"
+    },
+    {
+        "Code filière":"FIL12",
+        "Libellé filière majuscule":"INDUSTRIE AUTOMOBILE",
+        "Code NAF 2008 - Niv 5":"27.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de piles et d'accumulateurs électriques"
+    },
+    {
+        "Code filière":"FIL12",
+        "Libellé filière majuscule":"INDUSTRIE AUTOMOBILE",
+        "Code NAF 2008 - Niv 5":"29.10Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de véhicules automobiles"
+    },
+    {
+        "Code filière":"FIL12",
+        "Libellé filière majuscule":"INDUSTRIE AUTOMOBILE",
+        "Code NAF 2008 - Niv 5":"29.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de carrosseries et remorques"
+    },
+    {
+        "Code filière":"FIL12",
+        "Libellé filière majuscule":"INDUSTRIE AUTOMOBILE",
+        "Code NAF 2008 - Niv 5":"29.31Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements électriques et électroniques automobiles"
+    },
+    {
+        "Code filière":"FIL12",
+        "Libellé filière majuscule":"INDUSTRIE AUTOMOBILE",
+        "Code NAF 2008 - Niv 5":"29.32Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres équipements automobiles"
+    },
+    {
+        "Code filière":"FIL13",
+        "Libellé filière majuscule":"INDUSTRIE AÉRONAUTIQUE ET SPATIALE",
+        "Code NAF 2008 - Niv 5":"26.51A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'aide à la navigation"
+    },
+    {
+        "Code filière":"FIL13",
+        "Libellé filière majuscule":"INDUSTRIE AÉRONAUTIQUE ET SPATIALE",
+        "Code NAF 2008 - Niv 5":"30.30Z",
+        "Libellé NAF 2008 - Niv 5":"Construction aéronautique et spatiale"
+    },
+    {
+        "Code filière":"FIL13",
+        "Libellé filière majuscule":"INDUSTRIE AÉRONAUTIQUE ET SPATIALE",
+        "Code NAF 2008 - Niv 5":"33.16Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance d'aéronefs et d'engins spatiaux"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de colorants et de pigments"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.13A",
+        "Libellé NAF 2008 - Niv 5":"Enrichissement et  retraitement de matières nucléaires"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.13B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres produits chimiques inorganiques de base n.c.a."
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.14Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres produits chimiques organiques de base"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.15Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits azotés et d'engrais"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.16Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matières plastiques de base"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.17Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de caoutchouc synthétique"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de pesticides et d’autres produits agrochimiques"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de peintures, vernis, encres et mastics"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.41Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de savons, détergents et produits d'entretien"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.42Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de parfums et de produits pour la toilette"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.51Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits explosifs"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.52Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de colles"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.53Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'huiles essentielles"
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.59Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres produits chimiques n.c.a."
+    },
+    {
+        "Code filière":"FIL14",
+        "Libellé filière majuscule":"INDUSTRIE CHIMIQUE",
+        "Code NAF 2008 - Niv 5":"20.60Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de fibres artificielles ou synthétiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"01.28Z",
+        "Libellé NAF 2008 - Niv 5":"Culture de plantes à épices, aromatiques, médicinales et pharmaceutiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"13.96Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres textiles techniques et industriels"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"21.10Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits pharmaceutiques de base"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"21.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de préparations pharmaceutiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"22.22Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'emballages en matières plastiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"26.60Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'irradiation médicale, d'équipements électromédicaux et électrothérapeutiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"32.50A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel médico-chirurgical et dentaire"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"46.46Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de produits pharmaceutiques"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"47.73Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de produits pharmaceutiques en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"72.11Z",
+        "Libellé NAF 2008 - Niv 5":"Recherche-développement en biotechnologie"
+    },
+    {
+        "Code filière":"FIL16",
+        "Libellé filière majuscule":"INDUSTRIE FERROVIAIRE",
+        "Code NAF 2008 - Niv 5":"30.20Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de locomotives et d'autre matériel ferroviaire roulant"
+    },
+    {
+        "Code filière":"FIL16",
+        "Libellé filière majuscule":"INDUSTRIE FERROVIAIRE",
+        "Code NAF 2008 - Niv 5":"33.17Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance d'autres équipements de transport"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"30.11Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de navires et de structures flottantes"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"30.12Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de bateaux de plaisance"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"33.15Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance navale"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"50.10Z",
+        "Libellé NAF 2008 - Niv 5":"Transports maritimes et côtiers de passagers"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"50.20Z",
+        "Libellé NAF 2008 - Niv 5":"Transports maritimes et côtiers de fret"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"50.30Z",
+        "Libellé NAF 2008 - Niv 5":"Transports fluviaux de passagers"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"50.40Z",
+        "Libellé NAF 2008 - Niv 5":"Transports fluviaux de fret"
+    },
+    {
+        "Code filière":"FIL17",
+        "Libellé filière majuscule":"NAVAL ET NAUTISME",
+        "Code NAF 2008 - Niv 5":"52.24A",
+        "Libellé NAF 2008 - Niv 5":"Manutention portuaire"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"20.16Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matières plastiques de base"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"22.21Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de plaques, feuilles, tubes et profilés en matières plastiques"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"22.22Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'emballages en matières plastiques"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"22.23Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'éléments en matières plastiques pour la construction"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"22.29A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de pièces techniques à base de matières plastiques"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"25.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de structures métalliques et de parties de structures"
+    },
+    {
+        "Code filière":"FIL18",
+        "Libellé filière majuscule":"INDUSTRIE PLASTURGIQUE",
+        "Code NAF 2008 - Niv 5":"28.96Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour le travail du caoutchouc ou des plastiques"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.10Z",
+        "Libellé NAF 2008 - Niv 5":"Préparation de fibres textiles et filature"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.20Z",
+        "Libellé NAF 2008 - Niv 5":"Tissage"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.30Z",
+        "Libellé NAF 2008 - Niv 5":"Ennoblissement textile"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.91Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'étoffes à mailles"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles textiles, sauf habillement"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.93Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de tapis et moquettes"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.94Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de ficelles, cordes et filets"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.95Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de non-tissés, sauf habillement"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.96Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres textiles techniques et industriels"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"13.99Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres textiles n.c.a."
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vêtements en cuir"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vêtements de travail"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.13Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vêtements de dessus"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.14Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vêtements de dessous"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.19Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres vêtements et accessoires"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles en fourrure"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.31Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles chaussants à mailles"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"14.39Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres articles à mailles"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"15.11Z",
+        "Libellé NAF 2008 - Niv 5":"Apprêt et tannage des cuirs ; préparation et teinture des fourrures"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"15.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles de voyage, de maroquinerie et de sellerie"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"15.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de chaussures"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"26.52Z",
+        "Libellé NAF 2008 - Niv 5":"Horlogerie"
+    },
+    {
+        "Code filière":"FIL19",
+        "Libellé filière majuscule":"INDUSTRIE TEXTILE, MODE ET LUXE",
+        "Code NAF 2008 - Niv 5":"32.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d’articles de joaillerie et bijouterie"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de composants électroniques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de cartes électroniques assemblées"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'ordinateurs et d'équipements périphériques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements de communication"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.40Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits électroniques grand public"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.51A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'aide à la navigation"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.51B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'instrumentation scientifique et technique"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.60Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'irradiation médicale, d'équipements électromédicaux et électrothérapeutiques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.70Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériels optique et photographique"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"26.80Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de supports magnétiques et optiques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de moteurs, génératrices et transformateurs électriques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel de distribution et de commande électrique"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de piles et d'accumulateurs électriques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.31Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de câbles de fibres optiques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.32Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres fils et câbles électroniques ou électriques"
+    },
+    {
+        "Code filière":"FIL20",
+        "Libellé filière majuscule":"INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE",
+        "Code NAF 2008 - Niv 5":"27.33Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel d'installation électrique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.10Z",
+        "Libellé NAF 2008 - Niv 5":"Sidérurgie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de tubes, tuyaux, profilés creux et accessoires correspondants en acier"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.31Z",
+        "Libellé NAF 2008 - Niv 5":"Étirage à froid de barres"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.32Z",
+        "Libellé NAF 2008 - Niv 5":"Laminage à froid de feuillards"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.33Z",
+        "Libellé NAF 2008 - Niv 5":"Profilage à froid par formage ou pliage"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.34Z",
+        "Libellé NAF 2008 - Niv 5":"Tréfilage à froid"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.41Z",
+        "Libellé NAF 2008 - Niv 5":"Production de métaux précieux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.42Z",
+        "Libellé NAF 2008 - Niv 5":"Métallurgie de l'aluminium"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.43Z",
+        "Libellé NAF 2008 - Niv 5":"Métallurgie du plomb, du zinc ou de l'étain"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.44Z",
+        "Libellé NAF 2008 - Niv 5":"Métallurgie du cuivre"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.45Z",
+        "Libellé NAF 2008 - Niv 5":"Métallurgie des autres métaux non ferreux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.46Z",
+        "Libellé NAF 2008 - Niv 5":"Élaboration et transformation de matières nucléaires"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.51Z",
+        "Libellé NAF 2008 - Niv 5":"Fonderie de fonte"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.52Z",
+        "Libellé NAF 2008 - Niv 5":"Fonderie d'acier"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.53Z",
+        "Libellé NAF 2008 - Niv 5":"Fonderie de métaux légers"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"24.54Z",
+        "Libellé NAF 2008 - Niv 5":"Fonderie d'autres métaux non ferreux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de structures métalliques et de parties de structures"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de portes et fenêtres en métal"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.21Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de radiateurs et de chaudières pour le chauffage central"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.29Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres réservoirs, citernes et conteneurs métalliques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de générateurs de vapeur, à l'exception des chaudières pour le chauffage central"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.40Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'armes et de munitions"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.50A",
+        "Libellé NAF 2008 - Niv 5":"Forge, estampage, matriçage ; métallurgie des poudres"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.50B",
+        "Libellé NAF 2008 - Niv 5":"Découpage, emboutissage"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.61Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement et revêtement des métaux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.62A",
+        "Libellé NAF 2008 - Niv 5":"Décolletage"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.62B",
+        "Libellé NAF 2008 - Niv 5":"Mécanique industrielle"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.71Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de coutellerie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.72Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de serrures et de ferrures"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.73A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de moules et modèles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.73B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres outillages"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.91Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de fûts et emballages métalliques similaires"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'emballages métalliques légers"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.93Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles en fils métalliques, de chaînes et de ressorts"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.94Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de vis et de boulons"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.99A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles métalliques ménagers"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"25.99B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres articles métalliques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de composants électroniques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de cartes électroniques assemblées"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'ordinateurs et d'équipements périphériques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements de communication"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.40Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de produits électroniques grand public"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.51A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'aide à la navigation"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.51B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'instrumentation scientifique et technique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.52Z",
+        "Libellé NAF 2008 - Niv 5":"Horlogerie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.60Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'irradiation médicale, d'équipements électromédicaux et électrothérapeutiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.70Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériels optique et photographique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"26.80Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de supports magnétiques et optiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de moteurs, génératrices et transformateurs électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel de distribution et de commande électrique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de piles et d'accumulateurs électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.31Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de câbles de fibres optiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.32Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres fils et câbles électroniques ou électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.33Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel d'installation électrique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.40Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'appareils d'éclairage électrique"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.51Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'appareils électroménagers"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.52Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'appareils ménagers non électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"27.90Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres matériels électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.11Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de moteurs et turbines, à l'exception des moteurs d’avions et de véhicules"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements hydrauliques et pneumatiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.13Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres pompes et compresseurs"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.14Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres articles de robinetterie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.15Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'engrenages et d'organes mécaniques de transmission"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.21Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de fours et brûleurs"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.22Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel de levage et de manutention"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.23Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines et d'équipements de bureau (à l'exception des ordinateurs et équipements périphériques)"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.24Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'outillage portatif à moteur incorporé"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.25Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements aérauliques et frigorifiques industriels"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.29A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements d'emballage, de conditionnement et de pesage"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.29B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres machines d'usage général"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines agricoles et forestières"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.41Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines-outils pour le travail des métaux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.49Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres machines-outils"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.91Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour la métallurgie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour l'extraction ou la construction"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.93Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour l'industrie agro-alimentaire"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.94Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour les industries textiles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.95Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour les industries du papier et du carton"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.96Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines pour le travail du caoutchouc ou des plastiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.99A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de machines d'imprimerie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"28.99B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres machines spécialisées"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"29.10Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de véhicules automobiles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"29.20Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de carrosseries et remorques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"29.31Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'équipements électriques et électroniques automobiles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"29.32Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'autres équipements automobiles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.11Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de navires et de structures flottantes"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.12Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de bateaux de plaisance"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.20Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de locomotives et d'autre matériel ferroviaire roulant"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.30Z",
+        "Libellé NAF 2008 - Niv 5":"Construction aéronautique et spatiale"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.40Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de véhicules militaires de combat"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.91Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de motocycles"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de bicyclettes et de véhicules pour invalides"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"30.99Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d’autres équipements de transport n.c.a."
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"32.12Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d’articles de joaillerie et bijouterie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"32.13Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d’articles de bijouterie fantaisie et articles similaires"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"32.50A",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de matériel médico-chirurgical et dentaire"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"32.50B",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de lunettes"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"32.99Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités manufacturières n.c.a."
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.11Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'ouvrages en métaux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.12Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de machines et équipements mécaniques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.13Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de matériels électroniques et optiques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.14Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'équipements électriques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.15Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance navale"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.16Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance d'aéronefs et d'engins spatiaux"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.17Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance d'autres équipements de transport"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.19Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'autres équipements"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.20A",
+        "Libellé NAF 2008 - Niv 5":"Installation de structures métalliques, chaudronnées et de tuyauterie"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.20B",
+        "Libellé NAF 2008 - Niv 5":"Installation de machines et équipements mécaniques"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.20C",
+        "Libellé NAF 2008 - Niv 5":"Conception d'ensemble et assemblage sur site industriel d'équipements de contrôle des processus industriels"
+    },
+    {
+        "Code filière":"FIL21",
+        "Libellé filière majuscule":"MÉTALLURGIE - SCOPE UIMM",
+        "Code NAF 2008 - Niv 5":"33.20D",
+        "Libellé NAF 2008 - Niv 5":"Installation d'équipements électriques, de matériels électroniques et optiques ou d'autres matériels"
+    },
+    {
+        "Code filière":"FIL22",
+        "Libellé filière majuscule":"NUCLÉAIRE",
+        "Code NAF 2008 - Niv 5":"20.13A",
+        "Libellé NAF 2008 - Niv 5":"Enrichissement et  retraitement de matières nucléaires"
+    },
+    {
+        "Code filière":"FIL22",
+        "Libellé filière majuscule":"NUCLÉAIRE",
+        "Code NAF 2008 - Niv 5":"24.46Z",
+        "Libellé NAF 2008 - Niv 5":"Élaboration et transformation de matières nucléaires"
+    },
+    {
+        "Code filière":"FIL22",
+        "Libellé filière majuscule":"NUCLÉAIRE",
+        "Code NAF 2008 - Niv 5":"35.11Z",
+        "Libellé NAF 2008 - Niv 5":"Production d'électricité"
+    },
+    {
+        "Code filière":"FIL22",
+        "Libellé filière majuscule":"NUCLÉAIRE",
+        "Code NAF 2008 - Niv 5":"38.22Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement et élimination des déchets dangereux"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"42.22Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de réseaux électriques et de télécommunications"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"58.12Z",
+        "Libellé NAF 2008 - Niv 5":"Édition de répertoires et de fichiers d'adresses"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"58.21Z",
+        "Libellé NAF 2008 - Niv 5":"Édition de jeux électroniques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"58.29A",
+        "Libellé NAF 2008 - Niv 5":"Édition de logiciels système et de réseau"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"58.29B",
+        "Libellé NAF 2008 - Niv 5":"Edition de logiciels outils de développement et de langages"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"58.29C",
+        "Libellé NAF 2008 - Niv 5":"Edition de logiciels applicatifs"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"61.10Z",
+        "Libellé NAF 2008 - Niv 5":"Télécommunications filaires"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"61.20Z",
+        "Libellé NAF 2008 - Niv 5":"Télécommunications sans fil"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"61.30Z",
+        "Libellé NAF 2008 - Niv 5":"Télécommunications par satellite"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"61.90Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités de télécommunication"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"62.01Z",
+        "Libellé NAF 2008 - Niv 5":"Programmation informatique"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"62.02A",
+        "Libellé NAF 2008 - Niv 5":"Conseil en systèmes et logiciels informatiques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"62.02B",
+        "Libellé NAF 2008 - Niv 5":"Tierce maintenance de systèmes et d’applications informatiques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"62.03Z",
+        "Libellé NAF 2008 - Niv 5":"Gestion d'installations informatiques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"62.09Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités informatiques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"63.11Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement de données, hébergement et activités connexes"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"63.12Z",
+        "Libellé NAF 2008 - Niv 5":"Portails Internet"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"70.22Z",
+        "Libellé NAF 2008 - Niv 5":"Conseil pour les affaires et autres conseils de gestion"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"71.12B",
+        "Libellé NAF 2008 - Niv 5":"Ingénierie, études techniques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"74.90B",
+        "Libellé NAF 2008 - Niv 5":"Activités spécialisées scientifiques et techniques diverses"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"95.11Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'ordinateurs et d'équipements périphériques"
+    },
+    {
+        "Code filière":"FIL23",
+        "Libellé filière majuscule":"NUMÉRIQUE ET TÉLÉCOMMUNICATIONS",
+        "Code NAF 2008 - Niv 5":"95.12Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'équipements de communication"
+    },
+    {
+        "Code filière":"FIL24",
+        "Libellé filière majuscule":"PROPRETÉ",
+        "Code NAF 2008 - Niv 5":"81.21Z",
+        "Libellé NAF 2008 - Niv 5":"Nettoyage courant des bâtiments"
+    },
+    {
+        "Code filière":"FIL24",
+        "Libellé filière majuscule":"PROPRETÉ",
+        "Code NAF 2008 - Niv 5":"81.22Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités de nettoyage des bâtiments et nettoyage industriel"
+    },
+    {
+        "Code filière":"FIL24",
+        "Libellé filière majuscule":"PROPRETÉ",
+        "Code NAF 2008 - Niv 5":"81.29A",
+        "Libellé NAF 2008 - Niv 5":"Désinfection, désinsectisation, dératisation"
+    },
+    {
+        "Code filière":"FIL24",
+        "Libellé filière majuscule":"PROPRETÉ",
+        "Code NAF 2008 - Niv 5":"81.29B",
+        "Libellé NAF 2008 - Niv 5":"Autres activités de nettoyage n.c.a."
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"84.12Z",
+        "Libellé NAF 2008 - Niv 5":"Administration publique (tutelle) de la santé, de la formation, de la culture et des services sociaux, autre que sécurité sociale"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.10Z",
+        "Libellé NAF 2008 - Niv 5":"Activités hospitalières"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.21Z",
+        "Libellé NAF 2008 - Niv 5":"Activité des médecins généralistes"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.22A",
+        "Libellé NAF 2008 - Niv 5":"Activités de radiodiagnostic et de radiothérapie"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.22B",
+        "Libellé NAF 2008 - Niv 5":"Activités chirurgicales"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.22C",
+        "Libellé NAF 2008 - Niv 5":"Autres activités des médecins spécialistes"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.23Z",
+        "Libellé NAF 2008 - Niv 5":"Pratique dentaire"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90A",
+        "Libellé NAF 2008 - Niv 5":"Ambulances"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90B",
+        "Libellé NAF 2008 - Niv 5":"Laboratoires d'analyses médicales"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90C",
+        "Libellé NAF 2008 - Niv 5":"Centres de collecte et banques d'organes"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90D",
+        "Libellé NAF 2008 - Niv 5":"Activités des infirmiers et des sages-femmes"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90E",
+        "Libellé NAF 2008 - Niv 5":"Activités des professionnels de la rééducation, de l’appareillage et des pédicures-podologues"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"86.90F",
+        "Libellé NAF 2008 - Niv 5":"Activités de santé humaine non classées ailleurs"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.10A",
+        "Libellé NAF 2008 - Niv 5":"Hébergement médicalisé pour personnes âgées"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.10B",
+        "Libellé NAF 2008 - Niv 5":"Hébergement médicalisé pour enfants handicapés"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.10C",
+        "Libellé NAF 2008 - Niv 5":"Hébergement médicalisé pour adultes handicapés et autre hébergement médicalisé"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.20A",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour handicapés mentaux et malades mentaux"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.20B",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour toxicomanes"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.30A",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour personnes âgées"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.30B",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour handicapés  physiques"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.90A",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour enfants en difficultés"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"87.90B",
+        "Libellé NAF 2008 - Niv 5":"Hébergement social pour adultes et familles en difficultés et autre hébergement social"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.10A",
+        "Libellé NAF 2008 - Niv 5":"Aide à domicile"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.10B",
+        "Libellé NAF 2008 - Niv 5":"Accueil ou accompagnement sans hébergement d’adultes handicapés ou de  personnes âgées"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.10C",
+        "Libellé NAF 2008 - Niv 5":"Aide par le travail"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.91A",
+        "Libellé NAF 2008 - Niv 5":"Accueil de jeunes enfants"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.91B",
+        "Libellé NAF 2008 - Niv 5":"Accueil ou accompagnement sans hébergement d’enfants handicapés"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.99A",
+        "Libellé NAF 2008 - Niv 5":"Autre accueil ou accompagnement sans hébergement d’enfants_x000D_\n et d’adolescents"
+    },
+    {
+        "Code filière":"FIL25",
+        "Libellé filière majuscule":"SANTÉ, SOCIAL, SAP",
+        "Code NAF 2008 - Niv 5":"88.99B",
+        "Libellé NAF 2008 - Niv 5":"Action sociale sans hébergement n.c.a."
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"33.17Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation et maintenance d'autres équipements de transport"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.11Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de voitures et de véhicules automobiles légers"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.19Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce d'autres véhicules automobiles"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.20A",
+        "Libellé NAF 2008 - Niv 5":"Entretien et réparation de véhicules automobiles légers"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.20B",
+        "Libellé NAF 2008 - Niv 5":"Entretien et réparation d'autres véhicules automobiles"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.31Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros d'équipements automobiles"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.32Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'équipements automobiles"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"45.40Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce et réparation de motocycles"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"46.12A",
+        "Libellé NAF 2008 - Niv 5":"Centrales d'achat de carburant"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"47.30Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de carburants en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"52.21Z",
+        "Libellé NAF 2008 - Niv 5":"Services auxiliaires des transports terrestres"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"71.20A",
+        "Libellé NAF 2008 - Niv 5":"Contrôle technique automobile"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"77.11A",
+        "Libellé NAF 2008 - Niv 5":"Location de courte durée de voitures et de véhicules automobiles légers"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"77.11B",
+        "Libellé NAF 2008 - Niv 5":"Location de longue durée de voitures et de véhicules automobiles légers"
+    },
+    {
+        "Code filière":"FIL26",
+        "Libellé filière majuscule":"SERVICES AUTOMOBILES",
+        "Code NAF 2008 - Niv 5":"85.53Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement de la conduite"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"85.51Z",
+        "Libellé NAF 2008 - Niv 5":"Enseignement de disciplines sportives et d'activités de loisirs"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"93.11Z",
+        "Libellé NAF 2008 - Niv 5":"Gestion d'installations sportives"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"93.12Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de clubs de sports"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"93.13Z",
+        "Libellé NAF 2008 - Niv 5":"Activités des centres de culture physique"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"93.19Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités liées au sport"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"30.12Z",
+        "Libellé NAF 2008 - Niv 5":"Construction de bateaux de plaisance"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"30.92Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication de bicyclettes et de véhicules pour invalides"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"32.30Z",
+        "Libellé NAF 2008 - Niv 5":"Fabrication d'articles de sport"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"47.64Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail d'articles de sport en magasin spécialisé"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"49.39C",
+        "Libellé NAF 2008 - Niv 5":"Téléphériques et remontées mécaniques"
+    },
+    {
+        "Code filière":"FIL27",
+        "Libellé filière majuscule":"SPORT",
+        "Code NAF 2008 - Niv 5":"77.21Z",
+        "Libellé NAF 2008 - Niv 5":"Location et location-bail d'articles de loisirs et de sport"
+    },
+    {
+        "Code filière":"FIL28",
+        "Libellé filière majuscule":"SÉCURITÉ PRIVÉE",
+        "Code NAF 2008 - Niv 5":"80.10Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de sécurité privée"
+    },
+    {
+        "Code filière":"FIL28",
+        "Libellé filière majuscule":"SÉCURITÉ PRIVÉE",
+        "Code NAF 2008 - Niv 5":"80.20Z",
+        "Libellé NAF 2008 - Niv 5":"Activités liées aux systèmes de sécurité"
+    },
+    {
+        "Code filière":"FIL28",
+        "Libellé filière majuscule":"SÉCURITÉ PRIVÉE",
+        "Code NAF 2008 - Niv 5":"80.30Z",
+        "Libellé NAF 2008 - Niv 5":"Activités d'enquête"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"36.00Z",
+        "Libellé NAF 2008 - Niv 5":"Captage, traitement et distribution d'eau"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"37.00Z",
+        "Libellé NAF 2008 - Niv 5":"Collecte et traitement des eaux usées"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.11Z",
+        "Libellé NAF 2008 - Niv 5":"Collecte des déchets non dangereux"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.12Z",
+        "Libellé NAF 2008 - Niv 5":"Collecte des déchets dangereux"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.21Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement et élimination des déchets non dangereux"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.22Z",
+        "Libellé NAF 2008 - Niv 5":"Traitement et élimination des déchets dangereux"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.31Z",
+        "Libellé NAF 2008 - Niv 5":"Démantèlement d'épaves"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"38.32Z",
+        "Libellé NAF 2008 - Niv 5":"Récupération de déchets triés"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"39.00Z",
+        "Libellé NAF 2008 - Niv 5":"Dépollution et autres services de gestion des déchets"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"46.77Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de gros (commerce interentreprises) de déchets et débris"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"47.79Z",
+        "Libellé NAF 2008 - Niv 5":"Commerce de détail de biens d'occasion en magasin"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"72.11Z",
+        "Libellé NAF 2008 - Niv 5":"Recherche-développement en biotechnologie"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.11Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'ordinateurs et d'équipements périphériques"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.12Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'équipements de communication"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.21Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de produits électroniques grand public"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.22Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'appareils électroménagers et d'équipements pour la maison et le jardin"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.23Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de chaussures et d'articles en cuir"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.24Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation de meubles et d'équipements du foyer"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.25Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'articles d'horlogerie et de bijouterie"
+    },
+    {
+        "Code filière":"FIL29",
+        "Libellé filière majuscule":"TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES ",
+        "Code NAF 2008 - Niv 5":"95.29Z",
+        "Libellé NAF 2008 - Niv 5":"Réparation d'autres biens personnels et domestiques"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"46.17A",
+        "Libellé NAF 2008 - Niv 5":"Centrales d'achat alimentaires"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"46.19A",
+        "Libellé NAF 2008 - Niv 5":"Centrales d'achat non alimentaires"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.10Z",
+        "Libellé NAF 2008 - Niv 5":"Transport ferroviaire interurbain de voyageurs"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.20Z",
+        "Libellé NAF 2008 - Niv 5":"Transports ferroviaires de fret"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.31Z",
+        "Libellé NAF 2008 - Niv 5":"Transports urbains et suburbains de voyageurs"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.32Z",
+        "Libellé NAF 2008 - Niv 5":"Transports de voyageurs par taxis"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.39A",
+        "Libellé NAF 2008 - Niv 5":"Transports routiers réguliers de voyageurs"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.39B",
+        "Libellé NAF 2008 - Niv 5":"Autres transports routiers de voyageurs"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.39C",
+        "Libellé NAF 2008 - Niv 5":"Téléphériques et remontées mécaniques"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.41A",
+        "Libellé NAF 2008 - Niv 5":"Transports routiers de fret interurbains"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.41B",
+        "Libellé NAF 2008 - Niv 5":"Transports routiers de fret de proximité"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.41C",
+        "Libellé NAF 2008 - Niv 5":"Location de camions avec chauffeur"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.42Z",
+        "Libellé NAF 2008 - Niv 5":"Services de déménagement"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"49.50Z",
+        "Libellé NAF 2008 - Niv 5":"Transports par conduites"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"50.10Z",
+        "Libellé NAF 2008 - Niv 5":"Transports maritimes et côtiers de passagers"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"50.20Z",
+        "Libellé NAF 2008 - Niv 5":"Transports maritimes et côtiers de fret"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"50.30Z",
+        "Libellé NAF 2008 - Niv 5":"Transports fluviaux de passagers"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"50.40Z",
+        "Libellé NAF 2008 - Niv 5":"Transports fluviaux de fret"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"51.10Z",
+        "Libellé NAF 2008 - Niv 5":"Transports aériens de passagers"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"51.21Z",
+        "Libellé NAF 2008 - Niv 5":"Transports aériens de fret"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"51.22Z",
+        "Libellé NAF 2008 - Niv 5":"Transports spatiaux"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.10A",
+        "Libellé NAF 2008 - Niv 5":"Entreposage et stockage frigorifique"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.10B",
+        "Libellé NAF 2008 - Niv 5":"Entreposage et stockage non frigorifique"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.21Z",
+        "Libellé NAF 2008 - Niv 5":"Services auxiliaires des transports terrestres"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.22Z",
+        "Libellé NAF 2008 - Niv 5":"Services auxiliaires des transports par eau"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.23Z",
+        "Libellé NAF 2008 - Niv 5":"Services auxiliaires des transports aériens"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.24A",
+        "Libellé NAF 2008 - Niv 5":"Manutention portuaire"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.24B",
+        "Libellé NAF 2008 - Niv 5":"Manutention non portuaire"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.29A",
+        "Libellé NAF 2008 - Niv 5":"Messagerie, fret express"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"52.29B",
+        "Libellé NAF 2008 - Niv 5":"Affrètement et organisation des transports"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"53.10Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de poste dans le cadre d'une obligation de service universel"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"53.20Z",
+        "Libellé NAF 2008 - Niv 5":"Autres activités de poste et de courrier"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"77.12Z",
+        "Libellé NAF 2008 - Niv 5":"Location et location-bail de camions"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"77.31Z",
+        "Libellé NAF 2008 - Niv 5":"Location et location-bail de machines et équipements agricoles"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"77.34Z",
+        "Libellé NAF 2008 - Niv 5":"Location et location-bail de matériels de transport par eau"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"77.35Z",
+        "Libellé NAF 2008 - Niv 5":"Location et location-bail de matériels de transport aérien"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"82.92Z",
+        "Libellé NAF 2008 - Niv 5":"Activités de conditionnement"
+    },
+    {
+        "Code filière":"FIL30",
+        "Libellé filière majuscule":"TRANSPORTS ET LOGISTIQUE",
+        "Code NAF 2008 - Niv 5":"86.90A",
+        "Libellé NAF 2008 - Niv 5":"Ambulances"
+    },
+    {
+        "Code filière":"FIL15",
+        "Libellé filière majuscule":"INDUSTRIE DE SANTÉ",
+        "Code NAF 2008 - Niv 5":"72.19Z",
+        "Libellé NAF 2008 - Niv 5":"Recherche-développement en autres sciences physiques et naturelles"
+    }
+]

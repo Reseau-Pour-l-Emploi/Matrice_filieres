@@ -352,6 +352,140 @@
     }
     .ns-panel.hidden { display: none; }
 
+    /* ── FILIÈRE LABEL BUTTON ── */
+    .filiere-label-btn {
+      flex: 1; min-width: 0;
+      display: flex; align-items: center; gap: 4px;
+      cursor: pointer; border: none; background: none; padding: 0;
+      font-family: inherit; font-size: 12px; line-height: 1.3;
+      color: var(--ft-text); text-align: left;
+    }
+    .filiere-label-btn:hover { color: var(--ft-blue-lt); }
+    .filiere-label-btn .lbl-text { flex: 1; min-width: 0; }
+    .filiere-info-icon {
+      flex-shrink: 0; width: 13px; height: 13px; opacity: 0;
+      color: var(--ft-blue-lt); transition: opacity .15s;
+    }
+    .filiere-label-btn:hover .filiere-info-icon { opacity: 1; }
+
+    /* ── NAF MINI TOOLTIP ── */
+    #naf-mini-tooltip {
+      position: fixed; z-index: 500;
+      background: #1e293b; color: #f1f5f9;
+      padding: 9px 12px; border-radius: 9px;
+      font-size: 11.5px; font-family: 'DM Sans', sans-serif;
+      line-height: 1.55; pointer-events: none; opacity: 0;
+      transition: opacity .15s; max-width: 260px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    }
+    #naf-mini-tooltip .nmt-title {
+      font-weight: 700; font-size: 12px;
+      color: var(--ft-teal); margin-bottom: 5px;
+    }
+    #naf-mini-tooltip .nmt-item { color: #cbd5e1; margin-bottom: 1px; }
+    #naf-mini-tooltip .nmt-item .nmt-code {
+      font-weight: 600; color: #94a3b8; margin-right: 4px;
+    }
+    #naf-mini-tooltip .nmt-more {
+      margin-top: 6px; font-size: 11px;
+      color: var(--ft-teal); font-weight: 600; font-style: italic;
+    }
+
+    /* ── NAF MODAL ── */
+    #naf-modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    #naf-modal-overlay.open { opacity: 1; pointer-events: all; }
+    #naf-modal {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0,49,137,.22);
+      width: min(660px, 92vw); max-height: 80vh;
+      display: flex; flex-direction: column;
+      transform: translateY(12px) scale(.97);
+      transition: transform .2s;
+      overflow: hidden;
+    }
+    #naf-modal-overlay.open #naf-modal { transform: none; }
+    .naf-modal-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--ft-border);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .naf-modal-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: #eff6ff; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ft-blue);
+    }
+    .naf-modal-title {
+      flex: 1; min-width: 0;
+    }
+    .naf-modal-title h3 {
+      font-size: 14px; font-weight: 700;
+      color: var(--ft-blue); line-height: 1.3; margin-bottom: 2px;
+    }
+    .naf-modal-title p {
+      font-size: 11px; color: var(--ft-muted);
+    }
+    .naf-modal-close {
+      width: 28px; height: 28px; border-radius: 6px;
+      border: 1px solid var(--ft-border); background: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--ft-muted); transition: background .12s, color .12s;
+      flex-shrink: 0; font-size: 16px; line-height: 1;
+    }
+    .naf-modal-close:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+    .naf-modal-search {
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--ft-border);
+    }
+    .naf-modal-search input {
+      width: 100%; padding: 7px 10px 7px 30px;
+      border: 1px solid var(--ft-border); border-radius: 7px;
+      font-size: 12px; font-family: inherit;
+      background: var(--ft-bg); outline: none;
+      transition: border-color .15s;
+    }
+    .naf-modal-search input:focus { border-color: var(--ft-blue-lt); }
+    .naf-modal-search { position: relative; }
+    .naf-search-icon {
+      position: absolute; left: 28px; top: 50%;
+      transform: translateY(-50%); opacity: .4; pointer-events: none;
+    }
+    .naf-modal-body {
+      overflow-y: auto; padding: 10px 18px 16px;
+      flex: 1;
+    }
+    .naf-modal-body::-webkit-scrollbar { width: 5px; }
+    .naf-modal-body::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 3px; }
+    .naf-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 7px 8px; border-radius: 6px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background .1s;
+    }
+    .naf-row:last-child { border-bottom: none; }
+    .naf-row:hover { background: #f8faff; }
+    .naf-row.hidden { display: none; }
+    .naf-code {
+      flex-shrink: 0; font-size: 11px; font-weight: 700;
+      color: #fff; background: var(--ft-blue-lt);
+      padding: 2px 7px; border-radius: 4px;
+      letter-spacing: .04em; margin-top: 1px;
+      font-family: 'DM Mono', monospace, inherit;
+    }
+    .naf-libelle {
+      font-size: 12px; line-height: 1.45; color: var(--ft-text);
+    }
+    .naf-empty {
+      text-align: center; color: var(--ft-muted);
+      font-size: 13px; padding: 24px 0;
+    }
+
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
       .sidebar { max-height: 300px; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); top: auto; }
@@ -614,15 +748,44 @@
 </div>
 
 <div class="tooltip" id="tooltip"></div>
+<div id="naf-mini-tooltip"></div>
+
+<!-- ── NAF MODAL ── -->
+<div id="naf-modal-overlay" onclick="closeNAFModal(event)">
+  <div id="naf-modal">
+    <div class="naf-modal-header">
+      <div class="naf-modal-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div class="naf-modal-title">
+        <h3 id="naf-modal-filiere-name">—</h3>
+        <p id="naf-modal-count">— codes NAF</p>
+      </div>
+      <button class="naf-modal-close" onclick="closeNAFModal()">✕</button>
+    </div>
+    <div class="naf-modal-search">
+      <svg class="naf-search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="naf-modal-search-input" placeholder="Filtrer par code ou libellé…" oninput="filterNAFModal(this.value)">
+    </div>
+    <div class="naf-modal-body" id="naf-modal-body"></div>
+  </div>
+</div>
 
 <script>
 // ── CONFIGURATION ─────────────────────────────────────────────────────────────
 // Chemin vers le fichier JSON (relatif à index.html dans le repo)
 const DATA_URL = 'Data_DEP_REG.json';
+const NAF_URL  = 'Filieres-NAF.json';
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];   // données brutes chargées depuis le JSON
 let RAW = [];           // données du territoire sélectionné, après mapRow
+let NAF_BY_FILIERE = {}; // { "FIL01": [{code, libelle}, …], … }
 
 const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
 
@@ -669,7 +832,111 @@ async function loadData() {
   }
 }
 
-function loadTerritoryData(code, niveau) {
+async function loadNAF() {
+  try {
+    const res = await fetch(NAF_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    NAF_BY_FILIERE = {};
+    rows.forEach(r => {
+      const code = r['Code filière'];
+      if (!NAF_BY_FILIERE[code]) NAF_BY_FILIERE[code] = [];
+      NAF_BY_FILIERE[code].push({
+        code:    r['Code NAF 2008 - Niv 5'],
+        libelle: r['Libellé NAF 2008 - Niv 5'],
+      });
+    });
+    console.log(`✅ ${NAF_URL} chargé : ${rows.length} codes NAF`);
+  } catch(err) {
+    console.warn('⚠️ NAF non chargé :', err.message);
+  }
+}
+
+// ── NAF MINI TOOLTIP ──────────────────────────────────────────────────────────
+const nafMiniTip = document.getElementById('naf-mini-tooltip');
+let nafTipTimer;
+
+function showNAFPreview(e, filiereCode, filiereLabel) {
+  clearTimeout(nafTipTimer);
+  const nafs = NAF_BY_FILIERE[filiereCode] || [];
+  if (!nafs.length) return;
+  const preview = nafs.slice(0, 4);
+  const more    = nafs.length - preview.length;
+  nafMiniTip.innerHTML = `
+    <div class="nmt-title">${filiereLabel}</div>
+    ${preview.map(n => `<div class="nmt-item"><span class="nmt-code">${n.code}</span>${n.libelle}</div>`).join('')}
+    <div class="nmt-more">
+      ${more > 0
+        ? `+ ${more} autre${more > 1 ? 's' : ''} — cliquer pour voir la liste complète`
+        : '↗ Cliquer pour voir la liste complète'}
+    </div>`;
+  positionNAFTip(e);
+  nafMiniTip.style.opacity = '1';
+}
+
+function positionNAFTip(e) {
+  const pad = 14;
+  nafMiniTip.style.left = (e.clientX + pad) + 'px';
+  nafMiniTip.style.top  = (e.clientY - 10) + 'px';
+  // Reposition if overflow right
+  const rect = nafMiniTip.getBoundingClientRect();
+  if (rect.right > window.innerWidth - 8) {
+    nafMiniTip.style.left = (e.clientX - rect.width - pad) + 'px';
+  }
+}
+
+function hideNAFPreview() {
+  nafTipTimer = setTimeout(() => { nafMiniTip.style.opacity = '0'; }, 80);
+}
+
+// ── NAF MODAL ─────────────────────────────────────────────────────────────────
+function openNAFModal(filiereCode, filiereLabel) {
+  const nafs = NAF_BY_FILIERE[filiereCode] || [];
+  document.getElementById('naf-modal-filiere-name').textContent = filiereLabel;
+  document.getElementById('naf-modal-count').textContent = `${nafs.length} code${nafs.length > 1 ? 's' : ''} NAF`;
+  document.getElementById('naf-modal-search-input').value = '';
+  const body = document.getElementById('naf-modal-body');
+  if (!nafs.length) {
+    body.innerHTML = '<div class="naf-empty">Aucun code NAF disponible pour cette filière.</div>';
+  } else {
+    body.innerHTML = nafs.map(n => `
+      <div class="naf-row" data-search="${n.code.toLowerCase()} ${n.libelle.toLowerCase()}">
+        <span class="naf-code">${n.code}</span>
+        <span class="naf-libelle">${n.libelle}</span>
+      </div>`).join('');
+  }
+  nafMiniTip.style.opacity = '0';
+  document.getElementById('naf-modal-overlay').classList.add('open');
+  document.getElementById('naf-modal-search-input').focus();
+}
+
+function closeNAFModal(e) {
+  if (e && e.target !== document.getElementById('naf-modal-overlay')) return;
+  document.getElementById('naf-modal-overlay').classList.remove('open');
+}
+
+function filterNAFModal(q) {
+  const low = q.toLowerCase().trim();
+  document.querySelectorAll('#naf-modal-body .naf-row').forEach(row => {
+    row.classList.toggle('hidden', low && !row.dataset.search.includes(low));
+  });
+  const visible = document.querySelectorAll('#naf-modal-body .naf-row:not(.hidden)').length;
+  let empty = document.querySelector('#naf-modal-body .naf-empty');
+  if (!empty) {
+    empty = document.createElement('div');
+    empty.className = 'naf-empty';
+    document.getElementById('naf-modal-body').appendChild(empty);
+  }
+  empty.style.display = (low && visible === 0) ? 'block' : 'none';
+  empty.textContent = `Aucun résultat pour « ${q} »`;
+}
+
+// Fermer avec Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('naf-modal-overlay').classList.remove('open');
+});
+
+
   const territoryRows = SOURCE_DATA.filter(d =>
     d['Code'] === code && d['Niveau'] === niveau
   );
@@ -768,9 +1035,16 @@ function buildSidebar3() {
     item.dataset.code  = d.code;
     item.dataset.label = d.label.toLowerCase();
     const cbId = `cb-3-${d.code}`;
+    const hasNAF = (NAF_BY_FILIERE[d.code] || []).length > 0;
     item.innerHTML = `
       <input type="checkbox" id="${cbId}" checked>
-      <label for="${cbId}">${d.label}</label>
+      <button class="filiere-label-btn" data-code="${d.code}" data-label="${d.label.replace(/"/g,'&quot;')}" ${hasNAF ? 'title="Voir les codes NAF"' : ''}>
+        <span class="lbl-text">${d.label}</span>
+        ${hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/>
+          <line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/>
+        </svg>` : ''}
+      </button>
       <span class="tension-dot" style="background:${COL_EVOL3[d.evol3cat]}"></span>
     `;
     item.querySelector('input').addEventListener('change', e => {
@@ -779,6 +1053,13 @@ function buildSidebar3() {
       updateChart3();
       document.getElementById('sel-count-3').textContent = filteredData3().length;
     });
+    if (hasNAF) {
+      const btn = item.querySelector('.filiere-label-btn');
+      btn.addEventListener('mouseenter', e => showNAFPreview(e, d.code, d.label));
+      btn.addEventListener('mousemove',  e => positionNAFTip(e));
+      btn.addEventListener('mouseleave', () => hideNAFPreview());
+      btn.addEventListener('click', () => openNAFModal(d.code, d.label));
+    }
     list.appendChild(item);
   });
   document.getElementById('sel-count-3').textContent = RAW.length;
@@ -1064,7 +1345,7 @@ function resetZoom3() {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (async () => {
-  const ok = await loadData();
+  const [ok] = await Promise.all([loadData(), loadNAF()]);
   document.getElementById('loading-overlay').style.display = 'none';
   if (!ok) return;
 
