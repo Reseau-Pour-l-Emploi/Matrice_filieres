@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matrice de décision – Difficultés / Taux de recours – France Travail</title>
+  <title>Matrice &amp; Carte filières – France Travail</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003189'/%3E%3Crect x='4' y='4' width='24' height='4' rx='2' fill='%2300bfb3'/%3E%3Ctext x='16' y='26' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='14' fill='%23ffffff'%3EFT%3C/text%3E%3C/svg%3E">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
@@ -62,14 +62,48 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      flex: 1;
     }
+
+    /* ── TAB NAVIGATION ── */
+    .tab-nav {
+      background: #fff;
+      border-bottom: 2px solid var(--ft-border);
+      display: flex;
+      padding: 0 20px;
+      gap: 0;
+      position: sticky;
+      top: 62px;
+      z-index: 90;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 22px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ft-muted);
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      margin-bottom: -2px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--ft-blue-lt); }
+    .tab-btn.active { color: var(--ft-blue); border-bottom-color: var(--ft-blue); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     /* ── MAIN LAYOUT ── */
     .page {
       display: grid;
       grid-template-columns: 300px 1fr;
       gap: 0;
-      height: calc(100vh - 62px);
+      height: calc(100vh - 62px - 44px);
       transition: grid-template-columns .3s cubic-bezier(.4,0,.2,1);
     }
     .page.sidebar-collapsed {
@@ -83,29 +117,25 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      position: relative;   /* nécessaire pour l'overlay absolu */
+      position: relative;
       height: 100%;
     }
-
-    /* ── OVERLAY masquant tout le contenu en mode réduit ── */
     .sidebar::after {
       content: '';
       position: absolute;
-      inset: 44px 0 0 0;          /* couvre tout sauf le burger (44px) */
+      inset: 44px 0 0 0;
       background: var(--ft-card);
       opacity: 0;
       pointer-events: none;
-      transition: opacity .05s;   /* apparaît quasi-instantanément */
+      transition: opacity .05s;
       z-index: 20;
     }
-    .page.sidebar-collapsed .sidebar::after {
-      opacity: 1;
-    }
+    .page.sidebar-collapsed .sidebar::after { opacity: 1; }
 
     /* ── BURGER BUTTON ── */
     .burger-btn {
       flex-shrink: 0;
-      position: relative; z-index: 30; /* reste au-dessus de l'overlay */
+      position: relative; z-index: 30;
       display: flex; align-items: center; justify-content: center;
       height: 44px; min-height: 44px;
       border: none; background: var(--ft-card);
@@ -124,7 +154,7 @@
     .page.sidebar-collapsed .burger-btn .bar:nth-child(2) { opacity: 0; width: 0; }
     .page.sidebar-collapsed .burger-btn .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-    /* ── SIDEBAR INNER (content) ── */
+    /* ── SIDEBAR INNER ── */
     .sidebar-inner {
       flex: 1;
       overflow-y: auto;
@@ -146,8 +176,8 @@
       min-width: 0;
     }
     .chart-card {
-      flex: 1;          /* remplit l'espace restant */
-      min-height: 0;    /* autorise le shrink dans le flex */
+      flex: 1;
+      min-height: 0;
     }
     .filter-section {
       padding-top: 14px;
@@ -198,369 +228,373 @@
       gap: 5px;
       margin-top: 8px;
       font-size: 11px;
-      font-weight: 600;
       color: var(--ft-blue);
-      background: #dbeafe;
-      padding: 3px 9px;
-      border-radius: 10px;
+      font-weight: 600;
+      background: rgba(14,91,202,.08);
+      padding: 3px 8px;
+      border-radius: 20px;
     }
 
-    /* Chips */
-    .tension-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    /* ── CHIPS (évolution) ── */
+    .tension-chips { display: flex; flex-direction: column; gap: 6px; }
     .chip {
-      display: flex; align-items: center; gap: 6px;
-      padding: 5px 11px; border-radius: 20px;
-      border: 2px solid transparent;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: all .15s; user-select: none;
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 500;
+      border: 1.5px solid; cursor: pointer;
+      transition: opacity .15s;
+      user-select: none;
     }
-    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .chip.inactive { opacity: .35; background: #f3f4f6; border-color: #d1d5db; color: var(--ft-muted); }
+    .chip.inactive { opacity: .4; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
-    /* Search */
-    .search-box { position: relative; }
+    /* ── FILIÈRE LIST ── */
+    .search-box {
+      display: flex; align-items: center; gap: 7px;
+      border: 1px solid var(--ft-border);
+      border-radius: 7px; padding: 5px 9px;
+      background: #fff;
+    }
     .search-box input {
-      width: 100%; padding: 8px 10px 8px 32px;
-      border: 1px solid var(--ft-border); border-radius: 8px;
-      font-size: 13px; font-family: inherit;
-      background: var(--ft-bg); color: var(--ft-text);
-      outline: none; transition: border-color .15s;
+      border: none; outline: none; font-size: 12px; width: 100%;
+      font-family: inherit; background: transparent; color: var(--ft-text);
     }
-    .search-box input:focus { border-color: var(--ft-blue-lt); }
-    .search-box svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); opacity: .4; }
-
-    /* Filière list */
-    .filiere-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+    .filiere-actions {
+      display: flex; gap: 6px; margin-bottom: 8px;
+    }
     .btn-sm {
-      font-size: 11px; font-weight: 600; padding: 4px 10px;
-      border-radius: 5px; border: 1px solid var(--ft-border);
-      background: #fff; cursor: pointer; transition: all .12s;
-      font-family: inherit; letter-spacing: .03em; color: var(--ft-muted);
+      flex: 1; padding: 4px 0; font-size: 11px; font-family: inherit;
+      font-weight: 600; cursor: pointer; border-radius: 5px;
+      border: 1px solid var(--ft-border); background: #fff;
+      color: var(--ft-blue); transition: background .15s;
     }
-    .btn-sm:hover { background: var(--ft-bg); color: var(--ft-blue); border-color: var(--ft-blue); }
-    .filiere-list {
-      display: flex; flex-direction: column; gap: 2px;
-      max-height: calc(100vh - 420px); min-height: 120px; overflow-y: auto; padding-right: 2px;
-    }
-    .filiere-list::-webkit-scrollbar { width: 4px; }
-    .filiere-list::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
+    .btn-sm:hover { background: #eff6ff; }
+    .filiere-list { display: flex; flex-direction: column; gap: 2px; }
     .filiere-item {
-      display: flex; align-items: center; gap: 9px;
-      padding: 6px 8px; border-radius: 6px; cursor: pointer;
-      transition: background .1s; border: 1px solid transparent;
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 6px; border-radius: 6px;
+      transition: background .1s;
     }
-    .filiere-item:hover { background: var(--ft-bg); }
-    .filiere-item input[type="checkbox"] {
-      width: 14px; height: 14px; accent-color: var(--ft-blue); flex-shrink: 0; cursor: pointer;
-    }
-    .filiere-item label { font-size: 12px; line-height: 1.3; cursor: pointer; color: var(--ft-text); }
-    .filiere-item .tension-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-left: auto; }
+    .filiere-item:hover { background: #f8f9ff; }
     .filiere-item.hidden { display: none; }
-
+    .filiere-item input[type="checkbox"] { flex-shrink: 0; accent-color: var(--ft-blue); cursor: pointer; }
+    .filiere-label-btn {
+      flex: 1; background: none; border: none;
+      font-family: inherit; font-size: 12px; color: var(--ft-text);
+      text-align: left; cursor: default; padding: 0;
+      display: flex; align-items: center; gap: 4px; min-width: 0;
+    }
+    .filiere-label-btn[title] { cursor: pointer; color: var(--ft-blue-lt); }
+    .filiere-label-btn[title]:hover { text-decoration: underline; }
+    .lbl-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filiere-info-icon { width: 12px; height: 12px; flex-shrink: 0; color: var(--ft-teal); }
+    .tension-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .count-badge {
       background: var(--ft-blue); color: #fff;
-      font-size: 11px; font-weight: 700;
-      padding: 2px 7px; border-radius: 10px; margin-left: 6px;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px; margin-left: 5px;
     }
 
-    /* ── CHART AREA ── */
-    .chart-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 4px 10px; flex-shrink: 0; }
-    .chart-title { font-size: 17px; font-weight: 700; color: var(--ft-blue); line-height: 1.3; }
-    .chart-subtitle { font-size: 12px; color: var(--ft-muted); margin-top: 3px; }
-
-    .legend { display: flex; gap: 20px; flex-wrap: wrap; }
-    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 50%; opacity: .75; }
-
-    .chart-card {
-      background: var(--ft-card); border-radius: 12px;
-      border: 1px solid var(--ft-border);
-      box-shadow: var(--shadow); overflow: hidden; position: relative;
-      flex: 1; min-height: 0;
+    /* ── GRID INPUTS ── */
+    .grid-val-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .grid-val-row { display: flex; align-items: center; gap: 6px; }
+    .grid-val-lbl { font-size: 12px; width: 90px; flex-shrink: 0; }
+    .grid-val-eq { font-size: 13px; color: var(--ft-muted); }
+    .grid-val-inp {
+      width: 60px; padding: 4px 6px; border: 1px solid var(--ft-border);
+      border-radius: 5px; font-size: 12px; font-family: inherit; text-align: right;
     }
-    .chart-svg { width: 100%; height: 100%; display: block; }
+    .grid-val-unit { font-size: 12px; color: var(--ft-muted); }
+    .btn-bary {
+      width: 100%; padding: 6px 0; font-size: 12px; font-family: inherit;
+      font-weight: 600; cursor: pointer; border-radius: 7px;
+      border: 1px solid var(--ft-border); background: #fff; color: var(--ft-blue);
+      transition: background .15s;
+    }
+    .btn-bary:hover { background: #eff6ff; }
 
-    .bubble { cursor: pointer; }
-    .bubble:hover { stroke-width: 2 !important; }
-    .grid-zone-line { stroke: #9ca3af; stroke-dasharray: 6,4; stroke-width: 2.5; }
-    .axis path, .axis line { stroke: var(--ft-border); }
-    .axis text { fill: var(--ft-muted); font-family: 'DM Sans', sans-serif; font-size: 11px; }
-    .axis-label { fill: var(--ft-muted); font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+    /* ── CHART HEADER ── */
+    .chart-header {
+      padding: 14px 0 2px 0;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-shrink: 0;
+    }
+    .chart-title { font-size: 15px; font-weight: 700; color: var(--ft-blue); margin-bottom: 3px; }
+    .chart-subtitle { font-size: 11px; color: var(--ft-muted); }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .size-legend {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--ft-muted);
+    }
+    .sl-item { display: flex; align-items: center; gap: 4px; }
+    .sl-circle { border-radius: 50%; background: #94a3b8; opacity: .5; flex-shrink: 0; }
+
+    /* ── SVG / CHART CARD ── */
+    .chart-card { position: relative; background: #fff; border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+    .chart-svg { display: block; width: 100%; }
+    .axis text { font-size: 11px; fill: var(--ft-muted); font-family: 'DM Sans',sans-serif; }
+    .axis-label { font-size: 12px; fill: var(--ft-muted); font-family: 'DM Sans',sans-serif; font-weight: 600; }
+    .grid-zone-line { stroke: var(--ft-blue); stroke-width: 1.5; stroke-dasharray: 5 3; opacity: 0.55; }
     .zoom-rect { cursor: grab; }
     .zoom-rect:active { cursor: grabbing; }
+
     .zoom-reset-btn {
-      position: absolute; top: 10px; right: 12px;
-      font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
-      color: var(--ft-blue); background: #fff;
-      border: 1px solid var(--ft-border); border-radius: 6px;
-      padding: 4px 10px; cursor: pointer;
+      position: absolute; top: 8px; right: 8px;
       display: none; align-items: center; gap: 5px;
-      box-shadow: 0 1px 4px rgba(0,49,137,.10);
-      transition: background .12s, border-color .12s; z-index: 10;
+      background: #fff; border: 1px solid var(--ft-border);
+      border-radius: 6px; padding: 4px 9px;
+      font-size: 11px; font-family: inherit; font-weight: 600;
+      color: var(--ft-blue); cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: background .15s;
     }
-    .zoom-reset-btn:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
     .zoom-reset-btn.visible { display: flex; }
+    .zoom-reset-btn:hover { background: #eff6ff; }
     .zoom-hint {
-      position: absolute; bottom: 8px; right: 12px;
+      position: absolute; bottom: 6px; right: 10px;
       font-size: 10px; color: var(--ft-muted); opacity: .6;
-      pointer-events: none; font-family: 'DM Sans', sans-serif;
+      pointer-events: none;
     }
-
-    .tooltip {
-      position: fixed; background: #1e293b; color: #f1f5f9;
-      padding: 10px 14px; border-radius: 9px;
-      font-size: 12px; font-family: 'DM Sans', sans-serif;
-      line-height: 1.6; pointer-events: none; opacity: 0;
-      transition: opacity .15s; z-index: 999; max-width: 280px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.3);
-    }
-    .tooltip .tt-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; line-height: 1.3; }
-    .tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
-    .tooltip .tt-val { font-weight: 600; }
-
     .empty-state {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      text-align: center; color: var(--ft-muted);
-      font-size: 14px; pointer-events: none;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: var(--ft-muted); font-size: 14px; font-weight: 500;
     }
-    .empty-state svg { opacity: .3; margin-bottom: 8px; }
+    .empty-state svg { opacity: .3; }
 
-    .size-legend { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--ft-muted); }
-    .size-legend .sl-item { display: flex; align-items: center; gap: 6px; }
-    .sl-circle { background: #9ca3af; border-radius: 50%; opacity: .5; }
+    /* ── TOOLTIP ── */
+    .tooltip {
+      position: fixed; z-index: 9999;
+      background: #fff; border: 1px solid var(--ft-border);
+      border-radius: 10px; padding: 11px 14px;
+      box-shadow: 0 4px 20px rgba(0,49,137,.13);
+      font-size: 12.5px; pointer-events: none;
+      opacity: 0; transition: opacity .1s;
+      max-width: 280px;
+    }
+    .tt-title { font-weight: 700; font-size: 13px; margin-bottom: 7px; color: var(--ft-blue); }
+    .tt-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px; }
+    .tt-row span:first-child { color: var(--ft-muted); }
+    .tt-val { font-weight: 600; }
+    .tt-rank { font-size: 11px; color: var(--ft-muted); margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--ft-border); }
+    .tt-rank strong { color: var(--ft-blue); }
 
-    /* Loading overlay */
-    .loading-overlay {
-      position: fixed; inset: 0; background: rgba(244,246,251,.92);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 9999; flex-direction: column; gap: 12px;
-      font-size: 14px; color: var(--ft-muted); font-family: 'DM Sans', sans-serif;
+    /* ── NS PANEL ── */
+    .ns-panel {
+      background: #fffbeb; border: 1px solid #fcd34d;
+      border-radius: 10px; padding: 10px 14px; flex-shrink: 0;
     }
-    .loading-overlay .load-msg { font-size: 13px; color: var(--ft-muted); }
-    .loading-overlay .load-err {
-      color: #dc2626; font-weight: 600; font-size: 13px;
-      max-width: 440px; text-align: center; line-height: 1.6;
-      padding: 0 24px;
+    .ns-panel.hidden { display: none; }
+    .ns-panel-header {
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 6px; flex-wrap: wrap;
     }
-    .spinner {
-      width: 36px; height: 36px; border: 3px solid var(--ft-border);
-      border-top-color: var(--ft-blue); border-radius: 50%;
-      animation: spin .7s linear infinite;
+    .ns-panel-title { font-size: 12px; font-weight: 600; color: #92400e; flex: 1; }
+    .ns-count {
+      background: #92400e; color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .ns-list { display: flex; flex-wrap: wrap; gap: 4px; }
+    .ns-badge {
+      font-size: 11px; font-weight: 500;
+      background: #fef9c3; border: 1px solid #fde68a;
+      color: #78350f; padding: 2px 8px; border-radius: 12px;
+    }
 
-    /* Grid line panel */
-    .grid-val-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
-    .grid-val-row { display: flex; align-items: center; gap: 5px; }
-    .grid-val-lbl { font-size: 11px; color: var(--ft-muted); flex: 1; white-space: nowrap; }
-    .grid-val-eq  { font-size: 11px; color: var(--ft-muted); }
-    .grid-val-inp {
-      width: 62px; padding: 4px 6px;
-      border: 1px solid var(--ft-blue-lt); border-radius: 5px;
-      font-size: 12px; font-family: inherit;
-      background: #eff6ff; color: var(--ft-blue); font-weight: 700;
-      outline: none; text-align: right;
-      transition: border-color .15s, background .15s;
-      -moz-appearance: textfield;
-    }
-    .grid-val-inp::-webkit-inner-spin-button,
-    .grid-val-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
-    .grid-val-inp:focus { border-color: var(--ft-blue); background: #fff; }
-    .grid-val-unit { font-size: 11px; color: var(--ft-muted); }
-    .btn-bary {
-      width: 100%; padding: 7px 8px; border-radius: 6px;
-      border: 1px solid var(--ft-border); background: #fff; font-family: inherit;
-      font-size: 11px; font-weight: 600; color: var(--ft-blue);
-      cursor: pointer; text-align: center;
-      transition: background .12s, border-color .12s;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
-    .btn-bary:hover { background: var(--ft-bg); border-color: var(--ft-blue); }
-
+    /* ── INTERP BLOCK ── */
     .interp-block {
       background: #f0f4ff; border-left: 4px solid var(--ft-blue-lt);
       border-radius: 0 8px 8px 0; padding: 11px 16px;
       font-size: 12.5px; color: #1e3a6e; line-height: 1.6;
+      flex-shrink: 0;
     }
     .interp-block strong { font-weight: 700; }
     .interp-label {
       display: inline-block; font-size: 10px; font-weight: 700;
-      letter-spacing: .07em; text-transform: uppercase;
+      letter-spacing: .06em; text-transform: uppercase;
       color: var(--ft-blue-lt); margin-bottom: 4px;
     }
 
-    /* ── NON-SIGNIFICANT FILIÈRES PANEL ── */
-    .ns-panel {
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-radius: 10px;
-      padding: 14px 16px;
+    /* ── LOADING OVERLAY ── */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(244,246,251,.92);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
     }
-    .ns-panel-header {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 10px;
+    .spinner {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 4px solid var(--ft-border);
+      border-top-color: var(--ft-blue);
+      animation: spin .7s linear infinite;
     }
-    .ns-panel-title {
-      font-size: 12px; font-weight: 700;
-      color: #92400e; letter-spacing: .02em;
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .load-msg { font-size: 14px; font-weight: 600; color: var(--ft-blue); }
+    .load-err {
+      background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px;
+      padding: 16px 20px; font-size: 13px; color: #7f1d1d;
+      max-width: 420px; text-align: center; line-height: 1.6;
+      margin-top: 12px;
     }
-    .ns-count {
-      background: #fcd34d; color: #78350f;
-      font-size: 11px; font-weight: 700;
-      padding: 2px 7px; border-radius: 10px;
-    }
-    .ns-list {
-      display: flex; flex-wrap: wrap; gap: 6px;
-    }
-    .ns-tag {
-      background: #fef3c7; border: 1px solid #fcd34d;
-      color: #78350f; font-size: 11px; font-weight: 500;
-      padding: 3px 9px; border-radius: 6px;
-      line-height: 1.4;
-    }
-    .ns-panel.hidden { display: none; }
 
-    /* ── FILIÈRE LABEL BUTTON ── */
-    .filiere-label-btn {
-      flex: 1; min-width: 0;
-      display: flex; align-items: center; gap: 4px;
-      cursor: pointer; border: none; background: none; padding: 0;
-      font-family: inherit; font-size: 12px; line-height: 1.3;
-      color: var(--ft-text); text-align: left;
-    }
-    .filiere-label-btn:hover { color: var(--ft-blue-lt); }
-    .filiere-label-btn .lbl-text { flex: 1; min-width: 0; }
-    .filiere-info-icon {
-      flex-shrink: 0; width: 13px; height: 13px; opacity: 0;
-      color: var(--ft-blue-lt); transition: opacity .15s;
-    }
-    .filiere-label-btn:hover .filiere-info-icon { opacity: 1; }
-
-    /* ── NAF MINI TOOLTIP ── */
+    /* ── NAF MINI-TOOLTIP ── */
     #naf-mini-tooltip {
-      position: fixed; z-index: 500;
-      background: #1e293b; color: #f1f5f9;
-      padding: 9px 12px; border-radius: 9px;
-      font-size: 11.5px; font-family: 'DM Sans', sans-serif;
-      line-height: 1.55; pointer-events: none; opacity: 0;
-      transition: opacity .15s; max-width: 260px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.35);
-    }
-    #naf-mini-tooltip .nmt-title {
-      font-weight: 700; font-size: 12px;
-      color: var(--ft-teal); margin-bottom: 5px;
-    }
-    #naf-mini-tooltip .nmt-item { color: #cbd5e1; margin-bottom: 1px; }
-    #naf-mini-tooltip .nmt-item .nmt-code {
-      font-weight: 600; color: #94a3b8; margin-right: 4px;
-    }
-    #naf-mini-tooltip .nmt-more {
-      margin-top: 6px; font-size: 11px;
-      color: var(--ft-teal); font-weight: 600; font-style: italic;
+      position: fixed; z-index: 9999;
+      background: var(--ft-blue); color: #fff;
+      font-size: 11px; padding: 5px 10px; border-radius: 6px;
+      pointer-events: none; opacity: 0; transition: opacity .1s;
+      max-width: 220px;
     }
 
     /* ── NAF MODAL ── */
     #naf-modal-overlay {
-      position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity .2s;
+      position: fixed; inset: 0; z-index: 9997;
+      background: rgba(0,0,0,.35);
+      display: none; align-items: center; justify-content: center;
     }
-    #naf-modal-overlay.open { opacity: 1; pointer-events: all; }
+    #naf-modal-overlay.open { display: flex; }
     #naf-modal {
       background: #fff; border-radius: 14px;
-      box-shadow: 0 20px 60px rgba(0,49,137,.22);
-      width: min(660px, 92vw); max-height: 80vh;
-      display: flex; flex-direction: column;
-      transform: translateY(12px) scale(.97);
-      transition: transform .2s;
-      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.22);
+      width: 520px; max-width: 94vw; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
     }
-    #naf-modal-overlay.open #naf-modal { transform: none; }
     .naf-modal-header {
-      padding: 18px 22px 14px;
-      border-bottom: 1px solid var(--ft-border);
-      display: flex; align-items: flex-start; gap: 12px;
+      padding: 16px 20px; border-bottom: 1px solid var(--ft-border);
+      display: flex; align-items: center; gap: 12px;
     }
     .naf-modal-icon {
-      width: 36px; height: 36px; flex-shrink: 0;
-      background: #eff6ff; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--ft-blue);
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #eff6ff; display: flex; align-items: center; justify-content: center;
+      color: var(--ft-blue); flex-shrink: 0;
     }
-    .naf-modal-title {
-      flex: 1; min-width: 0;
-    }
-    .naf-modal-title h3 {
-      font-size: 14px; font-weight: 700;
-      color: var(--ft-blue); line-height: 1.3; margin-bottom: 2px;
-    }
-    .naf-modal-title p {
-      font-size: 11px; color: var(--ft-muted);
-    }
+    .naf-modal-title h3 { font-size: 14px; font-weight: 700; color: var(--ft-blue); }
+    .naf-modal-title p { font-size: 12px; color: var(--ft-muted); margin-top: 2px; }
     .naf-modal-close {
-      width: 28px; height: 28px; border-radius: 6px;
-      border: 1px solid var(--ft-border); background: #fff;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      color: var(--ft-muted); transition: background .12s, color .12s;
-      flex-shrink: 0; font-size: 16px; line-height: 1;
+      margin-left: auto; background: #f4f6fb; border: none;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 14px; cursor: pointer; color: var(--ft-muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s; flex-shrink: 0;
     }
-    .naf-modal-close:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+    .naf-modal-close:hover { background: #e0e7ff; color: var(--ft-blue); }
     .naf-modal-search {
-      padding: 10px 18px;
-      border-bottom: 1px solid var(--ft-border);
+      padding: 10px 20px; border-bottom: 1px solid var(--ft-border);
+      display: flex; align-items: center; gap: 8px; background: #f9fafb;
     }
+    .naf-search-icon { color: var(--ft-muted); flex-shrink: 0; }
     .naf-modal-search input {
-      width: 100%; padding: 7px 10px 7px 30px;
-      border: 1px solid var(--ft-border); border-radius: 7px;
-      font-size: 12px; font-family: inherit;
-      background: var(--ft-bg); outline: none;
-      transition: border-color .15s;
+      border: none; outline: none; font-size: 13px; font-family: inherit;
+      background: transparent; width: 100%; color: var(--ft-text);
     }
-    .naf-modal-search input:focus { border-color: var(--ft-blue-lt); }
-    .naf-modal-search { position: relative; }
-    .naf-search-icon {
-      position: absolute; left: 28px; top: 50%;
-      transform: translateY(-50%); opacity: .4; pointer-events: none;
-    }
-    .naf-modal-body {
-      overflow-y: auto; padding: 10px 18px 16px;
-      flex: 1;
-    }
-    .naf-modal-body::-webkit-scrollbar { width: 5px; }
-    .naf-modal-body::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 3px; }
+    .naf-modal-body { overflow-y: auto; padding: 12px 20px 16px; display: flex; flex-direction: column; gap: 5px; }
     .naf-row {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 7px 8px; border-radius: 6px;
-      border-bottom: 1px solid #f1f5f9;
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 10px; border-radius: 6px; transition: background .1s;
+    }
+    .naf-row:hover { background: #f0f4ff; }
+    .naf-code { font-size: 12px; font-weight: 700; color: var(--ft-blue-lt); min-width: 48px; flex-shrink: 0; }
+    .naf-libelle { font-size: 12px; color: var(--ft-text); }
+    .naf-row.hidden { display: none; }
+
+    /* ════════════════════════════════════════════════
+       ── MAP TAB SPECIFIC STYLES ──
+    ════════════════════════════════════════════════ */
+
+    /* Filière selector for map */
+    .map-filiere-box {
+      background: #eff6ff;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .map-filiere-box h2 {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: var(--ft-blue); margin-bottom: 8px;
+    }
+    .map-filiere-box select {
+      width: 100%; padding: 8px 10px;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 7px; font-size: 12px;
+      font-family: inherit; background: #fff;
+      color: var(--ft-text); outline: none; cursor: pointer;
+    }
+    .map-filiere-box select:focus { border-color: var(--ft-blue); }
+
+    /* Maille toggle */
+    .maille-toggle {
+      display: flex; border: 1px solid var(--ft-blue-lt); border-radius: 8px; overflow: hidden;
+    }
+    .maille-btn {
+      flex: 1; padding: 7px 0;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      border: none; cursor: pointer;
+      background: #fff; color: var(--ft-muted);
+      transition: background .15s, color .15s;
+    }
+    .maille-btn.active { background: var(--ft-blue); color: #fff; }
+
+    /* Indicator radios */
+    .indicator-list {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .indicator-list label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; cursor: pointer;
+      padding: 5px 8px; border-radius: 6px;
       transition: background .1s;
     }
-    .naf-row:last-child { border-bottom: none; }
-    .naf-row:hover { background: #f8faff; }
-    .naf-row.hidden { display: none; }
-    .naf-code {
-      flex-shrink: 0; font-size: 11px; font-weight: 700;
-      color: #fff; background: var(--ft-blue-lt);
-      padding: 2px 7px; border-radius: 4px;
-      letter-spacing: .04em; margin-top: 1px;
-      font-family: 'DM Mono', monospace, inherit;
+    .indicator-list label:hover { background: #f0f4ff; }
+    .indicator-list input[type="radio"] { accent-color: var(--ft-blue); cursor: pointer; }
+
+    /* Choropleth legend */
+    .choro-legend {
+      flex-shrink: 0;
     }
-    .naf-libelle {
-      font-size: 12px; line-height: 1.45; color: var(--ft-text);
+    .choro-legend-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--ft-muted); margin-bottom: 6px;
     }
-    .naf-empty {
-      text-align: center; color: var(--ft-muted);
-      font-size: 13px; padding: 24px 0;
+    .choro-legend-bar {
+      display: flex; gap: 2px; align-items: stretch;
+      border-radius: 5px; overflow: hidden;
+    }
+    .choro-legend-swatch {
+      flex: 1; height: 14px;
+    }
+    .choro-legend-labels {
+      display: flex; justify-content: space-between;
+      font-size: 10px; color: var(--ft-muted); margin-top: 3px;
+    }
+    .choro-missing-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 6px; font-size: 11px; color: var(--ft-muted);
+    }
+    .choro-missing-swatch {
+      width: 16px; height: 12px; border-radius: 3px;
+      background: #d1d5db; border: 1px solid #9ca3af; flex-shrink: 0;
     }
 
-    @media (max-width: 900px) {
-      .page:not(.sidebar-collapsed) { grid-template-columns: 240px 1fr; }
-      .sidebar { max-height: 50vh; }
-      .sidebar-inner { max-height: 300px; }
-      .filiere-list { max-height: 160px; }
+    /* Map SVG styles */
+    .map-path {
+      stroke: #fff;
+      stroke-width: 0.5;
+      cursor: pointer;
+      transition: opacity .12s;
     }
+    .map-path:hover { opacity: 0.75; stroke-width: 1.5; stroke: #1e3a8a; }
+    .map-path.no-data { fill: #d1d5db; stroke: #9ca3af; cursor: default; }
+    .map-path.no-data:hover { opacity: 1; stroke-width: 0.5; }
+
+    /* Map card fills full height */
+    #page-carte .chart-area { padding-top: 0; }
+    #map-card { position: relative; }
+    #map-card svg { width: 100%; height: 100%; display: block; }
   </style>
 </head>
 <body>
@@ -572,21 +606,33 @@
 
 <header>
   <div class="logo-badge">FT</div>
-  <h1>Matrice de décision – Difficultés / Taux de recours</h1>
+  <h1>Filières – Difficultés / Taux de recours – France Travail</h1>
 </header>
 
-<div class="page">
+<!-- ── TAB NAVIGATION ── -->
+<nav class="tab-nav">
+  <button class="tab-btn active" id="tab-btn-matrix" onclick="switchTab('matrix')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="16" r="3"/></svg>
+    Matrice filières
+  </button>
+  <button class="tab-btn" id="tab-btn-carte" onclick="switchTab('carte')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+    Carte par filière
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 : MATRICE
+══════════════════════════════════════════════ -->
+<div id="tab-matrix" class="tab-content active">
+<div class="page" id="page-matrix">
 
   <aside class="sidebar">
-
-    <button class="burger-btn" id="burger-btn" onclick="toggleSidebar()" title="Masquer / afficher le panneau de filtres">
+    <button class="burger-btn" id="burger-btn" onclick="toggleSidebar('matrix')" title="Masquer / afficher le panneau de filtres">
       <div class="bars">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </div>
     </button>
-
     <div class="sidebar-inner">
       <div class="territory-selector">
         <h2>📍 Territoire</h2>
@@ -826,7 +872,107 @@
       La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
     </div>
   </main>
-</div>
+</div><!-- /.page#page-matrix -->
+</div><!-- /#tab-matrix -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 : CARTE PAR FILIÈRE
+══════════════════════════════════════════════ -->
+<div id="tab-carte" class="tab-content">
+<div class="page" id="page-carte">
+
+  <aside class="sidebar" id="sidebar-carte">
+    <button class="burger-btn" id="burger-btn-carte" onclick="toggleSidebar('carte')" title="Masquer / afficher les filtres">
+      <div class="bars">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
+    </button>
+    <div class="sidebar-inner">
+
+      <!-- Filière selector -->
+      <div class="map-filiere-box">
+        <h2>🏭 Filière</h2>
+        <select id="map-filiere-select" onchange="onMapChange()">
+          <!-- populated by JS -->
+        </select>
+      </div>
+
+      <!-- Maille toggle -->
+      <div class="filter-section">
+        <h2>🔲 Maille territoriale</h2>
+        <div class="maille-toggle">
+          <button class="maille-btn active" id="btn-reg" onclick="setMaille('Régional')">Régionale</button>
+          <button class="maille-btn" id="btn-dep" onclick="setMaille('Départemental')">Départementale</button>
+        </div>
+      </div>
+
+      <!-- Indicateur selector -->
+      <div class="filter-section">
+        <h2>📊 Indicateur</h2>
+        <div class="indicator-list" id="indicator-list">
+          <label>
+            <input type="radio" name="map-ind" value="poids_rel" checked onchange="onMapChange()">
+            Poids relatif DPAE &gt; 1 mois
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="diffRecruit" onchange="onMapChange()">
+            Difficultés de recrutement
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="ent" onchange="onMapChange()">
+            Taux de recours
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="poids" onchange="onMapChange()">
+            Nb DPAE &gt; 1 mois
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="evol" onchange="onMapChange()">
+            Évolution DPAE &gt; 1 mois
+          </label>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="filter-section">
+        <div class="choro-legend" id="choro-legend">
+          <div class="choro-legend-title">Légende</div>
+          <div class="choro-legend-bar" id="choro-bar"></div>
+          <div class="choro-legend-labels" id="choro-labels">
+            <span id="choro-lbl-min">—</span>
+            <span id="choro-lbl-mid">—</span>
+            <span id="choro-lbl-max">—</span>
+          </div>
+          <div class="choro-missing-row">
+            <div class="choro-missing-swatch"></div>
+            Données absentes
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="chart-area">
+    <div class="chart-header" style="padding-bottom:8px">
+      <div>
+        <div class="chart-title" id="map-title">Carte filière</div>
+        <div class="chart-subtitle" id="map-subtitle">Sélectionnez une filière et un indicateur</div>
+      </div>
+    </div>
+    <div class="chart-card" id="map-card">
+      <svg id="map-svg"></svg>
+      <div class="empty-state" id="map-empty" style="display:none">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>
+        <div>Chargement de la carte…</div>
+      </div>
+    </div>
+  </main>
+</div><!-- /.page#page-carte -->
+</div><!-- /#tab-carte -->
 
 <div class="tooltip" id="tooltip"></div>
 <div id="naf-mini-tooltip"></div>
@@ -858,15 +1004,15 @@
 </div>
 
 <script>
-// ── CONFIGURATION ─────────────────────────────────────────────────────────────
-// Chemin vers le fichier JSON (relatif à index.html dans le repo)
 const DATA_URL = 'Data_DEP_REG.json';
 const NAF_URL  = 'Filieres-NAF.json';
+const DEP_URL  = 'dep.json';
+const REG_URL  = 'reg.json';
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
-let SOURCE_DATA = [];   // données brutes chargées depuis le JSON
-let RAW = [];           // données du territoire sélectionné, après mapRow
-let NAF_BY_FILIERE = {}; // { "FIL01": [{code, libelle}, …], … }
+let SOURCE_DATA = [];
+let RAW = [];
+let NAF_BY_FILIERE = {};
 
 const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
 
@@ -917,122 +1063,56 @@ async function loadNAF() {
   try {
     const res = await fetch(NAF_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const rows = await res.json();
-    NAF_BY_FILIERE = {};
-    rows.forEach(r => {
-      const code = r['Code filière'];
-      if (!NAF_BY_FILIERE[code]) NAF_BY_FILIERE[code] = [];
-      NAF_BY_FILIERE[code].push({
-        code:    r['Code NAF 2008 - Niv 5'],
-        libelle: r['Libellé NAF 2008 - Niv 5'],
-      });
+    const raw = await res.json();
+    raw.forEach(d => {
+      const fil = d['Code Filière'] || d['Filière'];
+      if (!fil) return;
+      if (!NAF_BY_FILIERE[fil]) NAF_BY_FILIERE[fil] = [];
+      NAF_BY_FILIERE[fil].push({ code: d['Code NAF'], libelle: d['Libellé NAF'] || d['Libelle NAF'] || '' });
     });
-    console.log(`✅ ${NAF_URL} chargé : ${rows.length} codes NAF`);
-  } catch(err) {
-    console.warn('⚠️ NAF non chargé :', err.message);
+    console.log(`✅ ${NAF_URL} chargé`);
+  } catch (err) {
+    console.warn('NAF non chargé :', err.message);
+  }
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+let mapInitialized = false;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('tab-btn-' + name).classList.add('active');
+
+  if (name === 'carte') {
+    if (!mapInitialized && SOURCE_DATA.length > 0) {
+      initMapTab();
+    }
+    setTimeout(() => { if (mapInitialized) renderMap(); }, 50);
+  }
+  if (name === 'matrix') {
+    setTimeout(initChart3, 50);
   }
 }
 
 // ── SIDEBAR TOGGLE ────────────────────────────────────────────────────────────
-function toggleSidebar() {
-  const page = document.querySelector('.page');
+function toggleSidebar(which) {
+  const page = document.getElementById('page-' + (which || 'matrix'));
   page.classList.toggle('sidebar-collapsed');
-  // Re-render chart after CSS transition ends (280ms)
-  setTimeout(initChart3, 300);
+  setTimeout(() => {
+    if (which === 'carte') renderMap();
+    else initChart3();
+  }, 320);
 }
 
-
-const nafMiniTip = document.getElementById('naf-mini-tooltip');
-let nafTipTimer;
-
-function showNAFPreview(e, filiereCode, filiereLabel) {
-  clearTimeout(nafTipTimer);
-  const nafs = NAF_BY_FILIERE[filiereCode] || [];
-  if (!nafs.length) return;
-  const preview = nafs.slice(0, 4);
-  const more    = nafs.length - preview.length;
-  nafMiniTip.innerHTML = `
-    <div class="nmt-title">${filiereLabel}</div>
-    ${preview.map(n => `<div class="nmt-item"><span class="nmt-code">${n.code}</span>${n.libelle}</div>`).join('')}
-    <div class="nmt-more">
-      ${more > 0
-        ? `+ ${more} autre${more > 1 ? 's' : ''} — cliquer pour voir la liste complète`
-        : '↗ Cliquer pour voir la liste complète'}
-    </div>`;
-  positionNAFTip(e);
-  nafMiniTip.style.opacity = '1';
-}
-
-function positionNAFTip(e) {
-  const pad = 14;
-  nafMiniTip.style.left = (e.clientX + pad) + 'px';
-  nafMiniTip.style.top  = (e.clientY - 10) + 'px';
-  // Reposition if overflow right
-  const rect = nafMiniTip.getBoundingClientRect();
-  if (rect.right > window.innerWidth - 8) {
-    nafMiniTip.style.left = (e.clientX - rect.width - pad) + 'px';
-  }
-}
-
-function hideNAFPreview() {
-  nafTipTimer = setTimeout(() => { nafMiniTip.style.opacity = '0'; }, 80);
-}
-
-// ── NAF MODAL ─────────────────────────────────────────────────────────────────
-function openNAFModal(filiereCode, filiereLabel) {
-  const nafs = NAF_BY_FILIERE[filiereCode] || [];
-  document.getElementById('naf-modal-filiere-name').textContent = filiereLabel;
-  document.getElementById('naf-modal-count').textContent = `${nafs.length} code${nafs.length > 1 ? 's' : ''} NAF`;
-  document.getElementById('naf-modal-search-input').value = '';
-  const body = document.getElementById('naf-modal-body');
-  if (!nafs.length) {
-    body.innerHTML = '<div class="naf-empty">Aucun code NAF disponible pour cette filière.</div>';
-  } else {
-    body.innerHTML = nafs.map(n => `
-      <div class="naf-row" data-search="${n.code.toLowerCase()} ${n.libelle.toLowerCase()}">
-        <span class="naf-code">${n.code}</span>
-        <span class="naf-libelle">${n.libelle}</span>
-      </div>`).join('');
-  }
-  nafMiniTip.style.opacity = '0';
-  document.getElementById('naf-modal-overlay').classList.add('open');
-  document.getElementById('naf-modal-search-input').focus();
-}
-
-function closeNAFModal(e) {
-  if (e && e.target !== document.getElementById('naf-modal-overlay')) return;
-  document.getElementById('naf-modal-overlay').classList.remove('open');
-}
-
-function filterNAFModal(q) {
-  const low = q.toLowerCase().trim();
-  document.querySelectorAll('#naf-modal-body .naf-row').forEach(row => {
-    row.classList.toggle('hidden', low && !row.dataset.search.includes(low));
-  });
-  const visible = document.querySelectorAll('#naf-modal-body .naf-row:not(.hidden)').length;
-  let empty = document.querySelector('#naf-modal-body .naf-empty');
-  if (!empty) {
-    empty = document.createElement('div');
-    empty.className = 'naf-empty';
-    document.getElementById('naf-modal-body').appendChild(empty);
-  }
-  empty.style.display = (low && visible === 0) ? 'block' : 'none';
-  empty.textContent = `Aucun résultat pour « ${q} »`;
-}
-
-// Fermer avec Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.getElementById('naf-modal-overlay').classList.remove('open');
-});
-
-
+// ── TERRITORY (Tab 1) ─────────────────────────────────────────────────────────
 function loadTerritoryData(code, niveau) {
   const territoryRows = SOURCE_DATA.filter(d =>
     d['Code'] === code && d['Niveau'] === niveau
   );
   RAW = territoryRows.map(mapRow);
 
-  // Filières absentes du territoire = non significatives
   const presentCodes = new Set(RAW.map(d => d.code));
   const absent = Object.entries(ALL_FILIERES)
     .filter(([c]) => !presentCodes.has(c))
@@ -1043,16 +1123,13 @@ function loadTerritoryData(code, niveau) {
 function updateNsPanel(absent) {
   const panel = document.getElementById('ns-panel');
   const list  = document.getElementById('ns-list');
-  const count = document.getElementById('ns-count');
-  if (absent.length === 0) {
-    panel.classList.add('hidden');
-    return;
-  }
+  const cnt   = document.getElementById('ns-count');
+  if (!absent.length) { panel.classList.add('hidden'); return; }
   panel.classList.remove('hidden');
-  count.textContent = absent.length;
-  list.innerHTML = absent
-    .map(f => `<span class="ns-tag" title="${f.code}">${f.code} – ${f.label}</span>`)
-    .join('');
+  cnt.textContent = absent.length;
+  list.innerHTML = absent.map(a =>
+    `<span class="ns-badge" title="${a.code}">${a.label}</span>`
+  ).join('');
 }
 
 function onTerritoryChange(value) {
@@ -1065,7 +1142,6 @@ function onTerritoryChange(value) {
 
   loadTerritoryData(code, niveau);
 
-  // Réinitialise l'état
   state3.selectedCodes = new Set(RAW.map(d => d.code));
   state3.activeEvol3   = new Set(['bas', 'mid', 'haut']);
   document.querySelectorAll('.chip[data-e3]').forEach(c => c.classList.remove('inactive'));
@@ -1076,46 +1152,79 @@ function onTerritoryChange(value) {
   initChart3();
 }
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-const state3    = { selectedCodes: new Set(), activeEvol3: new Set(['bas','mid','haut']) };
-const gridState3 = { x: null, y: null, bx: 0, by: 0 };
-
-function computeBarycenter(data, xAcc, yAcc, wAcc) {
-  const totalW = d3.sum(data, wAcc);
-  if (!totalW) return { x: d3.mean(data, xAcc) || 0, y: d3.mean(data, yAcc) || 0 };
-  return {
-    x: d3.sum(data, d => xAcc(d) * wAcc(d)) / totalW,
-    y: d3.sum(data, d => yAcc(d) * wAcc(d)) / totalW,
-  };
+// ── NAF MODAL ─────────────────────────────────────────────────────────────────
+function showNAFPreview(e, code, label) {
+  const tip = document.getElementById('naf-mini-tooltip');
+  const nafs = (NAF_BY_FILIERE[code] || []).slice(0,3);
+  if (!nafs.length) return;
+  tip.innerHTML = nafs.map(n => `<div>${n.code} – ${n.libelle}</div>`).join('') +
+    (NAF_BY_FILIERE[code].length > 3 ? `<div style="opacity:.7;margin-top:3px">… +${NAF_BY_FILIERE[code].length - 3} codes</div>` : '');
+  tip.style.opacity = '1';
+  positionNAFTip(e);
+}
+function positionNAFTip(e) {
+  const tip = document.getElementById('naf-mini-tooltip');
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY - 10) + 'px';
+}
+function hideNAFPreview() {
+  document.getElementById('naf-mini-tooltip').style.opacity = '0';
 }
 
-function getGridX3() { return gridState3.x !== null ? gridState3.x : gridState3.bx; }
-function getGridY3() { return gridState3.y !== null ? gridState3.y : gridState3.by; }
+function openNAFModal(code, label) {
+  const modal = document.getElementById('naf-modal-overlay');
+  document.getElementById('naf-modal-filiere-name').textContent = label;
+  const nafs = NAF_BY_FILIERE[code] || [];
+  document.getElementById('naf-modal-count').textContent = `${nafs.length} code${nafs.length !== 1 ? 's' : ''} NAF`;
+  document.getElementById('naf-modal-search-input').value = '';
+  const body = document.getElementById('naf-modal-body');
+  body.innerHTML = nafs.map(n =>
+    `<div class="naf-row"><span class="naf-code">${n.code}</span><span class="naf-libelle">${n.libelle}</span></div>`
+  ).join('');
+  modal.classList.add('open');
+}
+function closeNAFModal(e) {
+  if (!e || e.target === document.getElementById('naf-modal-overlay'))
+    document.getElementById('naf-modal-overlay').classList.remove('open');
+}
+function filterNAFModal(q) {
+  const low = q.toLowerCase().trim();
+  document.querySelectorAll('#naf-modal-body .naf-row').forEach(row => {
+    const txt = row.textContent.toLowerCase();
+    row.classList.toggle('hidden', low && !txt.includes(low));
+  });
+}
 
+// ── STATE (Tab 1) ─────────────────────────────────────────────────────────────
+const state3 = {
+  selectedCodes: new Set(),
+  activeEvol3:   new Set(['bas', 'mid', 'haut']),
+};
+const gridState3 = { x: null, y: null, bx: null, by: null };
+
+function getGridX3() { return gridState3.x !== null ? gridState3.x : (gridState3.bx !== null ? gridState3.bx : 0.4); }
+function getGridY3() { return gridState3.y !== null ? gridState3.y : (gridState3.by !== null ? gridState3.by : 0.3); }
 function syncGridInputs3() {
-  const xi = document.getElementById('g3x');
-  const yi = document.getElementById('g3y');
-  if (xi) xi.value = (getGridX3() * 100).toFixed(2);
-  if (yi) yi.value = (getGridY3() * 100).toFixed(2);
+  const fmt = v => v !== null ? (v * 100).toFixed(2) : '';
+  document.getElementById('g3x').value = fmt(gridState3.x !== null ? gridState3.x : gridState3.bx);
+  document.getElementById('g3y').value = fmt(gridState3.y !== null ? gridState3.y : gridState3.by);
 }
-
 function onManualGrid3(axis) {
-  const el = document.getElementById(axis === 'x' ? 'g3x' : 'g3y');
-  const v = parseFloat(el.value);
-  if (!isNaN(v)) {
-    if (axis === 'x') gridState3.x = v / 100;
-    else              gridState3.y = v / 100;
-    if (chart3.g) redrawChart3(false);
-  }
-}
-
-function resetToBarycenter3() {
-  gridState3.x = null; gridState3.y = null;
-  syncGridInputs3();
+  const v = parseFloat(document.getElementById(`g3${axis}`).value);
+  if (axis === 'x') gridState3.x = isNaN(v) ? null : v / 100;
+  else              gridState3.y = isNaN(v) ? null : v / 100;
   if (chart3.g) redrawChart3(false);
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function computeBarycenter(data, xFn, yFn, wFn) {
+  const totalW = d3.sum(data, wFn) || 1;
+  return {
+    x: d3.sum(data, d => xFn(d) * wFn(d)) / totalW,
+    y: d3.sum(data, d => yFn(d) * wFn(d)) / totalW,
+  };
+}
+
+// ── SIDEBAR (Tab 1) ────────────────────────────────────────────────────────────
 function buildSidebar3() {
   const list = document.getElementById('filiere-list-3');
   list.innerHTML = '';
@@ -1203,7 +1312,6 @@ let chart3 = {};
 
 function initChart3() {
   const card = document.getElementById('chart-card-3');
-  // Lire les dimensions AVANT de vider le SVG (sinon le card s'effondre)
   const W = card.clientWidth  || 800;
   const H = card.clientHeight || Math.max(400, window.innerHeight - 300);
 
@@ -1289,7 +1397,6 @@ function redrawChart3(useTransition = false) {
     .attr('x1', 0).attr('x2', iW)
     .attr('y1', v => yScale(v)).attr('y2', v => yScale(v));
 
-  // ── ZONE BACKGROUND LABELS ────────────────────────────────────────────────
   const gxPx = xScale(gxVal3), gyPx = yScale(gyVal3);
   const ZONE_DEFS = [
     { x: gxPx / 2,       y: gyPx / 2,       color:'#16a34a',
@@ -1299,7 +1406,8 @@ function redrawChart3(useTransition = false) {
     { x: gxPx / 2,       y:(gyPx+iH)/2,     color:'#d97706',
       lines:['Chercher des opportunités de partenariats','pour certains recrutements'] },
     { x:(gxPx+iW)/2,     y:(gyPx+iH)/2,     color:'#dc2626',
-      lines:["\u00c0 prioriser dans l\u2019\u00ab\u202faller vers\u202f\u00bb,","pour proposer des solutions","visant \u00e0 r\u00e9duire les tensions"] },
+      lines:['\u00c0 prioriser dans l\u2019\u00ab\u202faller vers\u202f\u00bb,','pour proposer des solutions',
+             'visant \u00e0 r\u00e9duire les tensions'] },
   ];
   const zg = g.select('.zone-labels');
   zg.selectAll('*').remove();
@@ -1321,7 +1429,6 @@ function redrawChart3(useTransition = false) {
         .text(line);
     });
   });
-  // ─────────────────────────────────────────────────────────────────────────
 
   const dragX3 = d3.drag()
     .on('start', (e) => { e.sourceEvent.stopPropagation(); })
@@ -1429,6 +1536,12 @@ function updateChart3() {
   redrawChart3(true);
 }
 
+function resetToBarycenter3() {
+  gridState3.x = null; gridState3.y = null;
+  syncGridInputs3();
+  if (chart3.g) redrawChart3(false);
+}
+
 function resetZoom3() {
   chart3.xScale = chart3.xScaleBase.copy();
   chart3.yScale = chart3.yScaleBase.copy();
@@ -1436,7 +1549,292 @@ function resetZoom3() {
   document.getElementById('zoom-reset-3').classList.remove('visible');
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+//  CARTE PAR FILIÈRE (Tab 2)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// 8-color diverging scale: dark red → dark blue
+// Index 0 = worst (red context), Index 7 = best (blue context)
+const CHORO_COLORS = [
+  '#7f1d1d', // 1 – rouge très foncé
+  '#b91c1c', // 2 – rouge foncé
+  '#ef4444', // 3 – rouge
+  '#fca5a5', // 4 – rouge clair
+  '#93c5fd', // 5 – bleu clair
+  '#3b82f6', // 6 – bleu
+  '#1d4ed8', // 7 – bleu foncé
+  '#1e3a8a', // 8 – bleu très foncé
+];
+
+// Indicateur config: label, format function, invert (true = high value is bad = red)
+const IND_CONFIG = {
+  poids_rel:   { label: 'Poids relatif DPAE > 1 mois', fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: true  },
+  ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false },
+  evol:        { label: 'Évolution DPAE > 1 mois',     fmt: v => (v >= 0 ? '+' : '') + (v*100).toFixed(1)+'%', invert: false },
+};
+
+// Map state
+const stateMap = {
+  filiere:    null,  // selected filière code
+  indicateur: 'poids_rel',
+  maille:     'Régional',
+};
+
+// Loaded GeoJSON
+const GEO = { reg: null, dep: null };
+
+// Precomputed totals DPAE by territory
+let totalDPAEByTerr = {};
+
+// Map data for current filière + maille: { code → { nom, diffRecruit, ent, evol, poids, poids_rel } }
+let mapDataByCode = {};
+
+async function initMapTab() {
+  mapInitialized = true;
+
+  // Compute total DPAE per territory
+  totalDPAEByTerr = {};
+  SOURCE_DATA.forEach(d => {
+    const p = +d['DPAE > 1 mois 2025'];
+    if (isNaN(p) || p <= 0) return;
+    const key = d['Code'] + '|' + d['Niveau'];
+    totalDPAEByTerr[key] = (totalDPAEByTerr[key] || 0) + p;
+  });
+
+  // Find default filière: highest DPAE > 1 mois at national level
+  const natRows = SOURCE_DATA.filter(d => d['Code'] === '00' && d['Niveau'] === 'National');
+  let bestCode = null, bestPoids = -1;
+  natRows.forEach(d => {
+    const p = +d['DPAE > 1 mois 2025'];
+    if (p > bestPoids) { bestPoids = p; bestCode = d['Filière']; }
+  });
+  stateMap.filiere = bestCode || 'FIL01';
+
+  // Populate filière select
+  const sel = document.getElementById('map-filiere-select');
+  sel.innerHTML = '';
+  Object.entries(ALL_FILIERES).forEach(([code, label]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = `${code} – ${label}`;
+    if (code === stateMap.filiere) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  // Load GeoJSON files
+  document.getElementById('map-empty').style.display = 'flex';
+  document.getElementById('map-empty').querySelector('div').textContent = 'Chargement des données géographiques…';
+
+  await Promise.all([
+    fetch(REG_URL).then(r => r.json()).then(d => { GEO.reg = d; }),
+    fetch(DEP_URL).then(r => r.json()).then(d => { GEO.dep = d; }),
+  ]).catch(err => {
+    document.getElementById('map-empty').querySelector('div').textContent = '⚠️ Impossible de charger les fichiers GeoJSON (dep.json / reg.json)';
+    console.error('GeoJSON error:', err);
+  });
+
+  if (GEO.reg && GEO.dep) {
+    document.getElementById('map-empty').style.display = 'none';
+    renderMap();
+  }
+}
+
+function onMapChange() {
+  stateMap.filiere    = document.getElementById('map-filiere-select').value;
+  stateMap.indicateur = document.querySelector('input[name="map-ind"]:checked').value;
+  renderMap();
+}
+
+function setMaille(maille) {
+  stateMap.maille = maille;
+  document.getElementById('btn-reg').classList.toggle('active', maille === 'Régional');
+  document.getElementById('btn-dep').classList.toggle('active', maille === 'Départemental');
+  onMapChange();
+}
+
+function buildMapData() {
+  const { filiere, maille } = stateMap;
+  const rows = SOURCE_DATA.filter(d => d['Filière'] === filiere && d['Niveau'] === maille);
+  mapDataByCode = {};
+  rows.forEach(d => {
+    const code = d['Code'];
+    const key  = code + '|' + maille;
+    const total = totalDPAEByTerr[key] || 0;
+    const poids = +d['DPAE > 1 mois 2025'];
+    const poids_rel = (total > 0 && !isNaN(poids)) ? poids / total : NaN;
+    mapDataByCode[code] = {
+      nom:         d['Libellé territoire'] || d['nom'] || code,
+      diffRecruit: parseFr(d['Difficultés de recrutement']),
+      ent:         parseFr(d['Taux de recours']),
+      evol:        parseFr(d['Evolution DPAE > 1 mois']),
+      poids:       isNaN(poids) ? NaN : poids,
+      poids_rel,
+    };
+  });
+}
+
+function getIndValue(row, ind) {
+  if (!row) return NaN;
+  return row[ind];
+}
+
+function renderMap() {
+  if (!GEO.reg || !GEO.dep) return;
+  const { maille, indicateur } = stateMap;
+  const geo = maille === 'Régional' ? GEO.reg : GEO.dep;
+  const cfg = IND_CONFIG[indicateur];
+
+  buildMapData();
+
+  // Compute valid values for color scale
+  const values = [];
+  geo.features.forEach(f => {
+    const code = f.properties.code_insee;
+    const row = mapDataByCode[code];
+    const v = getIndValue(row, indicateur);
+    if (!isNaN(v) && isFinite(v)) values.push(v);
+  });
+
+  // Compute ranks (for tooltip)
+  const sorted = [...values].sort((a, b) => a - b);
+  const rankOf = v => {
+    if (isNaN(v)) return null;
+    const pos = sorted.indexOf(v);
+    return pos >= 0 ? pos + 1 : null;
+  };
+  const n = sorted.length;
+
+  // Color scale: 8 quantile bins
+  let colorScale;
+  if (values.length < 2) {
+    colorScale = () => CHORO_COLORS[3];
+  } else {
+    const qScale = d3.scaleQuantile()
+      .domain(values)
+      .range(cfg.invert ? [...CHORO_COLORS].reverse() : CHORO_COLORS);
+    colorScale = qScale;
+  }
+
+  // Update legend
+  updateLegend(values, cfg);
+
+  // Update map title/subtitle
+  const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
+  document.getElementById('map-title').textContent = filiereLabel;
+  document.getElementById('map-subtitle').textContent =
+    `${cfg.label} · Maille ${maille === 'Régional' ? 'régionale' : 'départementale'}`;
+
+  // D3 render
+  const card  = document.getElementById('map-card');
+  const W = card.clientWidth  || 700;
+  const H = card.clientHeight || 500;
+  const pad = 20;
+
+  const svg = d3.select('#map-svg');
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('width', W).attr('height', H);
+  svg.selectAll('*').remove();
+
+  // Projection: geoMercator fitted to all features
+  const projection = d3.geoMercator()
+    .fitExtent([[pad, pad], [W - pad, H - pad]], geo);
+  const path = d3.geoPath().projection(projection);
+
+  const tooltip = document.getElementById('tooltip');
+  const fmtInd  = cfg.fmt;
+  const fmtPct  = v => (v*100).toFixed(1) + '%';
+  const fmtEvol = v => (v >= 0 ? '+' : '') + (v*100).toFixed(1) + '%';
+  const fmtNb   = v => Math.round(v).toLocaleString('fr-FR');
+
+  svg.selectAll('.map-path')
+    .data(geo.features)
+    .join('path')
+    .attr('class', d => {
+      const code = d.properties.code_insee;
+      const row  = mapDataByCode[code];
+      const v    = getIndValue(row, indicateur);
+      return 'map-path' + ((!row || isNaN(v) || !isFinite(v)) ? ' no-data' : '');
+    })
+    .attr('d', path)
+    .attr('fill', d => {
+      const code = d.properties.code_insee;
+      const row  = mapDataByCode[code];
+      if (!row) return '#d1d5db';
+      const v = getIndValue(row, indicateur);
+      if (isNaN(v) || !isFinite(v)) return '#d1d5db';
+      return colorScale(v);
+    })
+    .on('mousemove', function(event, d) {
+      const code = d.properties.code_insee;
+      const nom  = d.properties.nom_officiel || code;
+      const row  = mapDataByCode[code];
+
+      if (!row) {
+        tooltip.style.opacity = '1';
+        tooltip.style.left = (event.clientX + 14) + 'px';
+        tooltip.style.top  = (event.clientY - 10) + 'px';
+        tooltip.innerHTML = `<div class="tt-title">${nom}</div><div style="color:#9ca3af;font-size:12px">Données absentes pour cette filière</div>`;
+        return;
+      }
+
+      const v = getIndValue(row, indicateur);
+      const rank = isNaN(v) ? null : rankOf(v);
+      const rankDir = cfg.invert ? 'décroissant (1 = le plus élevé)' : 'croissant (1 = le plus faible)';
+
+      // Build all-indicator rows
+      const hasData = r => !isNaN(r) && isFinite(r);
+      const rows = [
+        { label:'Poids relatif DPAE', val: hasData(row.poids_rel)   ? fmtPct(row.poids_rel)   : '—', key:'poids_rel' },
+        { label:'Difficultés de recrutement', val: hasData(row.diffRecruit) ? fmtPct(row.diffRecruit) : '—', key:'diffRecruit' },
+        { label:'Taux de recours',    val: hasData(row.ent)         ? fmtPct(row.ent)         : '—', key:'ent' },
+        { label:'Nb DPAE > 1 mois',  val: hasData(row.poids)       ? fmtNb(row.poids)        : '—', key:'poids' },
+        { label:'Évolution DPAE > 1 mois', val: hasData(row.evol)  ? fmtEvol(row.evol)       : '—', key:'evol' },
+      ];
+
+      tooltip.style.opacity = '1';
+      tooltip.style.left = (event.clientX + 14) + 'px';
+      tooltip.style.top  = (event.clientY - 10) + 'px';
+      tooltip.innerHTML = `
+        <div class="tt-title">${nom}</div>
+        ${rows.map(r => `
+          <div class="tt-row" style="${r.key === indicateur ? 'font-weight:700;color:var(--ft-blue)' : ''}">
+            <span>${r.label}</span>
+            <span class="tt-val">${r.val}</span>
+          </div>`).join('')}
+        ${rank !== null ? `<div class="tt-rank">Classement sur « ${cfg.label} » : <strong>${rank}/${n}</strong> <span style="font-size:10px">(ordre ${rankDir})</span></div>` : ''}
+      `;
+      d3.select(this).raise();
+    })
+    .on('mouseleave', function() {
+      tooltip.style.opacity = '0';
+    });
+}
+
+function updateLegend(values, cfg) {
+  const bar    = document.getElementById('choro-bar');
+  const lblMin = document.getElementById('choro-lbl-min');
+  const lblMid = document.getElementById('choro-lbl-mid');
+  const lblMax = document.getElementById('choro-lbl-max');
+
+  const colors = cfg.invert ? [...CHORO_COLORS].reverse() : CHORO_COLORS;
+  bar.innerHTML = colors.map(c =>
+    `<div class="choro-legend-swatch" style="background:${c}"></div>`
+  ).join('');
+
+  if (values.length >= 2) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const minV = sorted[0], maxV = sorted[sorted.length - 1];
+    const midV = sorted[Math.floor(sorted.length / 2)];
+    lblMin.textContent = cfg.fmt(cfg.invert ? maxV : minV);
+    lblMid.textContent = cfg.fmt(midV);
+    lblMax.textContent = cfg.fmt(cfg.invert ? minV : maxV);
+  } else {
+    lblMin.textContent = lblMid.textContent = lblMax.textContent = '—';
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
 (async () => {
   const [ok] = await Promise.all([loadData(), loadNAF()]);
   document.getElementById('loading-overlay').style.display = 'none';
@@ -1451,9 +1849,11 @@ function resetZoom3() {
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(initChart3, 120);
+    resizeTimer = setTimeout(() => {
+      initChart3();
+      if (mapInitialized) renderMap();
+    }, 120);
   });
-  // Recalculate once fonts/layout have settled
   setTimeout(initChart3, 250);
 })();
 </script>
