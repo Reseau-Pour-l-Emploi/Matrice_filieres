@@ -1004,10 +1004,10 @@
 </div>
 
 <script>
-const DATA_URL = 'Data_DEP_REG.json';
-const NAF_URL  = 'Filieres-NAF.json';
-const DEP_URL  = 'dep.json';
-const REG_URL  = 'reg.json';
+const DATA_URL = 'Data_DEP_REG.geojson';
+const NAF_URL  = 'Filieres-NAF.geojson';
+const DEP_URL  = 'dep.geojson';
+const REG_URL  = 'reg.geojson';
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];
@@ -1042,7 +1042,7 @@ async function loadData() {
   try {
     const res = await fetch(DATA_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
-    SOURCE_DATA = await res.json();
+    SOURCE_DATA = await res.geojson();
     console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes`);
     return true;
   } catch (err) {
@@ -1063,7 +1063,7 @@ async function loadNAF() {
   try {
     const res = await fetch(NAF_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = await res.json();
+    const raw = await res.geojson();
     raw.forEach(d => {
       const fil = d['Code Filière'] || d['Filière'];
       if (!fil) return;
@@ -1628,10 +1628,10 @@ async function initMapTab() {
   document.getElementById('map-empty').querySelector('div').textContent = 'Chargement des données géographiques…';
 
   await Promise.all([
-    fetch(REG_URL).then(r => r.json()).then(d => { GEO.reg = d; }),
-    fetch(DEP_URL).then(r => r.json()).then(d => { GEO.dep = d; }),
+    fetch(REG_URL).then(r => r.geojson()).then(d => { GEO.reg = d; }),
+    fetch(DEP_URL).then(r => r.geojson()).then(d => { GEO.dep = d; }),
   ]).catch(err => {
-    document.getElementById('map-empty').querySelector('div').textContent = '⚠️ Impossible de charger les fichiers GeoJSON (dep.json / reg.json)';
+    document.getElementById('map-empty').querySelector('div').textContent = '⚠️ Impossible de charger les fichiers GeoJSON (dep.geojson / reg.geojson)';
     console.error('GeoJSON error:', err);
   });
 
