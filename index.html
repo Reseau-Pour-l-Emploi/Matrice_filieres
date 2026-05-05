@@ -1004,8 +1004,8 @@
 </div>
 
 <script>
-const DATA_URL = 'Data_DEP_REG.geojson';
-const NAF_URL  = 'Filieres-NAF.geojson';
+const DATA_URL = 'Data_DEP_REG.json';
+const NAF_URL  = 'Filieres-NAF.json';
 const DEP_URL  = 'dep.geojson';
 const REG_URL  = 'reg.geojson';
 
@@ -1042,7 +1042,7 @@ async function loadData() {
   try {
     const res = await fetch(DATA_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
-    SOURCE_DATA = await res.geojson();
+    SOURCE_DATA = await res.json();
     console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes`);
     return true;
   } catch (err) {
@@ -1063,12 +1063,12 @@ async function loadNAF() {
   try {
     const res = await fetch(NAF_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = await res.geojson();
+    const raw = await res.json();
     raw.forEach(d => {
-      const fil = d['Code Filière'] || d['Filière'];
+      const fil = d['Code filière'];
       if (!fil) return;
       if (!NAF_BY_FILIERE[fil]) NAF_BY_FILIERE[fil] = [];
-      NAF_BY_FILIERE[fil].push({ code: d['Code NAF'], libelle: d['Libellé NAF'] || d['Libelle NAF'] || '' });
+      NAF_BY_FILIERE[fil].push({ code: d['Code NAF 2008 - Niv 5'], libelle: d['Libellé NAF 2008 - Niv 5'] || '' });
     });
     console.log(`✅ ${NAF_URL} chargé`);
   } catch (err) {
@@ -1628,8 +1628,8 @@ async function initMapTab() {
   document.getElementById('map-empty').querySelector('div').textContent = 'Chargement des données géographiques…';
 
   await Promise.all([
-    fetch(REG_URL).then(r => r.geojson()).then(d => { GEO.reg = d; }),
-    fetch(DEP_URL).then(r => r.geojson()).then(d => { GEO.dep = d; }),
+    fetch(REG_URL).then(r => r.json()).then(d => { GEO.reg = d; }),
+    fetch(DEP_URL).then(r => r.json()).then(d => { GEO.dep = d; }),
   ]).catch(err => {
     document.getElementById('map-empty').querySelector('div').textContent = '⚠️ Impossible de charger les fichiers GeoJSON (dep.geojson / reg.geojson)';
     console.error('GeoJSON error:', err);
@@ -1665,7 +1665,7 @@ function buildMapData() {
     const poids = +d['DPAE > 1 mois 2025'];
     const poids_rel = (total > 0 && !isNaN(poids)) ? poids / total : NaN;
     mapDataByCode[code] = {
-      nom:         d['Libellé territoire'] || d['nom'] || code,
+      nom:         d['Territoire'] || code,
       diffRecruit: parseFr(d['Difficultés de recrutement']),
       ent:         parseFr(d['Taux de recours']),
       evol:        parseFr(d['Evolution DPAE > 1 mois']),
