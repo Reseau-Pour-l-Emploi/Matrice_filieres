@@ -70,20 +70,61 @@
       grid-template-columns: 300px 1fr;
       gap: 0;
       min-height: calc(100vh - 62px);
+      transition: grid-template-columns .28s cubic-bezier(.4,0,.2,1);
+    }
+    .page.sidebar-collapsed {
+      grid-template-columns: 44px 1fr;
     }
 
     /* ── SIDEBAR ── */
     .sidebar {
       background: var(--ft-card);
       border-right: 1px solid var(--ft-border);
-      padding: 20px 16px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
-      overflow-y: auto;
+      overflow: hidden;
       max-height: calc(100vh - 62px);
       position: sticky;
       top: 62px;
+    }
+
+    /* ── BURGER BUTTON ── */
+    .burger-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      height: 44px; min-height: 44px;
+      border: none; background: var(--ft-card);
+      border-bottom: 1px solid var(--ft-border);
+      cursor: pointer; width: 100%;
+      position: sticky; top: 0; z-index: 10;
+      transition: background .15s;
+    }
+    .burger-btn:hover { background: #eff6ff; }
+    .burger-btn .bar {
+      display: block; width: 18px; height: 2px;
+      background: var(--ft-blue); border-radius: 1px;
+      transition: transform .25s, opacity .25s, width .25s;
+    }
+    .burger-btn .bars { display: flex; flex-direction: column; gap: 4px; }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(2) { opacity: 0; width: 0; }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    /* ── SIDEBAR INNER (content) ── */
+    .sidebar-inner {
+      flex: 1; overflow-y: auto;
+      padding: 20px 16px;
+      display: flex; flex-direction: column; gap: 22px;
+      /* Largeur fixe : overflow:hidden du parent écrête au bon moment */
+      width: 300px; min-width: 300px;
+      /* Disparition immédiate du texte dès le début de la réduction */
+      transition: opacity .08s, visibility .08s;
+      opacity: 1; visibility: visible;
+    }
+    .sidebar-inner::-webkit-scrollbar { width: 4px; }
+    .sidebar-inner::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
+    .page.sidebar-collapsed .sidebar-inner {
+      opacity: 0; visibility: hidden; pointer-events: none;
     }
     .filter-section h2 {
       font-size: 11px;
@@ -488,7 +529,9 @@
 
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
-      .sidebar { max-height: 300px; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); top: auto; }
+      .page.sidebar-collapsed { grid-template-columns: 44px 1fr; }
+      .sidebar { max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); top: auto; }
+      .sidebar-inner { max-height: 300px; min-width: unset; }
       .filiere-list { max-height: 200px; }
     }
   </style>
@@ -509,7 +552,15 @@
 
   <aside class="sidebar">
 
-    <div class="territory-selector">
+    <button class="burger-btn" id="burger-btn" onclick="toggleSidebar()" title="Masquer / afficher le panneau de filtres">
+      <div class="bars">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </button>
+
+    <div class="sidebar-inner">
       <h2>📍 Territoire</h2>
       <select id="territory-select" onchange="onTerritoryChange(this.value)">
         <optgroup label="National">
@@ -690,6 +741,8 @@
       </div>
       <div class="filiere-list" id="filiere-list-3"></div>
     </div>
+
+  </div><!-- /.sidebar-inner -->
   </aside>
 
   <main class="chart-area">
@@ -852,7 +905,15 @@ async function loadNAF() {
   }
 }
 
-// ── NAF MINI TOOLTIP ──────────────────────────────────────────────────────────
+// ── SIDEBAR TOGGLE ────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const page = document.querySelector('.page');
+  page.classList.toggle('sidebar-collapsed');
+  // Re-render chart after CSS transition ends (280ms)
+  setTimeout(initChart3, 300);
+}
+
+
 const nafMiniTip = document.getElementById('naf-mini-tooltip');
 let nafTipTimer;
 
@@ -937,6 +998,7 @@ document.addEventListener('keydown', e => {
 });
 
 
+function loadTerritoryData(code, niveau) {
   const territoryRows = SOURCE_DATA.filter(d =>
     d['Code'] === code && d['Niveau'] === niveau
   );
@@ -1116,7 +1178,22 @@ function initChart3() {
   svg.selectAll('*').remove();
   const card = document.getElementById('chart-card-3');
   const W = card.clientWidth || 800;
-  const H = Math.max(500, Math.round(W * 0.6));
+
+  // ── Hauteur dynamique : tout doit tenir sans ascenseur ─────────────────────
+  const vh = window.innerHeight;
+  const headerEl   = document.querySelector('header');
+  const chartHdrEl = document.querySelector('.chart-header');
+  const interpEl   = document.querySelector('.interp-block');
+  const nsEl       = document.getElementById('ns-panel');
+  const headerH  = headerEl  ? headerEl.offsetHeight  : 62;
+  const chartHdrH= chartHdrEl? chartHdrEl.offsetHeight: 70;
+  const interpH  = interpEl  ? interpEl.offsetHeight  : 70;
+  const nsH      = (nsEl && !nsEl.classList.contains('hidden')) ? nsEl.offsetHeight + 16 : 0;
+  const areapadV = 24 + 20;   // padding-top + padding-bottom de .chart-area
+  const gaps     = 16 * 3;    // 3 gaps entre les blocs flex
+  const H = Math.max(400, vh - headerH - areapadV - chartHdrH - gaps - nsH - interpH);
+  // ───────────────────────────────────────────────────────────────────────────
+
   const m = { top:28, right:30, bottom:56, left:66 };
   const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
   svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
@@ -1360,6 +1437,8 @@ function resetZoom3() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(initChart3, 120);
   });
+  // Recalculate once fonts/layout have settled
+  setTimeout(initChart3, 250);
 })();
 </script>
 </body>
