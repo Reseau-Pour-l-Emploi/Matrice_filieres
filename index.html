@@ -69,11 +69,11 @@
       display: grid;
       grid-template-columns: 300px 1fr;
       gap: 0;
-      min-height: calc(100vh - 62px);
-      transition: grid-template-columns .28s cubic-bezier(.4,0,.2,1);
+      height: calc(100vh - 62px);
+      transition: grid-template-columns .3s cubic-bezier(.4,0,.2,1);
     }
     .page.sidebar-collapsed {
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 2vw 1fr;
     }
 
     /* ── SIDEBAR ── */
@@ -83,20 +83,33 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      max-height: calc(100vh - 62px);
-      position: sticky;
-      top: 62px;
+      position: relative;   /* nécessaire pour l'overlay absolu */
+    }
+
+    /* ── OVERLAY masquant tout le contenu en mode réduit ── */
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 44px 0 0 0;          /* couvre tout sauf le burger (44px) */
+      background: var(--ft-card);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .05s;   /* apparaît quasi-instantanément */
+      z-index: 20;
+    }
+    .page.sidebar-collapsed .sidebar::after {
+      opacity: 1;
     }
 
     /* ── BURGER BUTTON ── */
     .burger-btn {
       flex-shrink: 0;
+      position: relative; z-index: 30; /* reste au-dessus de l'overlay */
       display: flex; align-items: center; justify-content: center;
       height: 44px; min-height: 44px;
       border: none; background: var(--ft-card);
       border-bottom: 1px solid var(--ft-border);
       cursor: pointer; width: 100%;
-      position: sticky; top: 0; z-index: 10;
       transition: background .15s;
     }
     .burger-btn:hover { background: #eff6ff; }
@@ -112,19 +125,28 @@
 
     /* ── SIDEBAR INNER (content) ── */
     .sidebar-inner {
-      flex: 1; overflow-y: auto;
-      padding: 20px 16px;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 2vw;
       display: flex; flex-direction: column; gap: 22px;
-      /* Largeur fixe : overflow:hidden du parent écrête au bon moment */
-      width: 300px; min-width: 300px;
-      /* Disparition immédiate du texte dès le début de la réduction */
-      transition: opacity .08s, visibility .08s;
-      opacity: 1; visibility: visible;
+      width: 300px;
     }
     .sidebar-inner::-webkit-scrollbar { width: 4px; }
     .sidebar-inner::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
-    .page.sidebar-collapsed .sidebar-inner {
-      opacity: 0; visibility: hidden; pointer-events: none;
+
+    /* ── CHART AREA ── */
+    .chart-area {
+      padding: 24px 28px 20px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      min-width: 0;
+    }
+    .chart-card {
+      flex: 1;          /* remplit l'espace restant */
+      min-height: 0;    /* autorise le shrink dans le flex */
     }
     .filter-section h2 {
       font-size: 11px;
@@ -236,7 +258,6 @@
     }
 
     /* ── CHART AREA ── */
-    .chart-area { padding: 24px 28px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
     .chart-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .chart-title { font-size: 17px; font-weight: 700; color: var(--ft-blue); line-height: 1.3; }
     .chart-subtitle { font-size: 12px; color: var(--ft-muted); margin-top: 3px; }
@@ -249,8 +270,9 @@
       background: var(--ft-card); border-radius: 12px;
       border: 1px solid var(--ft-border);
       box-shadow: var(--shadow); overflow: hidden; position: relative;
+      flex: 1; min-height: 0;
     }
-    .chart-svg { width: 100%; display: block; }
+    .chart-svg { width: 100%; height: 100%; display: block; }
 
     .bubble { cursor: pointer; }
     .bubble:hover { stroke-width: 2 !important; }
@@ -528,11 +550,10 @@
     }
 
     @media (max-width: 900px) {
-      .page { grid-template-columns: 1fr; }
-      .page.sidebar-collapsed { grid-template-columns: 44px 1fr; }
-      .sidebar { max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--ft-border); top: auto; }
-      .sidebar-inner { max-height: 300px; min-width: unset; }
-      .filiere-list { max-height: 200px; }
+      .page:not(.sidebar-collapsed) { grid-template-columns: 240px 1fr; }
+      .sidebar { max-height: 50vh; }
+      .sidebar-inner { max-height: 300px; }
+      .filiere-list { max-height: 160px; }
     }
   </style>
 </head>
@@ -1174,25 +1195,13 @@ const R_MIN = 5, R_MAX = 35;
 let chart3 = {};
 
 function initChart3() {
+  const card = document.getElementById('chart-card-3');
+  // Lire les dimensions AVANT de vider le SVG (sinon le card s'effondre)
+  const W = card.clientWidth  || 800;
+  const H = card.clientHeight || Math.max(400, window.innerHeight - 300);
+
   const svg = d3.select('#chart-svg-3');
   svg.selectAll('*').remove();
-  const card = document.getElementById('chart-card-3');
-  const W = card.clientWidth || 800;
-
-  // ── Hauteur dynamique : tout doit tenir sans ascenseur ─────────────────────
-  const vh = window.innerHeight;
-  const headerEl   = document.querySelector('header');
-  const chartHdrEl = document.querySelector('.chart-header');
-  const interpEl   = document.querySelector('.interp-block');
-  const nsEl       = document.getElementById('ns-panel');
-  const headerH  = headerEl  ? headerEl.offsetHeight  : 62;
-  const chartHdrH= chartHdrEl? chartHdrEl.offsetHeight: 70;
-  const interpH  = interpEl  ? interpEl.offsetHeight  : 70;
-  const nsH      = (nsEl && !nsEl.classList.contains('hidden')) ? nsEl.offsetHeight + 16 : 0;
-  const areapadV = 24 + 20;   // padding-top + padding-bottom de .chart-area
-  const gaps     = 16 * 3;    // 3 gaps entre les blocs flex
-  const H = Math.max(400, vh - headerH - areapadV - chartHdrH - gaps - nsH - interpH);
-  // ───────────────────────────────────────────────────────────────────────────
 
   const m = { top:28, right:30, bottom:56, left:66 };
   const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
