@@ -181,6 +181,10 @@
       flex: 1;
       min-height: 0;
     }
+    /* In Tab 1, chart-main-row fills remaining space */
+    #tab-matrix .chart-area { overflow: hidden; }
+    #tab-matrix .chart-main-row { flex: 1; min-height: 0; overflow: hidden; }
+    #tab-matrix .chart-card { flex: 1; min-height: 0; overflow: hidden; }
     .filter-section {
       padding-top: 14px;
       border-top: 1px solid var(--ft-border);
@@ -419,6 +423,19 @@
       letter-spacing: .06em; text-transform: uppercase;
       color: var(--ft-blue-lt); margin-bottom: 4px;
     }
+    .side-legend-color,
+    .side-legend-size {
+      display: flex; flex-direction: column; gap: 5px;
+      margin-bottom: 4px;
+    }
+    .side-legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11.5px; color: #1e3a6e;
+    }
+    .side-divider {
+      border-top: 1px solid #c7d4f0;
+      margin: 14px 0;
+    }
 
     /* ── LOADING OVERLAY ── */
     .loading-overlay {
@@ -582,6 +599,99 @@
       background: #d1d5db; border: 1px solid #9ca3af; flex-shrink: 0;
     }
 
+    /* ── SOURCES BUTTON ── */
+    .sources-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.30);
+      color: #fff; border-radius: 6px; padding: 5px 12px;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      margin-left: auto;
+    }
+    .sources-btn:hover { background: rgba(255,255,255,.22); }
+
+    /* ── SOURCES POPUP ── */
+    .sources-popup {
+      position: fixed; top: 68px; right: 18px; z-index: 500;
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 32px rgba(0,49,137,.18);
+      border: 1px solid var(--ft-border); width: 380px; max-width: 94vw;
+      animation: fadeInDown .18s ease;
+    }
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
+    .sources-popup.hidden { display: none; }
+    .sources-popup-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--ft-border);
+      font-size: 13px; color: var(--ft-blue);
+    }
+    .sources-popup-close {
+      background: none; border: none; cursor: pointer; color: var(--ft-muted);
+      font-size: 14px; padding: 2px 5px; border-radius: 4px; transition: background .15s;
+    }
+    .sources-popup-close:hover { background: #f0f4ff; color: var(--ft-blue); }
+    .sources-popup-body {
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+      font-size: 12px; line-height: 1.6; color: var(--ft-text);
+      max-height: 60vh; overflow-y: auto;
+    }
+    .sources-popup-body p { margin: 0; }
+    .sources-backdrop {
+      position: fixed; inset: 0; z-index: 499;
+    }
+    .sources-backdrop.hidden { display: none; }
+
+    /* ── INTERP BLOCK SIDE (Tab 1) ── */
+    .chart-main-row {
+      display: flex; gap: 12px; flex: 1; min-height: 0;
+    }
+    .interp-block-side {
+      width: 210px; flex-shrink: 0;
+      background: #f0f4ff; border-left: 4px solid var(--ft-blue-lt);
+      border-radius: 0 8px 8px 0; padding: 12px 14px;
+      font-size: 11.5px; color: #1e3a6e; line-height: 1.6;
+      overflow-y: auto; align-self: stretch;
+    }
+    .interp-block-side strong { font-weight: 700; }
+    .interp-label {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--ft-blue-lt); margin-bottom: 6px;
+    }
+
+    /* ── RANKING PANEL (Tab 2) ── */
+    .ranking-panel {
+      width: 230px; flex-shrink: 0;
+      background: #fff; border-radius: 12px; box-shadow: var(--shadow);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .ranking-panel-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--ft-border);
+      font-size: 10px; font-weight: 700; color: var(--ft-blue);
+      text-transform: uppercase; letter-spacing: .07em; flex-shrink: 0;
+    }
+    .ranking-panel-sub {
+      font-size: 10px; font-weight: 400; color: var(--ft-muted);
+      text-transform: none; letter-spacing: 0; margin-top: 2px;
+    }
+    #ranking-list { overflow-y: auto; flex: 1; }
+    .ranking-row {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 12px; border-bottom: 1px solid #f0f2f8;
+      font-size: 11px;
+    }
+    .ranking-row:last-child { border-bottom: none; }
+    .ranking-rank { color: var(--ft-muted); min-width: 16px; text-align: right; font-size: 10px; }
+    .ranking-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ranking-val { font-weight: 700; color: var(--ft-blue); white-space: nowrap; }
+    .ranking-empty { padding: 20px 14px; font-size: 11px; color: var(--ft-muted); text-align: center; }
+
+    /* ── MAP CONTAINER ROW ── */
+    .map-row { display: flex; gap: 12px; flex: 1; min-height: 0; }
+    #tab-carte .chart-area { overflow: hidden; }
+    #tab-carte .map-row { flex: 1; min-height: 0; }
+    #map-card { flex: 1; min-width: 0; position: relative; }
+
     /* Map SVG styles */
     .map-path {
       stroke: #fff;
@@ -595,7 +705,6 @@
 
     /* Map card fills full height */
     #page-carte .chart-area { padding-top: 0; }
-    #map-card { position: relative; }
     #map-card svg { width: 100%; height: 100%; display: block; }
   </style>
 </head>
@@ -609,7 +718,27 @@
 <header>
   <div class="logo-badge">FT</div>
   <h1>Filières – Difficultés / Taux de recours – France Travail</h1>
+  <button class="sources-btn" onclick="toggleSourcesPopup(event)" id="sources-btn" title="Afficher les sources">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Sources
+  </button>
 </header>
+
+<!-- ── SOURCES POPUP ── -->
+<div id="sources-popup" class="sources-popup hidden">
+  <div class="sources-popup-header">
+    <strong>Sources des données</strong>
+    <button onclick="closeSourcesPopup()" class="sources-popup-close">✕</button>
+  </div>
+  <div class="sources-popup-body">
+    <p><strong>DPAE</strong> : les déclarations préalables à l'embauche (DPAE) issues de l'Acoss et de la CCMSA. Pour éviter les contrats à la journée, un filtre ne conserve que les DPAE de plus d'un mois.</p>
+    <p>Le <strong>Poids relatif DPAE &gt; 1 mois</strong> correspond au nombre d'embauches dans la filière concernée rapporté au nombre d'embauches de l'ensemble des filières du territoire.</p>
+    <p>L'<strong>évolution de la DPAE</strong> est calculée entre les DPAE enregistrées en 2025 et celles de l'année précédente.</p>
+    <p><strong>Taux de recours</strong> : sur les 12 derniers mois, ratio du nombre d'établissements ayant fait appel aux services de France Travail (dépôt d'offres &gt; 30 jours, contrat aidé, promotion de profil suivie d'un recrutement, POEI) sur le nombre d'établissements ayant recruté ou ayant fait appel aux services de France Travail.</p>
+    <p><strong>Difficultés de recrutement</strong> : Part des projets d'embauche jugés difficiles par les employeurs de la filière (BMO 2026, affiché si a minima 40 embauches prévues).</p>
+  </div>
+</div>
+<div id="sources-backdrop" class="sources-backdrop hidden" onclick="closeSourcesPopup()"></div>
 
 <!-- ── TAB NAVIGATION ── -->
 <nav class="tab-nav">
@@ -825,35 +954,7 @@
     <div class="chart-header">
       <div>
         <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
-        <div class="chart-subtitle">Difficultés de recrutement en abscisse · Taux de recours en ordonnée · Taille = Nb DPAE &gt; 1 mois · Couleur = Évolution DPAE &gt; 1 mois</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-haut)"></div>Hausse (&gt; +1%)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-mid)"></div>Évolution modérée (± 1%)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--col-e3-bas)"></div>Baisse (&lt; −1%)</div>
-        </div>
-        <div class="size-legend">
-          <span>Nb DPAE &gt; 1 mois :</span>
-          <div class="sl-item"><div class="sl-circle" style="width:10px;height:10px"></div> petit</div>
-          <div class="sl-item"><div class="sl-circle" style="width:20px;height:20px"></div> moyen</div>
-          <div class="sl-item"><div class="sl-circle" style="width:34px;height:34px"></div> grand</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-card" id="chart-card-3">
-      <svg class="chart-svg" id="chart-svg-3"></svg>
-      <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Réinitialiser le zoom
-      </button>
-      <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
-      <div class="empty-state" id="empty-state-3" style="display:none">
-        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
-        </svg>
-        <div>Aucune filière sélectionnée</div>
+        <div class="chart-subtitle">Abscisse : Difficultés de recrutement · Ordonnée : Taux de recours</div>
       </div>
     </div>
 
@@ -869,9 +970,61 @@
       <div class="ns-list" id="ns-list"></div>
     </div>
 
-    <div class="interp-block">
-      <div class="interp-label">💡 Exemple de lecture</div><br>
-      La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
+    <div class="chart-main-row">
+      <div class="chart-card" id="chart-card-3" style="flex:1;min-width:0;">
+        <svg class="chart-svg" id="chart-svg-3"></svg>
+        <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser le zoom
+        </button>
+        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
+        <div class="empty-state" id="empty-state-3" style="display:none">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
+          </svg>
+          <div>Aucune filière sélectionnée</div>
+        </div>
+      </div>
+      <div class="interp-block-side">
+
+        <div class="interp-label">🎨 Couleur — Évolution DPAE</div>
+        <div class="side-legend-color">
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-haut)"></div>
+            <span>Hausse (&gt; +1&nbsp;%)</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-mid)"></div>
+            <span>Modérée (± 1&nbsp;%)</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-bas)"></div>
+            <span>Baisse (&lt; −1&nbsp;%)</span>
+          </div>
+        </div>
+
+        <div class="interp-label" style="margin-top:14px">⚪ Taille — Nb DPAE &gt; 1 mois</div>
+        <div class="side-legend-size">
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:10px;height:10px;flex-shrink:0"></div>
+            <span>Petit volume</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:20px;height:20px;flex-shrink:0"></div>
+            <span>Volume moyen</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:32px;height:32px;flex-shrink:0"></div>
+            <span>Grand volume</span>
+          </div>
+        </div>
+
+        <div class="side-divider"></div>
+
+        <div class="interp-label">💡 Exemple de lecture</div><br>
+        La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
+
+      </div>
     </div>
   </main>
 </div><!-- /.page#page-matrix -->
@@ -925,10 +1078,6 @@
             Taux de recours
           </label>
           <label>
-            <input type="radio" name="map-ind" value="poids" onchange="onMapChange()">
-            Nb DPAE &gt; 1 mois
-          </label>
-          <label>
             <input type="radio" name="map-ind" value="evol" onchange="onMapChange()">
             Évolution DPAE &gt; 1 mois
           </label>
@@ -962,14 +1111,23 @@
         <div class="chart-subtitle" id="map-subtitle">Sélectionnez une filière et un indicateur</div>
       </div>
     </div>
-    <div class="chart-card" id="map-card">
-      <svg id="map-svg"></svg>
-      <div class="empty-state" id="map-empty" style="display:none">
-        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
-          <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-        </svg>
-        <div>Chargement de la carte…</div>
+    <div class="map-row">
+      <div class="chart-card" id="map-card" style="flex:1;min-width:0;">
+        <svg id="map-svg"></svg>
+        <div class="empty-state" id="map-empty" style="display:none">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+          <div>Chargement de la carte…</div>
+        </div>
+      </div>
+      <div class="ranking-panel">
+        <div class="ranking-panel-header">
+          🏆 Classement DPAE &gt; 1 mois
+          <div class="ranking-panel-sub" id="ranking-panel-sub">tous territoires</div>
+        </div>
+        <div id="ranking-list"></div>
       </div>
     </div>
   </main>
@@ -1689,8 +1847,7 @@ function renderMap() {
   const cfg = IND_CONFIG[indicateur];
 
   buildMapData();
-
-  // Compute valid values for color scale
+  updateRanking();
   const values = [];
   geo.features.forEach(f => {
     const code = f.properties.code_insee;
@@ -1836,7 +1993,54 @@ function updateLegend(values, cfg) {
   }
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// ── SOURCES POPUP ─────────────────────────────────────────────────────────────
+function toggleSourcesPopup(event) {
+  event.stopPropagation();
+  const popup = document.getElementById('sources-popup');
+  const backdrop = document.getElementById('sources-backdrop');
+  const isHidden = popup.classList.contains('hidden');
+  popup.classList.toggle('hidden', !isHidden);
+  backdrop.classList.toggle('hidden', !isHidden);
+}
+function closeSourcesPopup() {
+  document.getElementById('sources-popup').classList.add('hidden');
+  document.getElementById('sources-backdrop').classList.add('hidden');
+}
+
+// ── RANKING PANEL (Tab 2) ─────────────────────────────────────────────────────
+function updateRanking() {
+  const { filiere, maille } = stateMap;
+  const list = document.getElementById('ranking-list');
+  const sub  = document.getElementById('ranking-panel-sub');
+  if (!filiere || !SOURCE_DATA.length) { list.innerHTML = '<div class="ranking-empty">Données non disponibles</div>'; return; }
+
+  const mailleLabel = maille === 'Régional' ? 'régions' : 'départements';
+  sub.textContent = mailleLabel;
+
+  // Get all rows for this filiere + maille, sorted by DPAE > 1 mois desc
+  const rows = SOURCE_DATA
+    .filter(d => d['Filière'] === filiere && d['Niveau'] === maille)
+    .map(d => ({ nom: d['Territoire'] || d['Code'], poids: +d['DPAE > 1 mois 2025'] }))
+    .filter(d => !isNaN(d.poids) && d.poids > 0)
+    .sort((a, b) => b.poids - a.poids);
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="ranking-empty">Aucune donnée disponible</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map((r, i) => `
+    <div class="ranking-row">
+      <span class="ranking-rank">${i + 1}</span>
+      <span class="ranking-name" title="${r.nom}">${r.nom}</span>
+      <span class="ranking-val">${Math.round(r.poids).toLocaleString('fr-FR')}</span>
+    </div>
+  `).join('');
+}
+
+// ── CHART AREA HEIGHT PATCH FOR TAB1 ──────────────────────────────────────────
+// The chart-main-row takes the chart-card flex:1, so initChart3 must target its parent
+
 (async () => {
   const [ok] = await Promise.all([loadData(), loadNAF()]);
   document.getElementById('loading-overlay').style.display = 'none';
