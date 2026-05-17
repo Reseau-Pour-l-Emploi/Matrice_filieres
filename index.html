@@ -11,39 +11,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
     const ALL_FILIERES = {"FIL01": "AGRICULTURE, ÉLEVAGE ET PÊCHE", "FIL02": "ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE", "FIL03": "BANQUES ASSURANCES IMMOBILIER", "FIL04": "COMMERCE ET DISTRIBUTION", "FIL05": "CONSTRUCTION (BTP ET MATÉRIAUX)", "FIL06": "CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL", "FIL07": "EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)", "FIL08": "ENERGIES (RENOUVELABLES ET RÉSEAUX)", "FIL09": "FILIÈRE BOIS", "FIL10": "HÔTELLERIE ET RESTAURATIONS (HCRB)", "FIL11": "INDUSTRIE AGROALIMENTAIRE", "FIL12": "INDUSTRIE AUTOMOBILE", "FIL13": "INDUSTRIE AÉRONAUTIQUE ET SPATIALE", "FIL14": "INDUSTRIE CHIMIQUE", "FIL15": "INDUSTRIE DE SANTÉ", "FIL16": "INDUSTRIE FERROVIAIRE", "FIL17": "NAVAL ET NAUTISME", "FIL18": "INDUSTRIE PLASTURGIQUE", "FIL19": "INDUSTRIE TEXTILE, MODE ET LUXE", "FIL20": "INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE", "FIL21": "MÉTALLURGIE - SCOPE UIMM", "FIL22": "NUCLÉAIRE", "FIL23": "NUMÉRIQUE ET TÉLÉCOMMUNICATIONS", "FIL24": "PROPRETÉ", "FIL25": "SANTÉ, SOCIAL, SAP", "FIL26": "SERVICES AUTOMOBILES", "FIL27": "SPORT", "FIL28": "SÉCURITÉ PRIVÉE", "FIL29": "TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES", "FIL30": "TRANSPORTS ET LOGISTIQUE"};
-    // Leaders par filière (issus de Leader_filières.csv)
-    const LEADERS_FILIERES = {
-      "FIL27": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
-      "FIL01": { region: "BRETAGNE",                       directeur: "Angélique GOODALL" },
-      "FIL02": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
-      "FIL03": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL04": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL05": { region: "BOURGOGNE-FRANCHE-COMTÉ",        directeur: "Stéphane BAILLY" },
-      "FIL06": { region: "FRANCE TRAVAIL SERVICES",        directeur: "Philippe GUEUDAR DELAHAYE" },
-      "FIL07": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
-      "FIL08": { region: "NORMANDIE",                      directeur: "Laurence HURNI" },
-      "FIL09": { region: "GRAND EST",                      directeur: "Virginie COPPENS MENAGER" },
-      "FIL10": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL13": { region: "OCCITANIE",                      directeur: "Karine MEININGER" },
-      "FIL12": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
-      "FIL14": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
-      "FIL15": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
-      "FIL20": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL16": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
-      "FIL21": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL17": { region: "PAYS DE LA LOIRE",               directeur: "Catherine ADNOT-MALLET" },
-      "FIL18": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
-      "FIL11": { region: "BRETAGNE",                       directeur: "Angélique GOODALL" },
-      "FIL19": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
-      "FIL22": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
-      "FIL23": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
-      "FIL24": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL25": { region: "NOUVELLE-AQUITAINE",             directeur: "Olivier PELVOIZIN" },
-      "FIL28": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
-      "FIL26": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL29": { region: "DIRECTION GENERALE",             directeur: "-" },
-      "FIL30": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
-    };
+    // Leaders par filière – chargés depuis Leader_filieres.csv au démarrage
+    let LEADERS_FILIERES = {};
   </script>
   <style>
     :root {
@@ -1197,10 +1166,11 @@
 </div>
 
 <script>
-const DATA_URL = 'Data_DEP_REG.json';
-const NAF_URL  = 'Filieres-NAF.json';
-const DEP_URL  = 'dep.geojson';
-const REG_URL  = 'reg.geojson';
+const DATA_URL    = 'Data_DEP_REG.json';
+const NAF_URL     = 'Filieres-NAF.json';
+const DEP_URL     = 'dep.geojson';
+const REG_URL     = 'reg.geojson';
+const LEADERS_URL = 'Leader_filieres.csv';
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];
@@ -1208,6 +1178,24 @@ let RAW = [];
 let NAF_BY_FILIERE = {};
 
 const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
+
+// ── TOOLTIP POSITIONING ────────────────────────────────────────────────────────
+// Positions a fixed tooltip near the cursor while keeping it fully within the viewport.
+function clampTooltip(tip, event) {
+  const GAP = 14;
+  const TW = tip.offsetWidth  || 280;
+  const TH = tip.offsetHeight || 120;
+  const VW = window.innerWidth;
+  const VH = window.innerHeight;
+  let x = event.clientX + GAP;
+  let y = event.clientY - 10;
+  if (x + TW > VW - 8) x = event.clientX - TW - GAP;
+  if (x < 8) x = 8;
+  if (y + TH > VH - 8) y = VH - TH - 8;
+  if (y < 8) y = 8;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
 
 function parseFr(str) {
   if (typeof str === 'number') return str;
@@ -1252,7 +1240,28 @@ async function loadData() {
   }
 }
 
-async function loadNAF() {
+async function loadLeaders() {
+  try {
+    const res = await fetch(LEADERS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    // Parse semicolon-separated CSV (latin1 re-encoded as UTF-8 by server)
+    // Columns: Code filière;Libellé filière majuscule;Région;DIRECTEUR REGIONAL
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    lines.slice(1).forEach(line => {
+      const [code, , region, directeur] = line.split(';');
+      if (code && region) {
+        LEADERS_FILIERES[code.trim()] = {
+          region: region.trim(),
+          directeur: (directeur || '').trim(),
+        };
+      }
+    });
+    console.log(`✅ ${LEADERS_URL} chargé : ${Object.keys(LEADERS_FILIERES).length} filières`);
+  } catch (err) {
+    console.warn('⚠️ Leaders non chargés :', err.message);
+  }
+}
   try {
     const res = await fetch(NAF_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1705,8 +1714,7 @@ function updateChart3() {
     .attr('stroke-opacity', 0.8)
     .on('mousemove', function(event, d) {
       tooltip.style.opacity = '1';
-      tooltip.style.left = (event.clientX+16)+'px';
-      tooltip.style.top  = (event.clientY-10)+'px';
+      tooltip.style.left = '0px'; tooltip.style.top = '0px'; // measure at origin
       const leader = LEADERS_FILIERES[d.code] || {};
       const leaderHtml = leader.directeur && leader.directeur !== '-'
         ? `<div class="tt-row" style="margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb"><span>Région leader</span><span class="tt-val">${leader.region}</span></div>
@@ -1720,6 +1728,7 @@ function updateChart3() {
         <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${COL_EVOL3[d.evol3cat]}">${fmtEvol(d.evol)} (${EVOL3_LABEL[d.evol3cat]})</span></div>
         ${leaderHtml}
       `;
+      clampTooltip(tooltip, event);
       d3.select(this).attr('stroke-width',2.5).attr('fill-opacity',0.8);
     })
     .on('mouseleave', function() {
@@ -1986,9 +1995,8 @@ function renderMap() {
 
       if (!row) {
         tooltip.style.opacity = '1';
-        tooltip.style.left = (event.clientX + 14) + 'px';
-        tooltip.style.top  = (event.clientY - 10) + 'px';
         tooltip.innerHTML = `<div class="tt-title">${nom}</div><div style="color:#9ca3af;font-size:12px">Données absentes pour cette filière</div>`;
+        clampTooltip(tooltip, event);
         return;
       }
 
@@ -2013,8 +2021,6 @@ function renderMap() {
         : (leader.region ? `<div class="tt-row" style="margin-top:5px;padding-top:5px;border-top:1px solid #e5e7eb"><span>Leader</span><span class="tt-val">${leader.region}</span></div>` : '');
 
       tooltip.style.opacity = '1';
-      tooltip.style.left = (event.clientX + 14) + 'px';
-      tooltip.style.top  = (event.clientY - 10) + 'px';
       tooltip.innerHTML = `
         <div class="tt-title">${nom}</div>
         ${rows.map(r => `
@@ -2025,6 +2031,7 @@ function renderMap() {
         ${rank !== null ? `<div class="tt-rank">Classement sur « ${cfg.label} » : <strong>${rank}/${n}</strong> <span style="font-size:10px">(ordre ${rankDir})</span></div>` : ''}
         ${leaderHtml}
       `;
+      clampTooltip(tooltip, event);
       d3.select(this).raise();
     })
     .on('mouseleave', function() {
@@ -2105,7 +2112,7 @@ function updateRanking() {
 // The chart-main-row takes the chart-card flex:1, so initChart3 must target its parent
 
 (async () => {
-  const [ok] = await Promise.all([loadData(), loadNAF()]);
+  const [ok] = await Promise.all([loadData(), loadNAF(), loadLeaders()]);
   document.getElementById('loading-overlay').style.display = 'none';
   if (!ok) return;
 
