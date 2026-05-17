@@ -11,6 +11,39 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
     const ALL_FILIERES = {"FIL01": "AGRICULTURE, ÉLEVAGE ET PÊCHE", "FIL02": "ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE", "FIL03": "BANQUES ASSURANCES IMMOBILIER", "FIL04": "COMMERCE ET DISTRIBUTION", "FIL05": "CONSTRUCTION (BTP ET MATÉRIAUX)", "FIL06": "CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL", "FIL07": "EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)", "FIL08": "ENERGIES (RENOUVELABLES ET RÉSEAUX)", "FIL09": "FILIÈRE BOIS", "FIL10": "HÔTELLERIE ET RESTAURATIONS (HCRB)", "FIL11": "INDUSTRIE AGROALIMENTAIRE", "FIL12": "INDUSTRIE AUTOMOBILE", "FIL13": "INDUSTRIE AÉRONAUTIQUE ET SPATIALE", "FIL14": "INDUSTRIE CHIMIQUE", "FIL15": "INDUSTRIE DE SANTÉ", "FIL16": "INDUSTRIE FERROVIAIRE", "FIL17": "NAVAL ET NAUTISME", "FIL18": "INDUSTRIE PLASTURGIQUE", "FIL19": "INDUSTRIE TEXTILE, MODE ET LUXE", "FIL20": "INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE", "FIL21": "MÉTALLURGIE - SCOPE UIMM", "FIL22": "NUCLÉAIRE", "FIL23": "NUMÉRIQUE ET TÉLÉCOMMUNICATIONS", "FIL24": "PROPRETÉ", "FIL25": "SANTÉ, SOCIAL, SAP", "FIL26": "SERVICES AUTOMOBILES", "FIL27": "SPORT", "FIL28": "SÉCURITÉ PRIVÉE", "FIL29": "TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES", "FIL30": "TRANSPORTS ET LOGISTIQUE"};
+    // Leaders par filière (issus de Leader_filières.csv)
+    const LEADERS_FILIERES = {
+      "FIL27": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
+      "FIL01": { region: "BRETAGNE",                       directeur: "Angélique GOODALL" },
+      "FIL02": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
+      "FIL03": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL04": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL05": { region: "BOURGOGNE-FRANCHE-COMTÉ",        directeur: "Stéphane BAILLY" },
+      "FIL06": { region: "FRANCE TRAVAIL SERVICES",        directeur: "Philippe GUEUDAR DELAHAYE" },
+      "FIL07": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
+      "FIL08": { region: "NORMANDIE",                      directeur: "Laurence HURNI" },
+      "FIL09": { region: "GRAND EST",                      directeur: "Virginie COPPENS MENAGER" },
+      "FIL10": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL13": { region: "OCCITANIE",                      directeur: "Karine MEININGER" },
+      "FIL12": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
+      "FIL14": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
+      "FIL15": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
+      "FIL20": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL16": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
+      "FIL21": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL17": { region: "PAYS DE LA LOIRE",               directeur: "Catherine ADNOT-MALLET" },
+      "FIL18": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
+      "FIL11": { region: "BRETAGNE",                       directeur: "Angélique GOODALL" },
+      "FIL19": { region: "HAUTS-DE-FRANCE",               directeur: "Frédéric DANEL" },
+      "FIL22": { region: "AUVERGNE-RHÔNE-ALPES",          directeur: "Michel SWIETON" },
+      "FIL23": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
+      "FIL24": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL25": { region: "NOUVELLE-AQUITAINE",             directeur: "Olivier PELVOIZIN" },
+      "FIL28": { region: "ÎLE-DE-FRANCE",                 directeur: "Nadine CRINIER" },
+      "FIL26": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL29": { region: "DIRECTION GENERALE",             directeur: "-" },
+      "FIL30": { region: "PROVENCE-ALPES-CÔTE D'AZUR",    directeur: "Pascal BLAIN" },
+    };
   </script>
   <style>
     :root {
@@ -325,7 +358,7 @@
       display: flex; justify-content: space-between; align-items: flex-start;
       flex-shrink: 0;
     }
-    .chart-title { font-size: 15px; font-weight: 700; color: var(--ft-blue); margin-bottom: 3px; }
+    .chart-title { font-size: 15px; font-weight: 700; color: var(--ft-blue); margin-bottom: 3px; white-space: normal; }
     .chart-subtitle { font-size: 11px; color: var(--ft-muted); }
     .legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
@@ -1067,7 +1100,7 @@
         <div class="indicator-list" id="indicator-list">
           <label>
             <input type="radio" name="map-ind" value="poids_rel" checked onchange="onMapChange()">
-            Poids relatif DPAE &gt; 1 mois
+            Importance de la filière sur le territoire
           </label>
           <label>
             <input type="radio" name="map-ind" value="diffRecruit" onchange="onMapChange()">
@@ -1577,8 +1610,8 @@ function redrawChart3(useTransition = false) {
       .attr('text-anchor','middle')
       .attr('x', zone.x).attr('y', zone.y)
       .attr('fill', zone.color)
-      .attr('opacity', 0.22)
-      .attr('font-size','11')
+      .attr('opacity', 0.28)
+      .attr('font-size','16')
       .attr('font-family',"'DM Sans',sans-serif")
       .attr('font-weight','700')
       .attr('pointer-events','none');
@@ -1674,12 +1707,18 @@ function updateChart3() {
       tooltip.style.opacity = '1';
       tooltip.style.left = (event.clientX+16)+'px';
       tooltip.style.top  = (event.clientY-10)+'px';
+      const leader = LEADERS_FILIERES[d.code] || {};
+      const leaderHtml = leader.directeur && leader.directeur !== '-'
+        ? `<div class="tt-row" style="margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb"><span>Région leader</span><span class="tt-val">${leader.region}</span></div>
+           <div class="tt-row"><span>Dir. régional</span><span class="tt-val" style="color:var(--ft-blue)">${leader.directeur}</span></div>`
+        : `<div class="tt-row" style="margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb"><span>Leader</span><span class="tt-val">${leader.region || '—'}</span></div>`;
       tooltip.innerHTML = `
         <div class="tt-title">${d.label}</div>
         <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.diffRecruit)}</span></div>
         <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
         <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
         <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${COL_EVOL3[d.evol3cat]}">${fmtEvol(d.evol)} (${EVOL3_LABEL[d.evol3cat]})</span></div>
+        ${leaderHtml}
       `;
       d3.select(this).attr('stroke-width',2.5).attr('fill-opacity',0.8);
     })
@@ -1726,9 +1765,18 @@ const CHORO_COLORS = [
   '#1e3a8a', // 8 – bleu très foncé
 ];
 
+// Per-indicator color palettes (low → high value)
+const CHORO_COLORS_BY_IND = {
+  poids_rel:   ['#eff6ff','#bfdbfe','#93c5fd','#60a5fa','#3b82f6','#1d4ed8','#1e3a8a','#172554'], // bleu
+  diffRecruit: ['#f0fdf4','#bbf7d0','#86efac','#4ade80','#f97316','#ea580c','#dc2626','#7f1d1d'], // vert → rouge
+  ent:         ['#fdf4ff','#f3e8ff','#e9d5ff','#c084fc','#a855f7','#9333ea','#7e22ce','#581c87'], // violet
+  poids:       ['#fff7ed','#fed7aa','#fdba74','#fb923c','#f97316','#ea580c','#c2410c','#7c2d12'], // orange
+  evol:        ['#7f1d1d','#b91c1c','#fca5a5','#fef9c3','#bbf7d0','#4ade80','#16a34a','#14532d'], // rouge → vert
+};
+
 // Indicateur config: label, format function, invert (true = high value is bad = red)
 const IND_CONFIG = {
-  poids_rel:   { label: 'Poids relatif DPAE > 1 mois', fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  poids_rel:   { label: 'Importance de la filière sur le territoire', fmt: v => (v*100).toFixed(1)+'%', invert: false },
   diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: true  },
   ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false },
   poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false },
@@ -1866,13 +1914,14 @@ function renderMap() {
   const n = sorted.length;
 
   // Color scale: 8 quantile bins
+  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS;
   let colorScale;
   if (values.length < 2) {
-    colorScale = () => CHORO_COLORS[3];
+    colorScale = () => indColors[3];
   } else {
     const qScale = d3.scaleQuantile()
       .domain(values)
-      .range(cfg.invert ? [...CHORO_COLORS].reverse() : CHORO_COLORS);
+      .range(cfg.invert ? [...indColors].reverse() : indColors);
     colorScale = qScale;
   }
 
@@ -1881,7 +1930,13 @@ function renderMap() {
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
-  document.getElementById('map-title').textContent = filiereLabel;
+  const leaderInfo = LEADERS_FILIERES[stateMap.filiere];
+  const leaderSuffix = leaderInfo
+    ? (leaderInfo.directeur && leaderInfo.directeur !== '-'
+        ? ` · ${leaderInfo.region} – ${leaderInfo.directeur}`
+        : ` · ${leaderInfo.region}`)
+    : '';
+  document.getElementById('map-title').textContent = filiereLabel + leaderSuffix;
   document.getElementById('map-subtitle').textContent =
     `${cfg.label} · Maille ${maille === 'Régional' ? 'régionale' : 'départementale'}`;
 
@@ -1944,12 +1999,18 @@ function renderMap() {
       // Build all-indicator rows
       const hasData = r => !isNaN(r) && isFinite(r);
       const rows = [
-        { label:'Poids relatif DPAE', val: hasData(row.poids_rel)   ? fmtPct(row.poids_rel)   : '—', key:'poids_rel' },
+        { label:'Importance de la filière sur le territoire', val: hasData(row.poids_rel)   ? fmtPct(row.poids_rel)   : '—', key:'poids_rel' },
         { label:'Difficultés de recrutement', val: hasData(row.diffRecruit) ? fmtPct(row.diffRecruit) : '—', key:'diffRecruit' },
         { label:'Taux de recours',    val: hasData(row.ent)         ? fmtPct(row.ent)         : '—', key:'ent' },
         { label:'Nb DPAE > 1 mois',  val: hasData(row.poids)       ? fmtNb(row.poids)        : '—', key:'poids' },
         { label:'Évolution DPAE > 1 mois', val: hasData(row.evol)  ? fmtEvol(row.evol)       : '—', key:'evol' },
       ];
+
+      const leader = LEADERS_FILIERES[stateMap.filiere] || {};
+      const leaderHtml = leader.directeur && leader.directeur !== '-'
+        ? `<div class="tt-row" style="margin-top:5px;padding-top:5px;border-top:1px solid #e5e7eb"><span>Région leader</span><span class="tt-val">${leader.region}</span></div>
+           <div class="tt-row"><span>Dir. régional</span><span class="tt-val" style="color:var(--ft-blue)">${leader.directeur}</span></div>`
+        : (leader.region ? `<div class="tt-row" style="margin-top:5px;padding-top:5px;border-top:1px solid #e5e7eb"><span>Leader</span><span class="tt-val">${leader.region}</span></div>` : '');
 
       tooltip.style.opacity = '1';
       tooltip.style.left = (event.clientX + 14) + 'px';
@@ -1962,6 +2023,7 @@ function renderMap() {
             <span class="tt-val">${r.val}</span>
           </div>`).join('')}
         ${rank !== null ? `<div class="tt-rank">Classement sur « ${cfg.label} » : <strong>${rank}/${n}</strong> <span style="font-size:10px">(ordre ${rankDir})</span></div>` : ''}
+        ${leaderHtml}
       `;
       d3.select(this).raise();
     })
@@ -1976,7 +2038,8 @@ function updateLegend(values, cfg) {
   const lblMid = document.getElementById('choro-lbl-mid');
   const lblMax = document.getElementById('choro-lbl-max');
 
-  const colors = cfg.invert ? [...CHORO_COLORS].reverse() : CHORO_COLORS;
+  const indColors = CHORO_COLORS_BY_IND[Object.keys(IND_CONFIG).find(k => IND_CONFIG[k] === cfg)] || CHORO_COLORS;
+  const colors = cfg.invert ? [...indColors].reverse() : indColors;
   bar.innerHTML = colors.map(c =>
     `<div class="choro-legend-swatch" style="background:${c}"></div>`
   ).join('');
