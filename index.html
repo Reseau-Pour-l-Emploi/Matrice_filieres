@@ -1262,6 +1262,8 @@ async function loadLeaders() {
     console.warn('⚠️ Leaders non chargés :', err.message);
   }
 }
+
+async function loadNAF() {
   try {
     const res = await fetch(NAF_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
