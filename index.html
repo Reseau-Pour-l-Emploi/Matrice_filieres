@@ -1939,7 +1939,7 @@ function renderMap() {
   }
 
   // Update legend
-  updateLegend(values, cfg);
+  updateLegend(values, cfg, indicateur);
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
@@ -2044,13 +2044,13 @@ function renderMap() {
     });
 }
 
-function updateLegend(values, cfg) {
+function updateLegend(values, cfg, indicateur) {
   const bar    = document.getElementById('choro-bar');
   const lblMin = document.getElementById('choro-lbl-min');
   const lblMid = document.getElementById('choro-lbl-mid');
   const lblMax = document.getElementById('choro-lbl-max');
 
-  const indColors = CHORO_COLORS_BY_IND[Object.keys(IND_CONFIG).find(k => IND_CONFIG[k] === cfg)] || CHORO_COLORS;
+  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS;
   const colors = cfg.invert ? [...indColors].reverse() : indColors;
   bar.innerHTML = colors.map(c =>
     `<div class="choro-legend-swatch" style="background:${c}"></div>`
