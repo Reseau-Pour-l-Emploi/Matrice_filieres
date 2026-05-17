@@ -328,6 +328,7 @@
       flex-shrink: 0;
     }
     .chart-title { font-size: 15px; font-weight: 700; color: var(--ft-blue); margin-bottom: 3px; white-space: normal; }
+    .map-title-leader { font-weight: 500; color: var(--ft-teal); font-size: 13px; }
     .chart-subtitle { font-size: 11px; color: var(--ft-muted); }
     .legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
@@ -1244,8 +1245,9 @@ async function loadLeaders() {
   try {
     const res = await fetch(LEADERS_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    // Parse semicolon-separated CSV (latin1 re-encoded as UTF-8 by server)
+    // Decode as latin-1 (Windows-1252) to handle accented characters
+    const buffer = await res.arrayBuffer();
+    const text = new TextDecoder('windows-1252').decode(buffer);
     // Columns: Code filière;Libellé filière majuscule;Région;DIRECTEUR REGIONAL
     const lines = text.split(/\r?\n/).filter(l => l.trim());
     lines.slice(1).forEach(line => {
@@ -1782,7 +1784,7 @@ const CHORO_COLORS_BY_IND = {
   diffRecruit: ['#fef9c3','#fde047','#facc15','#f59e0b','#d97706','#b45309','#92400e','#78350f'], // jaune → ambre foncé
   ent:         ['#f0fdf4','#bbf7d0','#4ade80','#22c55e','#16a34a','#15803d','#166534','#14532d'], // vert clair → vert forêt
   poids:       ['#fff1f2','#fecdd3','#fb7185','#f43f5e','#e11d48','#be123c','#9f1239','#881337'], // rose → rouge framboise
-  evol:        ['#7f1d1d','#dc2626','#f87171','#fde68a','#d9f99d','#4ade80','#16a34a','#14532d'], // rouge → vert (divergent)
+  evol:        ['#faf5ff','#e9d5ff','#d8b4fe','#c084fc','#a855f7','#9333ea','#7e22ce','#581c87'], // mauve clair → violet foncé
 };
 
 // Indicateur config: label, format function, invert (true = high value is bad = red)
@@ -1947,7 +1949,8 @@ function renderMap() {
         ? ` · ${leaderInfo.region} – ${leaderInfo.directeur}`
         : ` · ${leaderInfo.region}`)
     : '';
-  document.getElementById('map-title').textContent = filiereLabel + leaderSuffix;
+  document.getElementById('map-title').innerHTML =
+    `${filiereLabel}${leaderSuffix ? `<span class="map-title-leader">${leaderSuffix}</span>` : ''}`;
   document.getElementById('map-subtitle').textContent =
     `${cfg.label} · Maille ${maille === 'Régional' ? 'régionale' : 'départementale'}`;
 
