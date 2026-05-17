@@ -10,8 +10,8 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003189'/%3E%3Crect x='4' y='4' width='24' height='4' rx='2' fill='%2300bfb3'/%3E%3Ctext x='16' y='26' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='14' fill='%23ffffff'%3EFT%3C/text%3E%3C/svg%3E">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
-    const ALL_FILIERES = {"FIL01": "AGRICULTURE, ÉLEVAGE ET PÊCHE", "FIL02": "ARMÉES, DÉFENSE ET SÉCURITÉ PUBLIQUE", "FIL03": "BANQUES ASSURANCES IMMOBILIER", "FIL04": "COMMERCE ET DISTRIBUTION", "FIL05": "CONSTRUCTION (BTP ET MATÉRIAUX)", "FIL06": "CULTURE, CINÉMA,SPECTACLE, AUDIOVISUEL", "FIL07": "EMPLOI PUBLIC (HORS SANTÉ ET DÉFENSE)", "FIL08": "ENERGIES (RENOUVELABLES ET RÉSEAUX)", "FIL09": "FILIÈRE BOIS", "FIL10": "HÔTELLERIE ET RESTAURATIONS (HCRB)", "FIL11": "INDUSTRIE AGROALIMENTAIRE", "FIL12": "INDUSTRIE AUTOMOBILE", "FIL13": "INDUSTRIE AÉRONAUTIQUE ET SPATIALE", "FIL14": "INDUSTRIE CHIMIQUE", "FIL15": "INDUSTRIE DE SANTÉ", "FIL16": "INDUSTRIE FERROVIAIRE", "FIL17": "NAVAL ET NAUTISME", "FIL18": "INDUSTRIE PLASTURGIQUE", "FIL19": "INDUSTRIE TEXTILE, MODE ET LUXE", "FIL20": "INDUSTRIE ÉLECTRIQUE ET ÉLECTRONIQUE", "FIL21": "MÉTALLURGIE - SCOPE UIMM", "FIL22": "NUCLÉAIRE", "FIL23": "NUMÉRIQUE ET TÉLÉCOMMUNICATIONS", "FIL24": "PROPRETÉ", "FIL25": "SANTÉ, SOCIAL, SAP", "FIL26": "SERVICES AUTOMOBILES", "FIL27": "SPORT", "FIL28": "SÉCURITÉ PRIVÉE", "FIL29": "TRANSFORMATION TRAITEMENT ET VALORISATION DES RESSOURCES", "FIL30": "TRANSPORTS ET LOGISTIQUE"};
-    // Leaders par filière – chargés depuis Leader_filieres.csv au démarrage
+    // Filières et leaders – construits dynamiquement depuis les fichiers du repo
+    let ALL_FILIERES = {};
     let LEADERS_FILIERES = {};
   </script>
   <style>
@@ -1225,7 +1225,13 @@ async function loadData() {
     const res = await fetch(DATA_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
     SOURCE_DATA = await res.json();
-    console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes`);
+    // Build filière label map from data (no hardcoded labels)
+    SOURCE_DATA.forEach(d => {
+      if (d['Filière'] && d['Libellé Filière']) {
+        ALL_FILIERES[d['Filière']] = d['Libellé Filière'];
+      }
+    });
+    console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes, ${Object.keys(ALL_FILIERES).length} filières`);
     return true;
   } catch (err) {
     console.error('❌', err);
@@ -1790,7 +1796,7 @@ const CHORO_COLORS_BY_IND = {
 // Indicateur config: label, format function, invert (true = high value is bad = red)
 const IND_CONFIG = {
   poids_rel:   { label: 'Importance de la filière sur le territoire', fmt: v => (v*100).toFixed(1)+'%', invert: false },
-  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: true  },
+  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: false },
   ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false },
   poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false },
   evol:        { label: 'Évolution DPAE > 1 mois',     fmt: v => (v >= 0 ? '+' : '') + (v*100).toFixed(1)+'%', invert: false },
