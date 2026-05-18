@@ -1942,23 +1942,54 @@ function renderMap() {
   };
   const n = sorted.length;
 
-  // Color scale: 5 quantile classes (equal-count), palette[0]=lowest, palette[4]=highest
+  // Color scale: 5 classes
+  //   class 0 → exact minimum value
+  //   classes 1-3 → equal-count split of middle observations
+  //   class 4 → exact maximum value
   const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS_BY_IND.poids_rel;
+  const palette = cfg.invert ? [...indColors].reverse() : indColors;
   let colorScale;
-  let quantileThresholds = [];
+  let classBounds = []; // [[lo, hi], ...] per class, for legend
 
   if (values.length < 2) {
-    colorScale = () => indColors[2];
+    colorScale = () => palette[2];
+    classBounds = palette.map(() => [null, null]);
   } else {
-    const qScale = d3.scaleQuantile()
-      .domain(values)
-      .range(indColors);
-    colorScale = qScale;
-    quantileThresholds = qScale.quantiles(); // 4 thresholds for 5 classes
+    const sorted = [...values].sort((a, b) => a - b);
+    const minV = sorted[0];
+    const maxV = sorted[sorted.length - 1];
+
+    // Middle observations: everything strictly between min and max
+    const middle = sorted.filter(v => v > minV && v < maxV);
+    const mLen = middle.length;
+
+    let t1, t2;
+    if (mLen === 0) {
+      t1 = minV; t2 = minV;
+    } else {
+      t1 = middle[Math.floor(mLen / 3)];
+      t2 = middle[Math.floor(2 * mLen / 3)];
+    }
+
+    classBounds = [
+      [minV, minV],
+      [minV, t1],
+      [t1,   t2],
+      [t2,   maxV],
+      [maxV, maxV],
+    ];
+
+    colorScale = v => {
+      if (v === minV) return palette[0];
+      if (v === maxV) return palette[4];
+      if (v <= t1)    return palette[1];
+      if (v <= t2)    return palette[2];
+      return palette[3];
+    };
   }
 
   // Update legend
-  updateLegend(values, cfg, indColors, quantileThresholds);
+  updateLegend(values, cfg, palette, classBounds);
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
@@ -2063,10 +2094,10 @@ function renderMap() {
     });
 }
 
-function updateLegend(values, cfg, palette, thresholds) {
+function updateLegend(values, cfg, palette, classBounds) {
   const bar = document.getElementById('choro-bar');
 
-  if (values.length < 2) {
+  if (!values || values.length < 2 || !classBounds.length) {
     bar.innerHTML = `<div class="choro-legend-row">
       <div class="choro-legend-swatch" style="background:${palette[2]}"></div>
       <span class="choro-legend-range">—</span>
@@ -2074,20 +2105,12 @@ function updateLegend(values, cfg, palette, thresholds) {
     return;
   }
 
-  const sorted = [...values].sort((a, b) => a - b);
-  const minV = sorted[0];
-  const maxV = sorted[sorted.length - 1];
-
-  // thresholds = [t1, t2, t3, t4] (4 boundaries between 5 classes)
-  // class i spans [bounds[i], bounds[i+1])
-  const bounds = [minV, ...thresholds, maxV];
-
   bar.innerHTML = palette.map((color, i) => {
-    const lo = bounds[i];
-    const hi = bounds[i + 1];
-    const label = i === palette.length - 1
-      ? `${cfg.fmt(lo)} → ${cfg.fmt(hi)}`
-      : `${cfg.fmt(lo)} → < ${cfg.fmt(hi)}`;
+    const [lo, hi] = classBounds[i];
+    if (lo === null) return '';
+    const label = (lo === hi)
+      ? cfg.fmt(lo)
+      : `${cfg.fmt(lo)} – ${cfg.fmt(hi)}`;
     return `<div class="choro-legend-row">
       <div class="choro-legend-swatch" style="background:${color}"></div>
       <span class="choro-legend-range">${label}</span>
