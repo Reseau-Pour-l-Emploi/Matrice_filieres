@@ -1942,29 +1942,23 @@ function renderMap() {
   };
   const n = sorted.length;
 
-  // Color scale: 5 equal-interval bins
-  const N_BINS = 5;
+  // Color scale: 5 quantile classes (equal-count), palette[0]=lowest, palette[4]=highest
   const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS_BY_IND.poids_rel;
-  const palette = cfg.invert ? [...indColors].reverse() : indColors;
   let colorScale;
-  let thresholds = [];
+  let quantileThresholds = [];
 
   if (values.length < 2) {
-    colorScale = () => palette[2];
+    colorScale = () => indColors[2];
   } else {
-    const minV = Math.min(...values);
-    const maxV = Math.max(...values);
-    const step = (maxV - minV) / N_BINS;
-    // N_BINS-1 internal thresholds
-    thresholds = Array.from({ length: N_BINS - 1 }, (_, i) => minV + step * (i + 1));
-    const tScale = d3.scaleThreshold()
-      .domain(thresholds)
-      .range(palette);
-    colorScale = tScale;
+    const qScale = d3.scaleQuantile()
+      .domain(values)
+      .range(indColors);
+    colorScale = qScale;
+    quantileThresholds = qScale.quantiles(); // 4 thresholds for 5 classes
   }
 
   // Update legend
-  updateLegend(values, cfg, palette, thresholds);
+  updateLegend(values, cfg, indColors, quantileThresholds);
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
@@ -2084,17 +2078,16 @@ function updateLegend(values, cfg, palette, thresholds) {
   const minV = sorted[0];
   const maxV = sorted[sorted.length - 1];
 
-  // Bounds: [minV, t0, t1, t2, t3, maxV]
+  // thresholds = [t1, t2, t3, t4] (4 boundaries between 5 classes)
+  // class i spans [bounds[i], bounds[i+1])
   const bounds = [minV, ...thresholds, maxV];
 
   bar.innerHTML = palette.map((color, i) => {
     const lo = bounds[i];
     const hi = bounds[i + 1];
-    const loStr = cfg.fmt(lo);
-    const hiStr = cfg.fmt(hi);
     const label = i === palette.length - 1
-      ? `${loStr} → ${hiStr}`
-      : `${loStr} → < ${hiStr}`;
+      ? `${cfg.fmt(lo)} → ${cfg.fmt(hi)}`
+      : `${cfg.fmt(lo)} → < ${cfg.fmt(hi)}`;
     return `<div class="choro-legend-row">
       <div class="choro-legend-swatch" style="background:${color}"></div>
       <span class="choro-legend-range">${label}</span>
