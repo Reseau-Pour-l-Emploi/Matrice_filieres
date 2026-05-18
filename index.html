@@ -589,15 +589,16 @@
       color: var(--ft-muted); margin-bottom: 6px;
     }
     .choro-legend-bar {
-      display: flex; gap: 2px; align-items: stretch;
-      border-radius: 5px; overflow: hidden;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .choro-legend-row {
+      display: flex; align-items: center; gap: 6px;
     }
     .choro-legend-swatch {
-      flex: 1; height: 14px;
+      width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
     }
-    .choro-legend-labels {
-      display: flex; justify-content: space-between;
-      font-size: 10px; color: var(--ft-muted); margin-top: 3px;
+    .choro-legend-range {
+      font-size: 10px; color: var(--ft-muted); white-space: nowrap;
     }
     .choro-missing-row {
       display: flex; align-items: center; gap: 6px;
@@ -1101,11 +1102,7 @@
         <div class="choro-legend" id="choro-legend">
           <div class="choro-legend-title">Légende</div>
           <div class="choro-legend-bar" id="choro-bar"></div>
-          <div class="choro-legend-labels" id="choro-labels">
-            <span id="choro-lbl-min">—</span>
-            <span id="choro-lbl-mid">—</span>
-            <span id="choro-lbl-max">—</span>
-          </div>
+        </div>
           <div class="choro-missing-row">
             <div class="choro-missing-swatch"></div>
             Données absentes
@@ -1800,11 +1797,11 @@ const CHORO_COLORS = [
 
 // Per-indicator color palettes (low → high value)
 const CHORO_COLORS_BY_IND = {
-  poids_rel:   ['#f0f9ff','#bae6fd','#38bdf8','#0284c7','#075985','#0c4a6e','#082f49','#011d2e'], // cyan → bleu pétrole
-  diffRecruit: ['#fef9c3','#fde047','#facc15','#f59e0b','#d97706','#b45309','#92400e','#78350f'], // jaune → ambre foncé
-  ent:         ['#f0fdf4','#bbf7d0','#4ade80','#22c55e','#16a34a','#15803d','#166534','#14532d'], // vert clair → vert forêt
-  poids:       ['#fff1f2','#fecdd3','#fb7185','#f43f5e','#e11d48','#be123c','#9f1239','#881337'], // rose → rouge framboise
-  evol:        ['#faf5ff','#e9d5ff','#d8b4fe','#c084fc','#a855f7','#9333ea','#7e22ce','#581c87'], // mauve clair → violet foncé
+  poids_rel:   ['#bae6fd','#38bdf8','#0284c7','#075985','#0c4a6e'], // cyan → bleu pétrole
+  diffRecruit: ['#fef9c3','#fde047','#f59e0b','#d97706','#92400e'], // jaune → ambre foncé
+  ent:         ['#bbf7d0','#4ade80','#22c55e','#15803d','#14532d'], // vert clair → vert forêt
+  poids:       ['#fecdd3','#fb7185','#f43f5e','#be123c','#881337'], // rose → rouge framboise
+  evol:        ['#e9d5ff','#c084fc','#a855f7','#7e22ce','#581c87'], // mauve clair → violet foncé
 };
 
 // Indicateur config: label, format function, invert (true = high value is bad = red)
@@ -1946,20 +1943,25 @@ function renderMap() {
   };
   const n = sorted.length;
 
-  // Color scale: 8 quantile bins
-  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS;
+  // Color scale: 5 quantile bins, shared with legend
+  const N_BINS = 5;
+  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS_BY_IND.poids_rel;
+  const palette = cfg.invert ? [...indColors].reverse() : indColors;
   let colorScale;
+  let quantileThresholds = [];
+
   if (values.length < 2) {
-    colorScale = () => indColors[3];
+    colorScale = () => palette[2];
   } else {
     const qScale = d3.scaleQuantile()
       .domain(values)
-      .range(cfg.invert ? [...indColors].reverse() : indColors);
+      .range(palette);
     colorScale = qScale;
+    quantileThresholds = qScale.quantiles(); // N_BINS-1 thresholds
   }
 
   // Update legend
-  updateLegend(values, cfg, indicateur);
+  updateLegend(values, cfg, palette, quantileThresholds);
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
@@ -2064,28 +2066,37 @@ function renderMap() {
     });
 }
 
-function updateLegend(values, cfg, indicateur) {
-  const bar    = document.getElementById('choro-bar');
-  const lblMin = document.getElementById('choro-lbl-min');
-  const lblMid = document.getElementById('choro-lbl-mid');
-  const lblMax = document.getElementById('choro-lbl-max');
+function updateLegend(values, cfg, palette, thresholds) {
+  const bar = document.getElementById('choro-bar');
 
-  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS;
-  const colors = cfg.invert ? [...indColors].reverse() : indColors;
-  bar.innerHTML = colors.map(c =>
-    `<div class="choro-legend-swatch" style="background:${c}"></div>`
-  ).join('');
-
-  if (values.length >= 2) {
-    const sorted = [...values].sort((a, b) => a - b);
-    const minV = sorted[0], maxV = sorted[sorted.length - 1];
-    const midV = sorted[Math.floor(sorted.length / 2)];
-    lblMin.textContent = cfg.fmt(cfg.invert ? maxV : minV);
-    lblMid.textContent = cfg.fmt(midV);
-    lblMax.textContent = cfg.fmt(cfg.invert ? minV : maxV);
-  } else {
-    lblMin.textContent = lblMid.textContent = lblMax.textContent = '—';
+  if (values.length < 2) {
+    bar.innerHTML = `<div class="choro-legend-row">
+      <div class="choro-legend-swatch" style="background:${palette[2]}"></div>
+      <span class="choro-legend-range">—</span>
+    </div>`;
+    return;
   }
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const minV = sorted[0];
+  const maxV = sorted[sorted.length - 1];
+
+  // Build class boundaries: [minV, t0, t1, t2, t3, maxV]
+  const bounds = [minV, ...thresholds, maxV];
+
+  bar.innerHTML = palette.map((color, i) => {
+    const lo = bounds[i];
+    const hi = bounds[i + 1];
+    const loStr = cfg.fmt(lo);
+    const hiStr = cfg.fmt(hi);
+    const label = i === palette.length - 1
+      ? `${loStr} → ${hiStr}`
+      : `${loStr} → < ${hiStr}`;
+    return `<div class="choro-legend-row">
+      <div class="choro-legend-swatch" style="background:${color}"></div>
+      <span class="choro-legend-range">${label}</span>
+    </div>`;
+  }).join('');
 }
 
 // ── SOURCES POPUP ─────────────────────────────────────────────────────────────
