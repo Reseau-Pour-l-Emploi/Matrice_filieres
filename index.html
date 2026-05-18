@@ -1942,25 +1942,29 @@ function renderMap() {
   };
   const n = sorted.length;
 
-  // Color scale: 5 quantile bins, shared with legend
+  // Color scale: 5 equal-interval bins
   const N_BINS = 5;
   const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS_BY_IND.poids_rel;
   const palette = cfg.invert ? [...indColors].reverse() : indColors;
   let colorScale;
-  let quantileThresholds = [];
+  let thresholds = [];
 
   if (values.length < 2) {
     colorScale = () => palette[2];
   } else {
-    const qScale = d3.scaleQuantile()
-      .domain(values)
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+    const step = (maxV - minV) / N_BINS;
+    // N_BINS-1 internal thresholds
+    thresholds = Array.from({ length: N_BINS - 1 }, (_, i) => minV + step * (i + 1));
+    const tScale = d3.scaleThreshold()
+      .domain(thresholds)
       .range(palette);
-    colorScale = qScale;
-    quantileThresholds = qScale.quantiles(); // N_BINS-1 thresholds
+    colorScale = tScale;
   }
 
   // Update legend
-  updateLegend(values, cfg, palette, quantileThresholds);
+  updateLegend(values, cfg, palette, thresholds);
 
   // Update map title/subtitle
   const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
@@ -2080,7 +2084,7 @@ function updateLegend(values, cfg, palette, thresholds) {
   const minV = sorted[0];
   const maxV = sorted[sorted.length - 1];
 
-  // Build class boundaries: [minV, t0, t1, t2, t3, maxV]
+  // Bounds: [minV, t0, t1, t2, t3, maxV]
   const bounds = [minV, ...thresholds, maxV];
 
   bar.innerHTML = palette.map((color, i) => {
