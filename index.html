@@ -1533,11 +1533,11 @@
     <div class="veille-main">
 
       <!-- ── Zone : Vos news ── -->
-      <div class="user-news-section">
+      <div class="user-news-section" id="user-news-section" style="display:none">
         <div class="user-news-section-header">
           <div class="user-news-section-title">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-            Vos news
+            Vos news — <span id="user-news-filiere-label" style="color:var(--ft-blue)"></span>
             <span style="font-size:10px;font-weight:500;color:var(--ft-teal);background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:1px 7px;margin-left:4px">
               🌐 Partagées
             </span>
@@ -1554,7 +1554,7 @@
         </div>
         <div id="user-news-status"></div>
         <div id="user-news-grid" class="user-news-grid" style="display:none"></div>
-        <div id="user-news-empty" class="user-news-empty-hint">Aucune news ajoutée — collez un lien ci-dessus.</div>
+        <div id="user-news-empty" class="user-news-empty-hint">Aucune news ajoutée pour cette filière — collez un lien ci-dessus.</div>
       </div>
 
       <!-- ── Zone : News du net ── -->
@@ -2715,6 +2715,7 @@ function initVeilleTab() {
   });
   sel.addEventListener('change', () => {
     document.getElementById('veille-search-btn').disabled = !sel.value;
+    renderUserNews();
   });
 }
 
@@ -2724,12 +2725,21 @@ function initVeilleTab() {
 // À configurer une fois par l'administrateur dans le repo :
 const GIST_FILENAME  = 'user_news.json';
 const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
-let userNewsList = [];
+// Structure: { FIL01: [{id, url, titre, ...}, ...], FIL02: [...], ... }
+let userNewsDB = {};
 
 // Load token + gistId from localStorage (set once by admin via hidden panel)
 const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
 let _token    = _cfg.token  || '';
 let _gistId   = _cfg.gistId || '';
+
+// Current filière context
+function getCurrentVeilleFiliere() {
+  return document.getElementById('veille-filiere-select')?.value || '';
+}
+function getUserNewsForFiliere(code) {
+  return userNewsDB[code] || [];
+}
 
 function setGistStatus(msg, color) {
   const el = document.getElementById('gist-status');
@@ -2744,9 +2754,19 @@ async function loadUserNews() {
     const res = await fetch(`https://api.github.com/gists/${_gistId}`, { headers });
     if (!res.ok) throw new Error(`GitHub ${res.status}`);
     const data = await res.json();
-    const content = data.files?.[GIST_FILENAME]?.content;
-    if (content) userNewsList = JSON.parse(content);
-    setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+    const raw = data.files?.[GIST_FILENAME]?.content;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Support both old flat array and new per-filière dict
+      if (Array.isArray(parsed)) {
+        // Migrate old format: put all in 'GENERAL' key
+        userNewsDB = { GENERAL: parsed };
+      } else {
+        userNewsDB = parsed;
+      }
+    }
+    const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
+    setGistStatus(`🌐 ${total} news partagées`, '#15803d');
   } catch (e) {
     setGistStatus('⚠️ ' + e.message, '#b45309');
   }
@@ -2754,11 +2774,10 @@ async function loadUserNews() {
 }
 
 async function saveUserNews() {
-  if (!_token) { return; } // Read-only if no token
+  if (!_token) { return; }
   try {
-    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsList) } } };
+    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsDB) } } };
     if (!_gistId) {
-      // First save: create the gist
       body.description = 'Matrice Filières – News partagées';
       body.public = false;
       const res = await fetch('https://api.github.com/gists', {
@@ -2769,8 +2788,7 @@ async function saveUserNews() {
       if (!res.ok) throw new Error(`GitHub ${res.status}`);
       const data = await res.json();
       _gistId = data.id;
-      // Log the new Gist ID so the admin can hardcode it
-      console.info(`✅ Gist créé — ajoutez cet ID dans le HTML : ${data.id}`);
+      console.info(`✅ Gist créé — ID : ${data.id}`);
       setGistStatus(`✅ Gist créé (voir console)`, '#15803d');
     } else {
       const res = await fetch(`https://api.github.com/gists/${_gistId}`, {
@@ -2779,7 +2797,8 @@ async function saveUserNews() {
         body: JSON.stringify(body)
       });
       if (!res.ok) throw new Error(`GitHub ${res.status}`);
-      setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+      const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
+      setGistStatus(`🌐 ${total} news partagées`, '#15803d');
     }
   } catch (e) {
     setGistStatus('⚠️ Sauvegarde : ' + e.message, '#b45309');
@@ -2787,6 +2806,9 @@ async function saveUserNews() {
 }
 
 async function addUserNews() {
+  const filiereCode = getCurrentVeilleFiliere();
+  if (!filiereCode) { showUserNewsStatus('⚠️ Sélectionnez d'abord une filière.', 'error'); return; }
+
   const input = document.getElementById('user-news-input');
   const btn   = document.getElementById('user-news-add-btn');
   const url   = input.value.trim();
@@ -2795,7 +2817,8 @@ async function addUserNews() {
   try { new URL(url); } catch {
     showUserNewsStatus('⚠️ URL invalide.', 'error'); return;
   }
-  if (userNewsList.find(n => n.url === url)) {
+  const existing = getUserNewsForFiliere(filiereCode);
+  if (existing.find(n => n.url === url)) {
     showUserNewsStatus('⚠️ Ce lien est déjà ajouté.', 'error'); return;
   }
 
@@ -2803,9 +2826,10 @@ async function addUserNews() {
   input.value = '';
   showUserNewsStatus('', '');
 
-  // Insert skeleton card immediately
+  // Insert skeleton immediately
   const id = Date.now();
-  userNewsList.unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, loading: true });
+  if (!userNewsDB[filiereCode]) userNewsDB[filiereCode] = [];
+  userNewsDB[filiereCode].unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, loading: true });
   renderUserNews();
 
   const domain  = extractDomain(url);
@@ -2821,101 +2845,105 @@ async function addUserNews() {
     if (res.ok) {
       const data = await res.json();
       const html = data.contents || '';
-
-      // og:title > title tag
       const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"'<>]+)["']/i)
                    || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:title["']/i);
       if (ogTitle) titre = ogTitle[1].trim();
-      if (!titre) {
-        const t = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-        if (t) titre = t[1].trim();
-      }
-
-      // og:description
+      if (!titre) { const t = html.match(/<title[^>]*>([^<]+)<\/title>/i); if (t) titre = t[1].trim(); }
       const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
                   || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
       if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
-
-      // og:image
       const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
                  || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
       if (ogImg) image = ogImg[1].trim();
-
-      // og:site_name
       const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"'<>]+)["']/i)
                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:site_name["']/i);
       if (ogSite) source = ogSite[1].trim();
     }
-  } catch (_) { /* use domain as fallback */ }
+  } catch (_) {}
 
   if (!titre) titre = url;
 
-  // Update card in place
-  const idx = userNewsList.findIndex(n => n.id === id);
-  if (idx !== -1) {
-    userNewsList[idx] = { url, titre, source, favicon, image, desc, id, loading: false };
-  }
+  const idx = userNewsDB[filiereCode].findIndex(n => n.id === id);
+  if (idx !== -1) userNewsDB[filiereCode][idx] = { url, titre, source, favicon, image, desc, id, loading: false };
   btn.disabled = false;
   await saveUserNews();
   renderUserNews();
 }
 
 async function deleteUserNews(id) {
-  userNewsList = userNewsList.filter(n => n.id !== id);
+  const filiereCode = getCurrentVeilleFiliere();
+  if (!filiereCode || !userNewsDB[filiereCode]) return;
+  userNewsDB[filiereCode] = userNewsDB[filiereCode].filter(n => n.id !== id);
   await saveUserNews();
   renderUserNews();
 }
 
 function showUserNewsStatus(msg, type) {
   const el = document.getElementById('user-news-status');
+  if (!el) return;
   if (!msg) { el.innerHTML = ''; return; }
   const color = type === 'error' ? '#991b1b' : 'var(--ft-muted)';
   el.innerHTML = `<div style="font-size:11px;color:${color};margin-bottom:8px">${msg}</div>`;
 }
 
 function renderUserNews() {
-  const grid  = document.getElementById('user-news-grid');
-  const empty = document.getElementById('user-news-empty');
-  if (!userNewsList.length) {
-    grid.style.display = 'none';
-    empty.style.display = 'block';
+  const filiereCode = getCurrentVeilleFiliere();
+  const section = document.getElementById('user-news-section');
+  const grid    = document.getElementById('user-news-grid');
+  const empty   = document.getElementById('user-news-empty');
+  const label   = document.getElementById('user-news-filiere-label');
+
+  if (!filiereCode) {
+    if (section) section.style.display = 'none';
     return;
   }
-  empty.style.display = 'none';
-  grid.style.display  = 'grid';
-  grid.innerHTML = userNewsList.map(n => {
-    if (n.loading) return `
-      <div class="user-news-card-skeleton">
-        <div class="sk-img"></div>
-        <div class="sk-body">
-          <div class="sk-line w40"></div>
-          <div class="sk-line w80"></div>
-          <div class="sk-line w60"></div>
-        </div>
-      </div>`;
 
-    const imgHtml = n.image
-      ? `<img class="user-news-card-img" src="${escHtml(n.image)}" alt="" onerror="this.parentElement.querySelector('.user-news-card-img-placeholder')&&(this.style.display='none');this.nextElementSibling&&(this.nextElementSibling.style.display='flex')" loading="lazy">`
-      : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+  if (section) section.style.display = '';
+  if (label) label.textContent = ALL_FILIERES[filiereCode] || filiereCode;
 
-    return `
-      <div class="user-news-card" onclick="window.open('${escHtml(n.url)}','_blank','noopener')">
-        <button class="user-news-delete-btn" onclick="event.stopPropagation();deleteUserNews(${n.id})" title="Supprimer">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        ${imgHtml}
-        <div class="user-news-card-body">
-          <div class="user-news-card-source">
-            <img src="${escHtml(n.favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
-            ${escHtml(n.source)}
+  const list = getUserNewsForFiliere(filiereCode);
+
+  if (!list.length) {
+    if (grid) grid.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  if (grid) {
+    grid.style.display = 'grid';
+    grid.innerHTML = list.map(n => {
+      if (n.loading) return `
+        <div class="user-news-card-skeleton">
+          <div class="sk-img"></div>
+          <div class="sk-body">
+            <div class="sk-line w40"></div>
+            <div class="sk-line w80"></div>
+            <div class="sk-line w60"></div>
           </div>
-          <div class="user-news-card-title">${escHtml(n.titre)}</div>
-          ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
-          <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
-        </div>
-      </div>`;
-  }).join('');
+        </div>`;
+      const imgHtml = n.image
+        ? `<img class="user-news-card-img" src="${escHtml(n.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+      return `
+        <div class="user-news-card" onclick="window.open('${escHtml(n.url)}','_blank','noopener')">
+          <button class="user-news-delete-btn" onclick="event.stopPropagation();deleteUserNews(${n.id})" title="Supprimer">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          ${imgHtml}
+          <div class="user-news-card-body">
+            <div class="user-news-card-source">
+              <img src="${escHtml(n.favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
+              ${escHtml(n.source)}
+            </div>
+            <div class="user-news-card-title">${escHtml(n.titre)}</div>
+            ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
+            <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
 }
+
 
 // ── VEILLE RSS ─────────────────────────────────────────────────────────────────
 
