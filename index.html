@@ -2716,6 +2716,7 @@ function initVeilleTab() {
   sel.addEventListener('change', () => {
     document.getElementById('veille-search-btn').disabled = !sel.value;
     renderUserNews();
+    if (sel.value) fetchVeilleNews();
   });
 }
 
@@ -2844,17 +2845,17 @@ async function addUserNews() {
     if (html) {
       const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"'<>]+)["']/i)
                    || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:title["']/i);
-      if (ogTitle) titre = ogTitle[1].trim();
-      if (!titre) { const t = html.match(/<title[^>]*>([^<]+)<\/title>/i); if (t) titre = t[1].trim(); }
+      if (ogTitle) titre = decodeHtml(ogTitle[1].trim());
+      if (!titre) { const t = html.match(/<title[^>]*>([^<]+)<\/title>/i); if (t) titre = decodeHtml(t[1].trim()); }
       const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
                   || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
-      if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
+      if (ogDesc) desc = decodeHtml(ogDesc[1].trim().slice(0, 200));
       const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
                  || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
       if (ogImg) image = ogImg[1].trim();
       const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"'<>]+)["']/i)
                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:site_name["']/i);
-      if (ogSite) source = ogSite[1].trim();
+      if (ogSite) source = decodeHtml(ogSite[1].trim());
     }
   } catch (_) {}
 
@@ -3181,12 +3182,11 @@ async function fetchVeilleNews() {
   btn.disabled = true;
 
   hideVeilleRateLimit();
-  document.getElementById('veille-empty').style.display = 'none';
-  document.getElementById('veille-error').style.display = 'none';
+  document.getElementById('veille-empty').style.display    = 'none';
+  document.getElementById('veille-error').style.display    = 'none';
   document.getElementById('veille-result-header').style.display = 'none';
-  document.getElementById('veille-grid').innerHTML = '';
+  document.getElementById('veille-grid').innerHTML         = '';
 
-  // Animated spinner messages
   const spinnerEl = document.getElementById('veille-spinner');
   const msgEl     = document.getElementById('veille-spinner-msg');
   const subEl     = document.getElementById('veille-spinner-sub');
@@ -3200,64 +3200,96 @@ async function fetchVeilleNews() {
   }, 2500);
 
   const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
-
-  // Show keywords
   const kwBox = document.getElementById('veille-keywords');
   document.getElementById('veille-keywords-list').textContent =
     [filiereLabel, ...topWords.slice(0, 6)].join(' · ');
   kwBox.style.display = 'block';
-  subEl.textContent = `${queries.length} requêtes · ${rssFeeds.length} flux RSS spécialisés`;
+
+  const FILTER_KEYWORDS = [
+    'emploi','recrutement','métier','compétence','formation','apprentissage','alternance',
+    'entreprise','économi','innovation','technologi','règlement','législation','loi',
+    'travail','salarié','embauche','chômage','marché','secteur','industrie','filière',
+    'qualification','diplôme','certification','contrat','convention','accord','syndicat',
+  ];
+
+  const seen      = new Set();
+  const collected = [];
+  let   emptyBatches = 0;
+
+  function isRelevant(a) {
+    const text = (a.titre + ' ' + (a.resume || '')).toLowerCase();
+    return FILTER_KEYWORDS.some(kw => text.includes(kw));
+  }
+
+  function addArticles(newOnes) {
+    newOnes.forEach(a => {
+      if (!a.url || seen.has(a.url) || !a.titre || !isRelevant(a)) return;
+      seen.add(a.url);
+      collected.push(a);
+    });
+  }
+
+  function showProgress() {
+    const n = collected.length;
+    subEl.textContent = n > 0 ? `${n} article${n>1?'s':''} trouvé${n>1?'s':''}…` : 'Recherche en cours…';
+    if (n > 0 && document.getElementById('veille-result-header').style.display === 'none') {
+      // Show partial results immediately
+      renderVeilleNews(collected.slice(0, 20), filiereLabel);
+      spinnerEl.style.display = 'none';
+      document.getElementById('veille-result-header').style.display = 'block';
+      document.getElementById('veille-result-title').textContent = filiereLabel;
+      document.getElementById('veille-result-subtitle').textContent =
+        `${n} actualités récentes · Source : Google News`;
+    } else if (n > 0) {
+      // Update count
+      document.getElementById('veille-result-subtitle').textContent =
+        `${Math.min(n, 20)} actualités récentes · Source : Google News`;
+    }
+  }
 
   try {
-    // Stagger Google News queries slightly to avoid rate-limit (200ms apart)
-    const googlePromises = queries.map((q, i) =>
-      new Promise(resolve => setTimeout(
-        () => resolve(fetchRssFeed(q, i < 3 ? 10 : 6)),
-        i * 220
-      ))
-    );
-    const rssFetches = rssFeeds.map(url => fetchDirectRss(url, 8));
+    // ── Batch 1: RSS feeds first (fast, no rate limit) ─────────────────────
+    if (rssFeeds.length > 0) {
+      const rssResults = await Promise.allSettled(rssFeeds.map(url => fetchDirectRss(url, 6000)));
+      rssResults.forEach(r => { if (r.status === 'fulfilled') addArticles(r.value); });
+      showProgress();
+    }
 
-    const results = await Promise.allSettled([...googlePromises, ...rssFetches]);
+    // ── Batch Google News queries in groups of 3 with 1.5s gap ─────────────
+    const BATCH_SIZE  = 3;
+    const BATCH_DELAY = 1500; // ms between batches
+
+    for (let i = 0; i < queries.length; i += BATCH_SIZE) {
+      const batch = queries.slice(i, i + BATCH_SIZE);
+      subEl.textContent = `Lot ${Math.floor(i/BATCH_SIZE)+1}/${Math.ceil(queries.length/BATCH_SIZE)} — ${collected.length} article${collected.length>1?'s':''} trouvé${collected.length>1?'s':''}`;
+
+      const batchResults = await Promise.allSettled(
+        batch.map(q => fetchRssFeed(q, i < BATCH_SIZE ? 10 : 7))
+      );
+
+      let batchGot = 0;
+      batchResults.forEach(r => {
+        if (r.status === 'fulfilled') { addArticles(r.value); batchGot += r.value.length; }
+      });
+      if (batchGot === 0) emptyBatches++;
+
+      showProgress();
+
+      // Stop early if we have 20+ articles or 3 consecutive empty batches
+      if (collected.length >= 20) break;
+      if (emptyBatches >= 3 && i >= BATCH_SIZE) break;
+
+      // Wait before next batch (except after last)
+      if (i + BATCH_SIZE < queries.length && collected.length < 20) {
+        await new Promise(res => setTimeout(res, BATCH_DELAY));
+      }
+    }
 
     clearInterval(msgTimer);
 
-    // Detect rate-limit: all Google fetches returned empty
-    const googleResults = results.slice(0, queries.length);
-    const rssResults    = results.slice(queries.length);
-    const googleEmpty   = googleResults.every(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.length === 0));
-    const rssOk         = rssResults.some(r => r.status === 'fulfilled' && r.value.length > 0);
-
-    const seen = new Set();
-    const articles = [];
-
-    // Keywords that must appear in title or summary for an article to be kept
-    const FILTER_KEYWORDS = [
-      'emploi','recrutement','métier','compétence','formation','apprentissage','alternance',
-      'entreprise','économi','innovation','technologi','règlement','législation','loi',
-      'travail','salarié','embauche','chômage','marché','secteur','industrie','filière',
-      'qualification','diplôme','certification','contrat','convention','accord','syndicat',
-    ];
-
-    results.forEach(r => {
-      if (r.status === 'fulfilled') {
-        r.value.forEach(a => {
-          if (!a.url || seen.has(a.url) || !a.titre) return;
-          // Keep if title or resume contains at least one thematic keyword
-          const text = (a.titre + ' ' + (a.resume || '')).toLowerCase();
-          const relevant = FILTER_KEYWORDS.some(kw => text.includes(kw));
-          if (relevant) {
-            seen.add(a.url);
-            articles.push(a);
-          }
-        });
-      }
-    });
-
-    if (!articles.length) {
+    if (!collected.length) {
       spinnerEl.style.display = 'none';
-      if (googleEmpty && !rssOk) {
-        // Likely rate-limited
+      if (emptyBatches >= 2) {
         showVeilleRateLimit(30);
       } else {
         const errEl = document.getElementById('veille-error');
@@ -3265,7 +3297,9 @@ async function fetchVeilleNews() {
         errEl.textContent = '⚠️ Aucune actualité trouvée pour cette filière. Réessayez dans quelques instants.';
       }
     } else {
-      renderVeilleNews(articles.slice(0, 20), filiereLabel);
+      // Final render with all results
+      spinnerEl.style.display = 'none';
+      renderVeilleNews(collected.slice(0, 20), filiereLabel);
     }
 
   } catch (err) {
@@ -3278,6 +3312,7 @@ async function fetchVeilleNews() {
     btn.disabled = false;
   }
 }
+
 
 function renderVeilleNews(articles, filiereLabel) {
   document.getElementById('veille-spinner').style.display = 'none';
