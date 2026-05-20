@@ -1484,10 +1484,25 @@
         <p>Sélectionnez une filière et lancez la recherche<br>pour accéder aux 20 dernières actualités.</p>
       </div>
       <div id="veille-spinner" class="veille-spinner" style="display:none">
-        <div class="veille-spinner-dot"></div>
-        <div class="veille-spinner-dot"></div>
-        <div class="veille-spinner-dot"></div>
-        <span>Recherche des actualités en cours…</span>
+        <div style="text-align:center">
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:14px">
+            <div class="veille-spinner-dot"></div>
+            <div class="veille-spinner-dot"></div>
+            <div class="veille-spinner-dot"></div>
+          </div>
+          <div id="veille-spinner-msg" style="font-size:13px;color:var(--ft-muted)">Recherche des actualités en cours…</div>
+          <div id="veille-spinner-sub" style="font-size:11px;color:#9ca3af;margin-top:6px"></div>
+        </div>
+      </div>
+      <div id="veille-rate-limit" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:32px;margin-bottom:12px">⏳</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ft-blue);margin-bottom:6px">Trop de requêtes simultanées</div>
+        <div style="font-size:12px;color:var(--ft-muted);margin-bottom:16px">Google News limite les appels fréquents. Nouvelle tentative dans :</div>
+        <div id="veille-countdown" style="font-size:36px;font-weight:700;color:var(--ft-blue);font-variant-numeric:tabular-nums">30</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">secondes</div>
+        <button id="veille-retry-btn" onclick="fetchVeilleNews()" style="margin-top:18px;padding:8px 20px;background:var(--ft-blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:none">
+          Réessayer maintenant
+        </button>
       </div>
       <div id="veille-error" class="veille-error" style="display:none"></div>
       <div class="veille-header" id="veille-result-header" style="display:none">
@@ -2746,45 +2761,63 @@ function buildVeilleKeywords(filiereCode) {
   const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
   const nafs = NAF_BY_FILIERE[filiereCode] || [];
 
-  const stopwords = new Set(['les','des','une','pour','dans','avec','sur','par','aux','que','qui','de','du','la','le','et','en','au','autres','fabrication','activités','services','travaux']);
+  // Stopwords étendus
+  const stopwords = new Set([
+    'les','des','une','pour','dans','avec','sur','par','aux','que','qui','de','du',
+    'la','le','et','en','au','autres','fabrication','activités','services','travaux',
+    'production','commerce','gestion','location','vente','achat','traitement','transport',
+    'réparation','installation','construction','exploitation','mise','sous'
+  ]);
+
+  // 1. Extract frequent significant words across all NAF libellés
   const wordFreq = {};
   nafs.forEach(n => {
     n.libelle.toLowerCase()
-      .split(/[\s,;()\-\/'']+/)
-      .filter(w => w.length > 4 && !stopwords.has(w) && !/^\d/.test(w))
+      .split(/[\s,;()\-\/''«»]+/)
+      .filter(w => w.length > 4 && !stopwords.has(w) && !/^\d/.test(w) && !/^[a-z]{1,2}$/.test(w))
       .forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
   });
   const topWords = Object.entries(wordFreq)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
+    .slice(0, 15)
     .map(([w]) => w);
 
-  // Google News queries — variées pour maximiser la couverture
+  // 2. Extract representative NAF sector groups (first meaningful words of each libellé)
+  const nafSectors = [...new Set(
+    nafs.map(n => {
+      const words = n.libelle
+        .split(/[\s,;()\-\/]+/)
+        .filter(w => w.length > 5 && !stopwords.has(w.toLowerCase()) && !/^\d/.test(w));
+      return words.slice(0, 3).join(' ');
+    }).filter(s => s.length > 5)
+  )].slice(0, 12);
+
+  // 3. Build diverse queries
   const queries = [
+    // Filière-level
     `${filiereLabel} emploi recrutement France`,
-    `${filiereLabel} actualité économique 2025`,
-    `${filiereLabel} marché du travail formation`,
-    `${filiereLabel} entreprises innovations tendances`,
+    `${filiereLabel} actualité économique`,
+    `${filiereLabel} marché travail formation professionnelle`,
+    `${filiereLabel} innovations entreprises 2025`,
   ];
 
-  // Add sector-specific keyword queries from NAF
-  if (topWords.length >= 3) {
-    queries.push(`${topWords.slice(0, 4).join(' ')} actualités France`);
-    queries.push(`${topWords.slice(2, 6).join(' ')} emploi recrutement`);
+  // Top keywords combinations
+  if (topWords.length >= 4) {
+    queries.push(`${topWords.slice(0, 4).join(' ')} France actualités`);
+    queries.push(`${topWords.slice(3, 7).join(' ')} emploi recrutement`);
+    queries.push(`${topWords.slice(6, 10).join(' ')} secteur économique`);
   }
 
-  // Specific NAF sector queries (up to 2 most representative)
-  const repNafs = nafs.slice(0, 6)
-    .map(n => n.libelle.split(' ').filter(w => w.length > 5).slice(0, 3).join(' '))
-    .filter(q => q.length > 6)
-    .filter((q, i, arr) => arr.indexOf(q) === i)
-    .slice(0, 2);
-  repNafs.forEach(q => queries.push(`${q} actualités`));
+  // NAF sector-specific queries (pick 4 diverse sectors)
+  const step = Math.max(1, Math.floor(nafSectors.length / 4));
+  for (let i = 0; i < nafSectors.length && queries.length < 12; i += step) {
+    queries.push(`${nafSectors[i]} actualités recrutement`);
+  }
 
-  // Specialized RSS feeds for this filière
+  // Specialized RSS feeds
   const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
 
-  return { filiereLabel, queries, topWords, rssFeeds };
+  return { filiereLabel, queries, topWords, nafSectors, rssFeeds };
 }
 
 // Fetch a direct RSS feed URL (specialized sectorial sources)
@@ -2877,6 +2910,45 @@ function stripHtml(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+let _veilleCountdownTimer = null;
+
+function showVeilleRateLimit(seconds = 30) {
+  document.getElementById('veille-spinner').style.display = 'none';
+  const rl = document.getElementById('veille-rate-limit');
+  rl.style.display = 'block';
+
+  const countEl  = document.getElementById('veille-countdown');
+  const retryBtn = document.getElementById('veille-retry-btn');
+  retryBtn.style.display = 'none';
+  let remaining = seconds;
+  countEl.textContent = remaining;
+
+  clearInterval(_veilleCountdownTimer);
+  _veilleCountdownTimer = setInterval(() => {
+    remaining--;
+    countEl.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(_veilleCountdownTimer);
+      retryBtn.style.display = 'inline-block';
+      countEl.textContent = '0';
+    }
+  }, 1000);
+}
+
+function hideVeilleRateLimit() {
+  clearInterval(_veilleCountdownTimer);
+  document.getElementById('veille-rate-limit').style.display = 'none';
+}
+
+const SPINNER_MESSAGES = [
+  'Recherche des actualités en cours…',
+  'Interrogation de Google News…',
+  'Analyse des flux RSS sectoriels…',
+  'Collecte des résultats…',
+  'Déduplication des articles…',
+  'Presque terminé…',
+];
+
 async function fetchVeilleNews() {
   const filiereCode = document.getElementById('veille-filiere-select').value;
   if (!filiereCode) return;
@@ -2884,26 +2956,53 @@ async function fetchVeilleNews() {
   const btn = document.getElementById('veille-search-btn');
   btn.disabled = true;
 
+  hideVeilleRateLimit();
   document.getElementById('veille-empty').style.display = 'none';
   document.getElementById('veille-error').style.display = 'none';
   document.getElementById('veille-result-header').style.display = 'none';
   document.getElementById('veille-grid').innerHTML = '';
-  document.getElementById('veille-spinner').style.display = 'flex';
 
-  const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
+  // Animated spinner messages
+  const spinnerEl = document.getElementById('veille-spinner');
+  const msgEl     = document.getElementById('veille-spinner-msg');
+  const subEl     = document.getElementById('veille-spinner-sub');
+  spinnerEl.style.display = 'flex';
+  msgEl.textContent = SPINNER_MESSAGES[0];
+  subEl.textContent = '';
+  let msgIdx = 0;
+  const msgTimer = setInterval(() => {
+    msgIdx = (msgIdx + 1) % SPINNER_MESSAGES.length;
+    msgEl.textContent = SPINNER_MESSAGES[msgIdx];
+  }, 2500);
+
+  const { filiereLabel, queries, topWords, nafSectors, rssFeeds } = buildVeilleKeywords(filiereCode);
 
   // Show keywords
   const kwBox = document.getElementById('veille-keywords');
   document.getElementById('veille-keywords-list').textContent =
-    [filiereLabel, ...topWords.slice(0, 5)].join(' · ');
+    [filiereLabel, ...topWords.slice(0, 6)].join(' · ');
   kwBox.style.display = 'block';
+  subEl.textContent = `${queries.length} requêtes · ${rssFeeds.length} flux RSS spécialisés`;
 
   try {
-    // Fetch Google News + specialized RSS feeds in parallel
-    const googleFetches = queries.map((q, i) => fetchRssFeed(q, i < 2 ? 10 : 6));
-    const rssFetches    = rssFeeds.map(url => fetchDirectRss(url, 8));
+    // Stagger Google News queries slightly to avoid rate-limit (200ms apart)
+    const googlePromises = queries.map((q, i) =>
+      new Promise(resolve => setTimeout(
+        () => resolve(fetchRssFeed(q, i < 3 ? 10 : 6)),
+        i * 220
+      ))
+    );
+    const rssFetches = rssFeeds.map(url => fetchDirectRss(url, 8));
 
-    const results = await Promise.allSettled([...googleFetches, ...rssFetches]);
+    const results = await Promise.allSettled([...googlePromises, ...rssFetches]);
+
+    clearInterval(msgTimer);
+
+    // Detect rate-limit: all Google fetches returned empty
+    const googleResults = results.slice(0, queries.length);
+    const rssResults    = results.slice(queries.length);
+    const googleEmpty   = googleResults.every(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.length === 0));
+    const rssOk         = rssResults.some(r => r.status === 'fulfilled' && r.value.length > 0);
 
     const seen = new Set();
     const articles = [];
@@ -2918,12 +3017,23 @@ async function fetchVeilleNews() {
       }
     });
 
-    if (!articles.length) throw new Error('Aucune actualité trouvée. Réessayez dans quelques instants.');
-
-    renderVeilleNews(articles.slice(0, 20), filiereLabel);
+    if (!articles.length) {
+      spinnerEl.style.display = 'none';
+      if (googleEmpty && !rssOk) {
+        // Likely rate-limited
+        showVeilleRateLimit(30);
+      } else {
+        const errEl = document.getElementById('veille-error');
+        errEl.style.display = 'block';
+        errEl.textContent = '⚠️ Aucune actualité trouvée pour cette filière. Réessayez dans quelques instants.';
+      }
+    } else {
+      renderVeilleNews(articles.slice(0, 20), filiereLabel);
+    }
 
   } catch (err) {
-    document.getElementById('veille-spinner').style.display = 'none';
+    clearInterval(msgTimer);
+    spinnerEl.style.display = 'none';
     const errEl = document.getElementById('veille-error');
     errEl.style.display = 'block';
     errEl.textContent = `⚠️ ${err.message}`;
