@@ -1592,6 +1592,16 @@
           News du net — <span id="veille-result-title"></span>
         </div>
         <p id="veille-result-subtitle" style="font-size:12px;color:var(--ft-muted);margin-top:2px"></p>
+
+        <!-- Chapô IA -->
+        <div id="veille-chapo" style="display:none;margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:12px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+            <svg width="14" height="14" fill="none" stroke="#1d4ed8" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
+            <span style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.06em">Synthèse IA — Gemini</span>
+            <span id="veille-chapo-spinner" style="font-size:10px;color:var(--ft-muted);display:none">⏳ Génération…</span>
+          </div>
+          <p id="veille-chapo-text" style="font-size:13px;line-height:1.65;color:#1e3a8a;margin:0"></p>
+        </div>
       </div>
       <div class="veille-grid" id="veille-grid"></div>
     </div>
@@ -2734,8 +2744,59 @@ let userNewsDB = {};
 
 // Load token + gistId from localStorage, fallback to GIST_ID_DEFAULT for read
 const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
-let _token    = _cfg.token  || '';
-let _gistId   = _cfg.gistId || GIST_ID_DEFAULT; // all users share the default Gist
+let _token     = _cfg.token     || '';
+let _gistId    = _cfg.gistId    || GIST_ID_DEFAULT;
+let _geminiKey = _cfg.geminiKey || '';
+
+// ── GEMINI SYNTHESIS ─────────────────────────────────────────────────────────
+async function generateChapo(articles, filiereLabel) {
+  if (!_geminiKey) return; // No key configured
+  const chapoEl   = document.getElementById('veille-chapo');
+  const textEl    = document.getElementById('veille-chapo-text');
+  const spinnerEl = document.getElementById('veille-chapo-spinner');
+
+  chapoEl.style.display   = 'block';
+  spinnerEl.style.display = 'inline';
+  textEl.textContent      = '';
+
+  // Build context from article titles and summaries
+  const context = articles.slice(0, 12).map((a, i) =>
+    `${i+1}. ${a.titre}${a.resume ? ' — ' + a.resume.slice(0, 120) : ''}`
+  ).join('\n');
+
+  const prompt = `Tu es un expert en marché du travail et emploi en France.
+Voici ${articles.length} actualités récentes sur la filière "${filiereLabel}".
+Rédige un chapô de synthèse en 3-4 phrases en français, factuel et professionnel, qui résume les grandes tendances de ces actualités (emploi, recrutement, innovations, réglementation, formation).
+Ne cite pas les sources. Ne commence pas par "Dans cet article" ou "Voici".
+
+Actualités :
+${context}
+
+Chapô :`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${_geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 300 }
+        })
+      }
+    );
+    if (!res.ok) throw new Error(`Gemini API ${res.status}`);
+    const data  = await res.json();
+    const text  = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    textEl.textContent = text.trim();
+  } catch (e) {
+    textEl.textContent = `⚠️ Synthèse indisponible : ${e.message}`;
+    textEl.style.color = '#b45309';
+  } finally {
+    spinnerEl.style.display = 'none';
+  }
+}
 
 // Current filière context
 function getCurrentVeilleFiliere() {
@@ -3371,6 +3432,10 @@ function renderVeilleNews(articles, filiereLabel) {
     `${articles.length} actualités récentes · Source : Google News`;
   header.style.display = 'block';
 
+  // Reset chapô
+  document.getElementById('veille-chapo').style.display = 'none';
+  document.getElementById('veille-chapo-text').textContent = '';
+
   const grid = document.getElementById('veille-grid');
 
   // Show skeletons immediately
@@ -3425,6 +3490,9 @@ function renderVeilleNews(articles, filiereLabel) {
         <div class="user-news-card-domain">${escHtml(a.date)} · ${escHtml(domain)}</div>
       </div>`;
   });
+
+  // Generate AI summary chapô (async, non-blocking)
+  generateChapo(articles, filiereLabel);
 }
 
 function escHtml(str) {
@@ -3540,6 +3608,10 @@ function updateRanking() {
 
     <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Gist ID <span style="font-weight:400">(laisser vide = créé au 1er enregistrement)</span></label>
     <input id="admin-gist-id" type="text" placeholder="abc1234…"
+      style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;font-family:monospace">
+
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Clé API Google Gemini <span style="font-weight:400">(<a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ft-blue)">aistudio.google.com</a>)</span></label>
+    <input id="admin-gemini-key" type="password" placeholder="AIza…"
       style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:20px;box-sizing:border-box;font-family:monospace">
 
     <div style="display:flex;gap:10px">
@@ -3558,8 +3630,9 @@ document.addEventListener('keydown', e => {
     panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
     if (panel.style.display === 'flex') {
       const cfg = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
-      document.getElementById('admin-token').value   = cfg.token  || '';
-      document.getElementById('admin-gist-id').value = cfg.gistId || '';
+      document.getElementById('admin-token').value      = cfg.token     || '';
+      document.getElementById('admin-gist-id').value    = cfg.gistId    || '';
+      document.getElementById('admin-gemini-key').value = cfg.geminiKey || '';
       document.getElementById('admin-status').textContent = '';
     }
   }
@@ -3574,9 +3647,10 @@ function adminClose() {
 }
 
 async function adminSave() {
-  const token  = document.getElementById('admin-token').value.trim();
-  const gistId = document.getElementById('admin-gist-id').value.trim();
-  const status = document.getElementById('admin-status');
+  const token     = document.getElementById('admin-token').value.trim();
+  const gistId    = document.getElementById('admin-gist-id').value.trim();
+  const geminiKey = document.getElementById('admin-gemini-key').value.trim();
+  const status    = document.getElementById('admin-status');
 
   if (!token) { status.textContent = '⚠️ Token requis.'; status.style.color = '#b45309'; return; }
 
@@ -3589,9 +3663,10 @@ async function adminSave() {
     if (!res.ok) throw new Error(`Token invalide (${res.status})`);
     const user = await res.json();
 
-    localStorage.setItem(GIST_LS_KEY, JSON.stringify({ token, gistId }));
-    _token  = token;
-    _gistId = gistId;
+    localStorage.setItem(GIST_LS_KEY, JSON.stringify({ token, gistId, geminiKey }));
+    _token     = token;
+    _gistId    = gistId;
+    _geminiKey = geminiKey;
 
     status.textContent = `✅ Connecté en tant que @${user.login}`;
     status.style.color = '#15803d';
