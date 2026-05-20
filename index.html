@@ -1444,6 +1444,8 @@
         <strong>Mots-clés utilisés</strong>
         <span id="veille-keywords-list"></span>
       </div>
+
+      <div id="gist-status" style="font-size:11px;margin-top:14px;color:var(--ft-muted);min-height:16px"></div>
     </aside>
 
     <!-- Main content -->
@@ -2501,9 +2503,13 @@ function updateLegend(values, cfg, palette, classBounds) {
 
 // ── VEILLE FILIÈRES ───────────────────────────────────────────────────────────
 
+let veilleTabInitialized = false;
+
 function initVeilleTab() {
+  if (veilleTabInitialized) return; // Only initialize once
+  veilleTabInitialized = true;
+
   const sel = document.getElementById('veille-filiere-select');
-  loadUserNews();
   // Populate from ALL_FILIERES (already loaded)
   const sorted = Object.entries(ALL_FILIERES).sort((a, b) => a[1].localeCompare(b[1], 'fr'));
   sorted.forEach(([code, label]) => {
@@ -2519,25 +2525,69 @@ function initVeilleTab() {
 
 // ── USER NEWS ─────────────────────────────────────────────────────────────────
 
-// ── USER NEWS – stockage partagé (window.storage, shared=true) ───────────────
-const USER_NEWS_KEY = 'user_news_list';
+// ── USER NEWS – stockage partagé via GitHub Gist ─────────────────────────────
+// À configurer une fois par l'administrateur dans le repo :
+const GIST_FILENAME  = 'user_news.json';
+const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
 let userNewsList = [];
 
+// Load token + gistId from localStorage (set once by admin via hidden panel)
+const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+let _token    = _cfg.token  || '';
+let _gistId   = _cfg.gistId || '';
+
+function setGistStatus(msg, color) {
+  const el = document.getElementById('gist-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
+}
+
 async function loadUserNews() {
+  if (!_gistId) { renderUserNews(); return; }
   try {
-    const result = await window.storage.get(USER_NEWS_KEY, true);
-    userNewsList = JSON.parse(result.value);
-  } catch (_) {
-    userNewsList = [];
+    const headers = { Accept: 'application/vnd.github.v3+json' };
+    if (_token) headers['Authorization'] = `token ${_token}`;
+    const res = await fetch(`https://api.github.com/gists/${_gistId}`, { headers });
+    if (!res.ok) throw new Error(`GitHub ${res.status}`);
+    const data = await res.json();
+    const content = data.files?.[GIST_FILENAME]?.content;
+    if (content) userNewsList = JSON.parse(content);
+    setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+  } catch (e) {
+    setGistStatus('⚠️ ' + e.message, '#b45309');
   }
   renderUserNews();
 }
 
 async function saveUserNews() {
+  if (!_token) { return; } // Read-only if no token
   try {
-    await window.storage.set(USER_NEWS_KEY, JSON.stringify(userNewsList), true);
+    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsList) } } };
+    if (!_gistId) {
+      // First save: create the gist
+      body.description = 'Matrice Filières – News partagées';
+      body.public = false;
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+      const data = await res.json();
+      _gistId = data.id;
+      // Log the new Gist ID so the admin can hardcode it
+      console.info(`✅ Gist créé — ajoutez cet ID dans le HTML : ${data.id}`);
+      setGistStatus(`✅ Gist créé (voir console)`, '#15803d');
+    } else {
+      const res = await fetch(`https://api.github.com/gists/${_gistId}`, {
+        method: 'PATCH',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+      setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+    }
   } catch (e) {
-    console.warn('Sauvegarde impossible :', e.message);
+    setGistStatus('⚠️ Sauvegarde : ' + e.message, '#b45309');
   }
 }
 
@@ -2674,12 +2724,29 @@ function renderUserNews() {
 
 // ── VEILLE RSS ─────────────────────────────────────────────────────────────────
 
+// RSS feeds spécialisés par filière (flux publics gratuits)
+const FILIERE_RSS_FEEDS = {
+  'FIL01': ['https://www.pleinchamp.com/rss', 'https://www.reussir.fr/rss.xml'],
+  'FIL05': ['https://www.batiweb.com/rss/flux-rss.xml', 'https://www.lemoniteur.fr/rss/'],
+  'FIL06': ['https://www.francetvinfo.fr/culture.rss'],
+  'FIL08': ['https://www.actu-environnement.com/rss/actu.xml', 'https://www.enerzine.com/feed'],
+  'FIL09': ['https://www.foretpriveefrancaise.com/rss'],
+  'FIL10': ['https://www.lhôtellerie-restauration.fr/rss'],
+  'FIL11': ['https://www.process-alimentaire.com/rss.xml', 'https://www.usinenouvelle.com/rss/secteur/agroalimentaire.xml'],
+  'FIL12': ['https://www.automobile-entreprise.com/rss'],
+  'FIL13': ['https://www.aerobuzz.fr/feed/', 'https://www.usinenouvelle.com/rss/secteur/aeronautique.xml'],
+  'FIL15': ['https://www.lequotidiendumedecin.fr/rss', 'https://www.usinenouvelle.com/rss/secteur/pharmacie-biotechnologie.xml'],
+  'FIL22': ['https://www.sfen.org/feed/', 'https://www.world-nuclear-news.org/rss'],
+  'FIL23': ['https://www.silicon.fr/feed', 'https://www.journaldunet.com/rss/jdn.xml'],
+  'FIL25': ['https://www.hospimedia.fr/rss', 'https://www.gazette-sante-social.fr/rss'],
+  'FIL30': ['https://www.vecteurplus.com/rss', 'https://www.wk-transport-logistique.fr/rss'],
+};
+
 function buildVeilleKeywords(filiereCode) {
   const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
   const nafs = NAF_BY_FILIERE[filiereCode] || [];
 
-  // Extract significant words from NAF libellés (skip short/common words)
-  const stopwords = new Set(['les','des','une','pour','dans','avec','sur','par','aux','que','qui','les','de','du','la','le','et','en','au','à','d']);
+  const stopwords = new Set(['les','des','une','pour','dans','avec','sur','par','aux','que','qui','de','du','la','le','et','en','au','autres','fabrication','activités','services','travaux']);
   const wordFreq = {};
   nafs.forEach(n => {
     n.libelle.toLowerCase()
@@ -2687,24 +2754,67 @@ function buildVeilleKeywords(filiereCode) {
       .filter(w => w.length > 4 && !stopwords.has(w) && !/^\d/.test(w))
       .forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
   });
-  // Top keywords by frequency
   const topWords = Object.entries(wordFreq)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
+    .slice(0, 10)
     .map(([w]) => w);
 
-  // Build multiple Google News RSS queries to get ~20 articles
-  // Query 1: filière name + emploi/recrutement
-  // Query 2: top sector keywords
+  // Google News queries — variées pour maximiser la couverture
   const queries = [
     `${filiereLabel} emploi recrutement France`,
-    `${filiereLabel} actualités marché travail`,
+    `${filiereLabel} actualité économique 2025`,
+    `${filiereLabel} marché du travail formation`,
+    `${filiereLabel} entreprises innovations tendances`,
   ];
-  if (topWords.length >= 2) {
-    queries.push(`${topWords.slice(0, 3).join(' ')} actualités France`);
+
+  // Add sector-specific keyword queries from NAF
+  if (topWords.length >= 3) {
+    queries.push(`${topWords.slice(0, 4).join(' ')} actualités France`);
+    queries.push(`${topWords.slice(2, 6).join(' ')} emploi recrutement`);
   }
 
-  return { filiereLabel, queries, topWords };
+  // Specific NAF sector queries (up to 2 most representative)
+  const repNafs = nafs.slice(0, 6)
+    .map(n => n.libelle.split(' ').filter(w => w.length > 5).slice(0, 3).join(' '))
+    .filter(q => q.length > 6)
+    .filter((q, i, arr) => arr.indexOf(q) === i)
+    .slice(0, 2);
+  repNafs.forEach(q => queries.push(`${q} actualités`));
+
+  // Specialized RSS feeds for this filière
+  const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
+
+  return { filiereLabel, queries, topWords, rssFeeds };
+}
+
+// Fetch a direct RSS feed URL (specialized sectorial sources)
+async function fetchDirectRss(feedUrl, maxItems = 8) {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+  const res = await Promise.race([
+    fetch(proxyUrl),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+  ]);
+  if (!res.ok) throw new Error(`Direct RSS error ${res.status}`);
+  const data = await res.json();
+  const xml = data.contents || '';
+  if (!xml) throw new Error('Réponse vide');
+
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const items = [...doc.querySelectorAll('item, entry')].slice(0, maxItems);
+
+  return items.map(item => {
+    const getText = tag => item.querySelector(tag)?.textContent?.trim() || '';
+    const link = item.querySelector('link')?.getAttribute('href')
+              || item.querySelector('link')?.textContent?.trim()
+              || getText('guid');
+    return {
+      titre:  getText('title').replace(/\s*-\s*[^-]+$/, ''),
+      source: extractDomain(feedUrl),
+      url:    link || '',
+      date:   formatRssDate(getText('pubDate') || getText('updated')),
+      resume: stripHtml(getText('description') || getText('summary') || getText('content')).slice(0, 280),
+    };
+  }).filter(a => a.titre && a.url);
 }
 
 // Fetch Google News RSS via allorigins CORS proxy + DOMParser
@@ -2780,19 +2890,20 @@ async function fetchVeilleNews() {
   document.getElementById('veille-grid').innerHTML = '';
   document.getElementById('veille-spinner').style.display = 'flex';
 
-  const { filiereLabel, queries, topWords } = buildVeilleKeywords(filiereCode);
+  const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
 
   // Show keywords
   const kwBox = document.getElementById('veille-keywords');
   document.getElementById('veille-keywords-list').textContent =
-    [filiereLabel, ...topWords].join(' · ');
+    [filiereLabel, ...topWords.slice(0, 5)].join(' · ');
   kwBox.style.display = 'block';
 
   try {
-    // Fetch from multiple queries in parallel, deduplicate by URL
-    const results = await Promise.allSettled(
-      queries.map((q, i) => fetchRssFeed(q, i === 0 ? 12 : 8))
-    );
+    // Fetch Google News + specialized RSS feeds in parallel
+    const googleFetches = queries.map((q, i) => fetchRssFeed(q, i < 2 ? 10 : 6));
+    const rssFetches    = rssFeeds.map(url => fetchDirectRss(url, 8));
+
+    const results = await Promise.allSettled([...googleFetches, ...rssFetches]);
 
     const seen = new Set();
     const articles = [];
@@ -2955,6 +3066,9 @@ function updateRanking() {
   buildSidebar3();
   initChart3();
 
+  // Load shared user news once at startup
+  loadUserNews();
+
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -2976,5 +3090,81 @@ function updateRanking() {
   setTimeout(initChart3, 250);
 })();
 </script>
+<!-- ── ADMIN PANEL (Ctrl+Shift+A) ── -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:380px;max-width:92vw;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="font-weight:700;font-size:15px;color:var(--ft-blue);margin-bottom:4px">⚙️ Configuration admin</div>
+    <div style="font-size:11px;color:var(--ft-muted);margin-bottom:18px">Ces informations sont stockées uniquement dans votre navigateur.</div>
+
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Token GitHub (scope : gist)</label>
+    <input id="admin-token" type="password" placeholder="ghp_…"
+      style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;font-family:monospace">
+
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Gist ID <span style="font-weight:400">(laisser vide = créé au 1er enregistrement)</span></label>
+    <input id="admin-gist-id" type="text" placeholder="abc1234…"
+      style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:20px;box-sizing:border-box;font-family:monospace">
+
+    <div style="display:flex;gap:10px">
+      <button onclick="adminSave()" style="flex:1;padding:10px;background:var(--ft-blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Enregistrer</button>
+      <button onclick="adminClose()" style="padding:10px 16px;background:#f3f4f6;border:none;border-radius:8px;font-size:13px;cursor:pointer">Annuler</button>
+    </div>
+    <div id="admin-status" style="font-size:11px;margin-top:10px;min-height:16px;text-align:center"></div>
+  </div>
+</div>
+
+<script>
+// Admin panel — Ctrl+Shift+A
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    if (panel.style.display === 'flex') {
+      const cfg = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+      document.getElementById('admin-token').value   = cfg.token  || '';
+      document.getElementById('admin-gist-id').value = cfg.gistId || '';
+      document.getElementById('admin-status').textContent = '';
+    }
+  }
+  if (e.key === 'Escape') adminClose();
+});
+document.getElementById('admin-panel').addEventListener('click', e => {
+  if (e.target === e.currentTarget) adminClose();
+});
+
+function adminClose() {
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
+async function adminSave() {
+  const token  = document.getElementById('admin-token').value.trim();
+  const gistId = document.getElementById('admin-gist-id').value.trim();
+  const status = document.getElementById('admin-status');
+
+  if (!token) { status.textContent = '⚠️ Token requis.'; status.style.color = '#b45309'; return; }
+
+  // Test token validity
+  status.textContent = 'Vérification…'; status.style.color = 'var(--ft-muted)';
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) throw new Error(`Token invalide (${res.status})`);
+    const user = await res.json();
+
+    localStorage.setItem(GIST_LS_KEY, JSON.stringify({ token, gistId }));
+    _token  = token;
+    _gistId = gistId;
+
+    status.textContent = `✅ Connecté en tant que @${user.login}`;
+    status.style.color = '#15803d';
+
+    setTimeout(() => { adminClose(); loadUserNews(); }, 1200);
+  } catch(e) {
+    status.textContent = '⚠️ ' + e.message;
+    status.style.color = '#991b1b';
+  }
+}
+</script>
+
 </body>
 </html>
