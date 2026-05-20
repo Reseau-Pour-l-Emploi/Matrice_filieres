@@ -2793,26 +2793,41 @@ function buildVeilleKeywords(filiereCode) {
   )].slice(0, 12);
 
   // 3. Build diverse queries
-  const queries = [
-    // Filière-level
-    `${filiereLabel} emploi recrutement France`,
-    `${filiereLabel} actualité économique`,
-    `${filiereLabel} marché travail formation professionnelle`,
-    `${filiereLabel} innovations entreprises 2025`,
+  // Thèmes métier — chaque requête croise la filière avec l'un d'eux
+  const THEMES = [
+    'emploi recrutement',
+    'métiers compétences',
+    'formation professionnelle',
+    'entreprises économie',
+    'innovations technologies',
+    'réglementation législation',
+    'marché du travail',
+    'conditions de travail',
   ];
 
-  // Top keywords combinations
-  if (topWords.length >= 4) {
-    queries.push(`${topWords.slice(0, 4).join(' ')} France actualités`);
-    queries.push(`${topWords.slice(3, 7).join(' ')} emploi recrutement`);
-    queries.push(`${topWords.slice(6, 10).join(' ')} secteur économique`);
+  const queries = [];
+
+  // 1. Filière × chaque thème (8 requêtes de base)
+  THEMES.forEach(theme => {
+    queries.push(`${filiereLabel} ${theme} France`);
+  });
+
+  // 2. Top mots-clés NAF × thèmes prioritaires
+  if (topWords.length >= 3) {
+    const kwGroup1 = topWords.slice(0, 4).join(' ');
+    const kwGroup2 = topWords.slice(4, 8).join(' ');
+    queries.push(`${kwGroup1} emploi recrutement métiers`);
+    queries.push(`${kwGroup2} formation compétences`);
+    queries.push(`${kwGroup1} innovations réglementation`);
+    queries.push(`${kwGroup2} entreprises marché travail`);
   }
 
-  // NAF sector-specific queries (pick 4 diverse sectors)
+  // 3. Secteurs NAF représentatifs × thèmes (jusqu'à 4 requêtes supplémentaires)
   const step = Math.max(1, Math.floor(nafSectors.length / 4));
-  for (let i = 0; i < nafSectors.length && queries.length < 12; i += step) {
-    queries.push(`${nafSectors[i]} actualités recrutement`);
-  }
+  THEMES.slice(0, 4).forEach((theme, i) => {
+    const sector = nafSectors[i * step];
+    if (sector) queries.push(`${sector} ${theme}`);
+  });
 
   // Specialized RSS feeds
   const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
@@ -3006,10 +3021,23 @@ async function fetchVeilleNews() {
 
     const seen = new Set();
     const articles = [];
+
+    // Keywords that must appear in title or summary for an article to be kept
+    const FILTER_KEYWORDS = [
+      'emploi','recrutement','métier','compétence','formation','apprentissage','alternance',
+      'entreprise','économi','innovation','technologi','règlement','législation','loi',
+      'travail','salarié','embauche','chômage','marché','secteur','industrie','filière',
+      'qualification','diplôme','certification','contrat','convention','accord','syndicat',
+    ];
+
     results.forEach(r => {
       if (r.status === 'fulfilled') {
         r.value.forEach(a => {
-          if (a.url && !seen.has(a.url) && a.titre) {
+          if (!a.url || seen.has(a.url) || !a.titre) return;
+          // Keep if title or resume contains at least one thematic keyword
+          const text = (a.titre + ' ' + (a.resume || '')).toLowerCase();
+          const relevant = FILTER_KEYWORDS.some(kw => text.includes(kw));
+          if (relevant) {
             seen.add(a.url);
             articles.push(a);
           }
