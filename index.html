@@ -141,8 +141,11 @@
       flex-shrink: 0;
       position: relative; z-index: 30;
       display: flex; align-items: center; justify-content: center;
-      height: 44px; min-height: 44px;
+      height: 44px; min-height: 44px; width: 44px;
       border: none; background: var(--ft-card);
+      cursor: pointer; border-bottom: 1px solid var(--ft-border);
+      transition: background .15s;
+    }
       border-bottom: 1px solid var(--ft-border);
       cursor: pointer; width: 100%;
       transition: background .15s;
@@ -860,9 +863,13 @@
     /* ══════════════════════════════════════════
        RESPONSIVE MOBILE  (≤ 768px)
     ══════════════════════════════════════════ */
+    /* ── Mobile-only elements hidden on desktop ── */
+    .sidebar-mobile-header { display: none; }
+    .mobile-fab { display: none !important; }
+
     @media (max-width: 768px) {
 
-      /* ── Header ── */
+      /* Header */
       header { padding: 0 12px; height: 50px; }
       .header-title { font-size: 15px; }
       .header-subtitle { display: none; }
@@ -870,100 +877,98 @@
       .header-actions .btn { padding: 5px 10px; font-size: 11px; }
       .header-logo { width: 28px; height: 28px; }
 
-      /* ── Tab nav ── */
+      /* Tab nav */
       .tab-nav { padding: 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; top: 50px; }
       .tab-btn { padding: 10px 14px; font-size: 12px; gap: 5px; white-space: nowrap; }
       .tab-btn svg { width: 12px; height: 12px; }
 
-      /* ── Page layout ── */
-      .page { display: block; height: auto; min-height: calc(100vh - 90px); position: relative; }
-
-      /* ── Sidebar drawer : full height, scrollable ── */
+      /* Sidebar: overlay drawer — ONLY position/transform, keep desktop display/flex intact */
       .sidebar {
         position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 88vw !important; max-width: 340px !important;
+        top: 0 !important;
+        left: 0 !important;
         height: 100dvh !important;
-        z-index: 300;
-        transform: translateX(-100%);
-        transition: transform .28s cubic-bezier(.4,0,.2,1);
-        box-shadow: 4px 0 24px rgba(0,0,0,.18);
-        overflow: hidden !important;
+        width: 88vw !important;
+        max-width: 340px !important;
+        z-index: 300 !important;
+        transform: translateX(-110%) !important;
+        transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
+        box-shadow: 4px 0 24px rgba(0,0,0,.2) !important;
         border-right: none !important;
-        /* reset flex from desktop — sidebar-inner will scroll via calc height */
-        display: block !important;
+        /* Keep desktop flex layout — just fix the height */
       }
-      .sidebar.mobile-open { transform: translateX(0) !important; }
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
       .sidebar::after { display: none !important; }
-      .page.sidebar-collapsed .sidebar { transform: translateX(-100%) !important; }
 
-      /* sidebar-mobile-header: fixed height at top */
-      .sidebar-mobile-header { height: 53px; box-sizing: border-box; }
-
-      /* sidebar-inner: fill the rest and scroll */
-      .sidebar-inner {
-        height: calc(100dvh - 53px) !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 12px 14px 40px !important;
-        overscroll-behavior: contain;
-        display: block !important;
-      }
-
-      /* Close button pinned at top of drawer */
+      /* Show close header */
       .sidebar-mobile-header {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 14px 10px; border-bottom: 1px solid var(--ft-border);
-        background: var(--ft-bg); flex-shrink: 0;
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        height: 52px;
+        min-height: 52px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--ft-border);
+        background: var(--ft-bg);
+        box-sizing: border-box;
       }
       .sidebar-mobile-title { font-size: 13px; font-weight: 700; color: var(--ft-blue); }
       .sidebar-mobile-close {
         background: none; border: none; cursor: pointer; color: var(--ft-muted);
-        padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+        padding: 8px; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
       }
-      .sidebar-mobile-close:hover { background: var(--ft-border); }
+
+      /* sidebar-inner scrolls within the remaining drawer height */
+      .sidebar-inner {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding: 12px 14px 40px !important;
+      }
 
       /* Backdrop */
       .mobile-sidebar-backdrop {
         display: none; position: fixed; inset: 0;
-        background: rgba(0,0,0,.4); z-index: 299; backdrop-filter: blur(1px);
+        background: rgba(0,0,0,.4); z-index: 299;
       }
       .mobile-sidebar-backdrop.active { display: block; }
 
-      /* Burger FAB */
-      .burger-btn { display: none !important; } /* hide original burger on mobile */
+      /* Desktop burger hidden, mobile FAB visible */
+      .desktop-burger { display: none !important; }
       .mobile-fab {
+        display: flex !important;
         position: fixed; bottom: 20px; left: 20px;
         width: 54px; height: 54px; border-radius: 50%;
         background: var(--ft-blue); color: #fff; border: none;
         box-shadow: 0 4px 16px rgba(0,49,137,.35);
         z-index: 250; cursor: pointer;
-        display: flex !important; align-items: center; justify-content: center;
-        transition: background .15s, transform .15s;
+        align-items: center; justify-content: center;
       }
-      .mobile-fab:hover { background: #0026a8; transform: scale(1.05); }
-      .mobile-fab.hidden { display: none !important; }
+      .mobile-fab[style*="display: none"] { display: none !important; }
+
+      /* Page: block layout, no transition */
+      .page { display: block !important; transition: none !important; }
 
       /* Chart area */
-      .chart-area { padding: 10px 12px 90px 12px; overflow-y: auto; height: auto; }
+      .chart-area { padding: 10px 12px 90px !important; }
 
-      /* Matrice */
-      .chart-main-row { flex-direction: column; height: auto; }
-      #chart-card-3 { height: 75vw; min-height: 280px; }
+      /* Matrice chart */
+      .chart-main-row { flex-direction: column !important; height: auto !important; }
+      #chart-card-3 { height: 75vw !important; min-height: 280px; }
 
       /* Carte */
-      .map-row { flex-direction: column; height: auto; }
-      #map-card { height: 65vw; min-height: 260px; }
-      .ranking-panel { width: 100%; max-width: none; border-left: none; border-top: 1px solid var(--ft-border); max-height: 280px; overflow-y: auto; }
+      .map-row { flex-direction: column !important; height: auto !important; }
+      #map-card { height: 65vw !important; min-height: 260px; }
+      .ranking-panel { width: 100% !important; max-width: none !important; border-left: none !important; border-top: 1px solid var(--ft-border) !important; max-height: 260px; overflow-y: auto; }
 
       /* Chart header */
       .chart-header { flex-wrap: wrap; gap: 8px; padding: 8px 0; }
       .chart-title { font-size: 13px; }
-      .chart-subtitle { font-size: 10px; }
-
-      /* Legend */
-      .legend { gap: 8px; }
-      .legend-item { font-size: 10px; }
       .interp-box { display: none; }
 
       /* Tooltip */
@@ -977,23 +982,15 @@
 
       /* NS panel */
       .ns-panel { font-size: 11px; }
-
-      /* Filter sections */
-      .filter-section { padding-bottom: 12px; margin-bottom: 12px; }
-      .filter-section h2 { font-size: 11px; margin-bottom: 8px; }
+      .filter-section h2 { font-size: 11px; }
       .filiere-list { max-height: 200px; }
-
-      /* Bigger touch targets */
-      .chip { padding: 8px 12px; font-size: 12px; }
-      .grid-val-inp { height: 34px; font-size: 14px; }
-      .btn-bary { padding: 8px 12px; font-size: 12px; }
       select { font-size: 14px; }
+      .chip { padding: 8px 10px; font-size: 12px; }
 
-      /* ── Veille tab ── */
+      /* Veille */
       #tab-veille { height: auto; }
       .veille-layout { flex-direction: column; }
       .veille-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--ft-border); padding: 14px 12px; }
-      .veille-keywords { font-size: 10px; }
       .veille-main { padding: 14px 12px 90px; }
       .veille-grid { grid-template-columns: 1fr; gap: 12px; }
       .user-news-grid { grid-template-columns: 1fr; gap: 10px; }
@@ -1001,14 +998,12 @@
       .user-news-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
       .user-news-add-row { width: 100%; }
       .user-news-input { min-width: 0; flex: 1; font-size: 16px; }
-      .user-news-add-btn { padding: 9px 14px; font-size: 13px; }
-      .veille-search-btn { padding: 11px; font-size: 13px; }
 
       /* Popups */
       #sources-popup { width: 92vw; left: 4vw !important; right: 4vw; }
       #naf-modal { width: 95vw; max-height: 78vh; }
 
-      /* Legend swatches */
+      /* Legend */
       .choro-legend-swatch { width: 18px; height: 18px; }
       .choro-legend-range { font-size: 11px; }
     }
@@ -1016,8 +1011,8 @@
     @media (max-width: 400px) {
       .tab-btn { padding: 10px 10px; font-size: 11px; }
       .tab-btn svg { display: none; }
-      #chart-card-3 { height: 82vw; }
-      #map-card { height: 72vw; }
+      #chart-card-3 { height: 82vw !important; }
+      #map-card { height: 72vw !important; }
     }
 
 
@@ -1083,14 +1078,7 @@
      TAB 1 : MATRICE
 ══════════════════════════════════════════════ -->
 <div id="tab-matrix" class="tab-content active">
-<div class="page" id="page-matrix">
-
-  <aside class="sidebar">
-    <button class="burger-btn" id="burger-btn" onclick="toggleSidebar('matrix')" title="Masquer / afficher le panneau de filtres">
-      <div class="bars">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </div>
-    </button>
+<aside class="sidebar" id="sidebar-matrix">
     <div class="sidebar-mobile-header">
         <span class="sidebar-mobile-title">🎛️ Filtres</span>
         <button class="sidebar-mobile-close" onclick="toggleSidebar('matrix')" title="Fermer">
@@ -1283,7 +1271,14 @@
     </div><!-- /.sidebar-inner -->
   </aside>
 
+<div class="page" id="page-matrix">
+
+
+
   <main class="chart-area">
+    <button class="burger-btn desktop-burger" id="burger-btn" onclick="toggleSidebar('matrix')" title="Masquer / afficher les filtres">
+      <div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </button>
     <div class="chart-header">
       <div>
         <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
@@ -1370,14 +1365,7 @@
      TAB 2 : CARTE PAR FILIÈRE
 ══════════════════════════════════════════════ -->
 <div id="tab-carte" class="tab-content">
-<div class="page" id="page-carte">
-
-  <aside class="sidebar" id="sidebar-carte">
-    <button class="burger-btn" id="burger-btn-carte" onclick="toggleSidebar('carte')" title="Masquer / afficher les filtres">
-      <div class="bars">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </div>
-    </button>
+<aside class="sidebar" id="sidebar-carte">
     <div class="sidebar-mobile-header">
         <span class="sidebar-mobile-title">🎛️ Filtres</span>
         <button class="sidebar-mobile-close" onclick="toggleSidebar('carte')" title="Fermer">
@@ -1441,7 +1429,12 @@
     </div>
   </aside>
 
+<div class="page" id="page-carte">
+
   <main class="chart-area">
+    <button class="burger-btn desktop-burger" id="burger-btn-carte" onclick="toggleSidebar('carte')" title="Masquer / afficher les filtres">
+      <div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </button>
     <div class="chart-header" style="padding-bottom:8px">
       <div>
         <div class="chart-title" id="map-title">Carte filière</div>
