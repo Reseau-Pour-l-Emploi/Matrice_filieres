@@ -2725,13 +2725,16 @@ function initVeilleTab() {
 // À configurer une fois par l'administrateur dans le repo :
 const GIST_FILENAME  = 'user_news.json';
 const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
+// ⬇️ Renseignez ici l'ID du Gist après la première création (Ctrl+Shift+A)
+const GIST_ID_DEFAULT = ''; // ex: 'abc1234567890abcdef'
+
 // Structure: { FIL01: [{id, url, titre, ...}, ...], FIL02: [...], ... }
 let userNewsDB = {};
 
-// Load token + gistId from localStorage (set once by admin via hidden panel)
+// Load token + gistId from localStorage, fallback to GIST_ID_DEFAULT for read
 const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
 let _token    = _cfg.token  || '';
-let _gistId   = _cfg.gistId || '';
+let _gistId   = _cfg.gistId || GIST_ID_DEFAULT; // all users share the default Gist
 
 // Current filière context
 function getCurrentVeilleFiliere() {
@@ -2837,14 +2840,8 @@ async function addUserNews() {
   let titre = '', source = domain, image = null, desc = '';
 
   try {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    const res = await Promise.race([
-      fetch(proxyUrl),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 7000))
-    ]);
-    if (res.ok) {
-      const data = await res.json();
-      const html = data.contents || '';
+    const html = await fetchWithProxy(url, 7000);
+    if (html) {
       const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"'<>]+)["']/i)
                    || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:title["']/i);
       if (ogTitle) titre = ogTitle[1].trim();
@@ -3017,14 +3014,7 @@ function buildVeilleKeywords(filiereCode) {
 
 // Fetch a direct RSS feed URL (specialized sectorial sources)
 async function fetchDirectRss(feedUrl, maxItems = 8) {
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
-  const res = await Promise.race([
-    fetch(proxyUrl),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
-  ]);
-  if (!res.ok) throw new Error(`Direct RSS error ${res.status}`);
-  const data = await res.json();
-  const xml = data.contents || '';
+  const xml = await fetchWithProxy(feedUrl, 6000);
   if (!xml) throw new Error('Réponse vide');
 
   const doc = new DOMParser().parseFromString(xml, 'text/xml');
@@ -3036,11 +3026,11 @@ async function fetchDirectRss(feedUrl, maxItems = 8) {
               || item.querySelector('link')?.textContent?.trim()
               || getText('guid');
     return {
-      titre:  getText('title').replace(/\s*-\s*[^-]+$/, ''),
+      titre:  decodeHtml(getText('title').replace(/\s*-\s*[^-]+$/, '')),
       source: extractDomain(feedUrl),
       url:    link || '',
       date:   formatRssDate(getText('pubDate') || getText('updated')),
-      resume: stripHtml(getText('description') || getText('summary') || getText('content')).slice(0, 280),
+      resume: decodeHtml(stripHtml(getText('description') || getText('summary') || getText('content')).slice(0, 280)),
     };
   }).filter(a => a.titre && a.url);
 }
@@ -3048,15 +3038,7 @@ async function fetchDirectRss(feedUrl, maxItems = 8) {
 // Fetch Google News RSS via allorigins CORS proxy + DOMParser
 async function fetchRssFeed(query, maxItems = 12) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=fr&gl=FR&ceid=FR:fr`;
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-
-  const res = await Promise.race([
-    fetch(proxyUrl),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
-  ]);
-  if (!res.ok) throw new Error(`Proxy error ${res.status}`);
-  const data = await res.json();
-  const xml = data.contents || '';
+  const xml = await fetchWithProxy(rssUrl, 8000);
   if (!xml) throw new Error('Réponse vide');
 
   const doc = new DOMParser().parseFromString(xml, 'text/xml');
@@ -3067,11 +3049,11 @@ async function fetchRssFeed(query, maxItems = 12) {
     const rawLink = getText('link') || item.querySelector('guid')?.textContent?.trim() || '';
     const srcUrl  = extractSourceUrl({ link: rawLink, guid: rawLink, description: getText('description') });
     return {
-      titre:  getText('title').replace(/\s*-\s*[^-]+$/, ''),
+      titre:  decodeHtml(getText('title').replace(/\s*-\s*[^-]+$/, '')),
       source: getText('source') || extractDomain(srcUrl),
       url:    srcUrl,
       date:   formatRssDate(getText('pubDate')),
-      resume: stripHtml(getText('description')).slice(0, 280),
+      resume: decodeHtml(stripHtml(getText('description')).slice(0, 280)),
     };
   }).filter(a => a.titre && a.url);
 }
@@ -3090,8 +3072,45 @@ function extractSourceUrl(item) {
   return item.link || '';
 }
 
+// ── CORS PROXY WITH FALLBACK ─────────────────────────────────────────────────
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+];
+
+async function fetchWithProxy(url, timeoutMs = 7000) {
+  let lastErr;
+  for (const makeProxy of CORS_PROXIES) {
+    try {
+      const proxyUrl = makeProxy(url);
+      const res = await Promise.race([
+        fetch(proxyUrl),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), timeoutMs))
+      ]);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      // allorigins wraps in JSON: { contents: "..." }
+      if (text.startsWith('{') && text.includes('"contents"')) {
+        return JSON.parse(text).contents || '';
+      }
+      return text;
+    } catch(e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('Tous les proxys ont échoué');
+}
+
 function extractDomain(url) {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return '—'; }
+}
+
+function decodeHtml(str) {
+  if (!str) return '';
+  const ta = document.createElement('textarea');
+  ta.innerHTML = str;
+  return ta.value;
 }
 
 function formatRssDate(dateStr) {
@@ -3279,14 +3298,8 @@ function renderVeilleNews(articles, filiereLabel) {
     let image = null, desc = a.resume || '';
 
     try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(a.url)}`;
-      const res = await Promise.race([
-        fetch(proxyUrl),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
-      ]);
-      if (res.ok) {
-        const data = await res.json();
-        const html = data.contents || '';
+      const html = await fetchWithProxy(a.url, 6000).catch(() => '');
+      if (html) {
         const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
                    || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
         if (ogImg) image = ogImg[1].trim();
