@@ -2930,10 +2930,10 @@ function renderUserNews() {
           <div class="user-news-card-body">
             <div class="user-news-card-source">
               <img src="${escHtml(n.favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
-              ${escHtml(n.source)}
+              ${safeText(n.source)}
             </div>
-            <div class="user-news-card-title">${escHtml(n.titre)}</div>
-            ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
+            <div class="user-news-card-title">${safeText(n.titre)}</div>
+            ${n.desc ? `<div class="user-news-card-desc">${safeText(n.desc)}</div>` : ''}
             <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
           </div>
         </div>`;
@@ -3111,6 +3111,16 @@ function decodeHtml(str) {
   const ta = document.createElement('textarea');
   ta.innerHTML = str;
   return ta.value;
+}
+
+// Safe text for innerHTML: decode HTML entities then re-escape only dangerous chars
+function safeText(str) {
+  const decoded = decodeHtml(str);
+  // Only escape the chars that break HTML structure, not accented chars
+  return decoded
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 function formatRssDate(dateStr) {
@@ -3325,9 +3335,9 @@ function renderVeilleNews(articles, filiereLabel) {
       <div class="user-news-card-body">
         <div class="user-news-card-source">
           <img src="${escHtml(favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
-          ${escHtml(a.source)}
+          ${safeText(a.source)}
         </div>
-        <div class="user-news-card-title">${escHtml(a.titre)}</div>
+        <div class="user-news-card-title">${safeText(a.titre)}</div>
         ${desc ? `<div class="user-news-card-desc">${escHtml(desc)}</div>` : ''}
         <div class="user-news-card-domain">${escHtml(a.date)} · ${escHtml(domain)}</div>
       </div>`;
