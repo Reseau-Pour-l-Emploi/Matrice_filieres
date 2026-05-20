@@ -967,8 +967,18 @@
       .chart-area { padding: 10px 12px 90px !important; }
 
       /* Matrice chart */
-      .chart-main-row { flex-direction: column !important; height: auto !important; }
-      #chart-card-3 { height: 75vw !important; min-height: 280px; }
+      .chart-main-row {
+        flex-direction: column !important;
+        height: auto !important;
+        display: block !important;
+      }
+      #chart-card-3 {
+        height: 75vw !important;
+        min-height: 280px !important;
+        width: 100% !important;
+        display: block !important;
+        position: relative !important;
+      }
 
       /* Carte */
       .map-row { flex-direction: column !important; height: auto !important; }
@@ -2010,8 +2020,10 @@ let chart3 = {};
 
 function initChart3() {
   const card = document.getElementById('chart-card-3');
-  const W = card.clientWidth  || 800;
-  const H = card.clientHeight || Math.max(400, window.innerHeight - 300);
+  const isMobile = window.innerWidth <= 768;
+  const W = card.clientWidth  || card.offsetWidth  || window.innerWidth - 24 || 800;
+  const H = card.clientHeight || card.offsetHeight ||
+    (isMobile ? Math.round(window.innerWidth * 0.75) : Math.max(400, window.innerHeight - 300));
 
   const svg = d3.select('#chart-svg-3');
   svg.selectAll('*').remove();
@@ -3252,7 +3264,13 @@ function updateRanking() {
 
   state3.selectedCodes = new Set(RAW.map(d => d.code));
   buildSidebar3();
-  initChart3();
+
+  // On mobile, delay chart init to let CSS layout paint first
+  if (window.innerWidth <= 768) {
+    setTimeout(initChart3, 300);
+  } else {
+    initChart3();
+  }
 
   // Init mobile FAB visibility
   if (window.innerWidth <= 768) {
