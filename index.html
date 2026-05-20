@@ -2165,58 +2165,66 @@ function redrawChart3(useTransition = false) {
   const [xDomMin, xDomMax] = xScale.domain();
 
   if (xDomMin <= 0.40 && xDomMax >= 0.70) {
-    const xLeft = Math.max(0, x40);
+    const xLeft  = Math.max(0, x40);
     const xRight = Math.min(iW, x70);
+    const rectW  = xRight - xLeft;
+    const rectY  = -RECT_H - 4;
+    const midX   = (xLeft + xRight) / 2;
+    const midY   = rectY + RECT_H / 2 + 4; // vertical center of rect
 
-    // Filled rectangle above chart area
+    // Filled rectangle
     bg.append('rect')
-      .attr('x', xLeft)
-      .attr('y', -RECT_H - 4)
-      .attr('width', xRight - xLeft)
-      .attr('height', RECT_H)
-      .attr('fill', '#bfdbfe')
-      .attr('rx', 4)
+      .attr('x', xLeft).attr('y', rectY)
+      .attr('width', rectW).attr('height', RECT_H)
+      .attr('fill', '#bfdbfe').attr('rx', 4)
       .attr('pointer-events', 'none');
 
+    // 40% and 70% — centered vertically on rectangle, outside horizontally
+    [{ val: '40%', x: xLeft - 2, anchor: 'end' },
+     { val: '70%', x: xRight + 2, anchor: 'start' }].forEach(({ val, x, anchor }) => {
+      bg.append('text')
+        .attr('x', x).attr('y', midY)
+        .attr('text-anchor', anchor)
+        .attr('dominant-baseline', 'middle')
+        .attr('font-size', '11').attr('font-weight', '700')
+        .attr('fill', TENSION_COLOR).attr('pointer-events', 'none')
+        .text(val);
+    });
 
+    // Title inside rectangle: 2 lines if space, emoji only if too narrow
+    const TITLE_PARTS = ['🎯 Filières à prioriser', 'pour les prospections - fidélisations'];
+    const TITLE_SHORT = '🎯';
+    // Approx char width at font-size 11 ≈ 6px
+    const fits2Lines  = rectW > TITLE_PARTS[1].length * 6.2;
+    const fits1Line   = rectW > (TITLE_PARTS[0] + ' ' + TITLE_PARTS[1]).length * 6.2;
+    const FONT = 11;
 
-    // 40% label outside rectangle, below left edge
-    bg.append('text')
-      .attr('x', xLeft)
-      .attr('y', 4)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', '10')
-      .attr('font-weight', '700')
-      .attr('fill', TENSION_COLOR)
-      .attr('pointer-events', 'none')
-      .text('40%');
-
-    // 70% label outside rectangle, below right edge
-    bg.append('text')
-      .attr('x', xRight)
-      .attr('y', 4)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', '10')
-      .attr('font-weight', '700')
-      .attr('fill', TENSION_COLOR)
-      .attr('pointer-events', 'none')
-      .text('70%');
-
-    // Title centered inside rectangle — forced to fit with textLength
-    const titleText = '🎯 Filières à prioriser pour les prospections - fidélisations';
-    const availWidth = xRight - xLeft - 80;
-    const titleFontSize = Math.max(9, Math.min(12, availWidth / titleText.length * 1.6));
-    bg.append('text')
-      .attr('x', (xLeft + xRight) / 2)
-      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', titleFontSize.toFixed(1))
-      .attr('font-weight', '700')
-      .attr('fill', TENSION_COLOR)
-      .attr('textLength', Math.max(availWidth * 0.9, 10))
-      .attr('lengthAdjust', 'spacingAndGlyphs')
-      .attr('pointer-events', 'none')
-      .text(titleText);
+    if (fits2Lines) {
+      // Two lines centered
+      TITLE_PARTS.forEach((line, i) => {
+        bg.append('text')
+          .attr('x', midX).attr('y', rectY + (i === 0 ? RECT_H * 0.38 : RECT_H * 0.72))
+          .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+          .attr('font-size', FONT).attr('font-weight', '700')
+          .attr('fill', TENSION_COLOR).attr('pointer-events', 'none')
+          .text(line);
+      });
+    } else if (fits1Line) {
+      // One line
+      bg.append('text')
+        .attr('x', midX).attr('y', midY)
+        .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+        .attr('font-size', FONT).attr('font-weight', '700')
+        .attr('fill', TENSION_COLOR).attr('pointer-events', 'none')
+        .text(TITLE_PARTS[0] + ' ' + TITLE_PARTS[1]);
+    } else {
+      // Emoji only
+      bg.append('text')
+        .attr('x', midX).attr('y', midY)
+        .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+        .attr('font-size', '18').attr('pointer-events', 'none')
+        .text(TITLE_SHORT);
+    }
   }
 
   const ZONE_DEFS = [
