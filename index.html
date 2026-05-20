@@ -2162,16 +2162,7 @@ function redrawChart3(useTransition = false) {
       .attr('rx', 4)
       .attr('pointer-events', 'none');
 
-    // Solid vertical lines at 40% and 70% (no dash)
-    [xLeft, xRight].forEach(x => {
-      bg.append('line')
-        .attr('x1', x).attr('x2', x)
-        .attr('y1', -RECT_H - 4).attr('y2', iH)
-        .attr('stroke', TENSION_COLOR)
-        .attr('stroke-width', 1.5)
-        .attr('opacity', 0.5)
-        .attr('pointer-events', 'none');
-    });
+
 
     // 40% label at left edge inside rectangle
     bg.append('text')
@@ -2750,7 +2741,7 @@ let _geminiKey = _cfg.geminiKey || '';
 const GEMINI_MODELS = [
   'gemini-2.0-flash-lite',
   'gemini-2.0-flash',
-  'gemini-1.5-flash-8b',
+  'gemini-2.5-flash-preview-05-20',
 ];
 
 async function generateChapo(articles, filiereLabel) {
@@ -2789,13 +2780,19 @@ Chapô :`;
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${_geminiKey}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }
       );
-      if (res.status === 429) continue; // quota exceeded → try next model
+      if (res.status === 429) {
+        await new Promise(r => setTimeout(r, 2000)); // wait 2s before next model
+        continue;
+      }
+      if (res.status === 404) continue; // model not available, try next
       if (!res.ok) throw new Error(`Gemini ${res.status}`);
       const data = await res.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       if (text) { textEl.textContent = text.trim(); spinnerEl.style.display = 'none'; return; }
     } catch (e) {
-      if (!e.message.includes('429')) { textEl.textContent = `⚠️ ${e.message}`; textEl.style.color = '#b45309'; break; }
+      if (!e.message.includes('429') && !e.message.includes('404')) {
+        textEl.textContent = `⚠️ ${e.message}`; textEl.style.color = '#b45309'; break;
+      }
     }
   }
 
