@@ -1526,7 +1526,7 @@
         <span id="veille-keywords-list"></span>
       </div>
 
-      <div id="gist-status" style="font-size:11px;margin-top:14px;color:var(--ft-muted);min-height:16px;cursor:pointer;text-decoration:underline dotted" onclick="showAllUserNews()" title="Cliquer pour voir toutes les news"></div>
+      <div id="gist-status" style="font-size:11px;margin-top:14px;min-height:16px" onclick="if(this.style.cursor==='pointer')showAllUserNews()" title="Cliquer pour voir toutes les news"></div>
     </aside>
 
     <!-- Main content -->
@@ -2055,6 +2055,7 @@ function filteredData3() {
 // ── CHART 3 ───────────────────────────────────────────────────────────────────
 const R_MIN = 5, R_MAX = 35;
 let chart3 = {};
+let chart3svg = null; // module-level reference for redrawChart3
 
 function initChart3() {
   const card = document.getElementById('chart-card-3');
@@ -2064,6 +2065,7 @@ function initChart3() {
     (isMobile ? Math.round(window.innerWidth * 0.75) : Math.max(400, window.innerHeight - 300));
 
   const svg = d3.select('#chart-svg-3');
+  chart3svg = svg;
   svg.selectAll('*').remove();
 
   const m = { top:56, right:30, bottom:56, left:66 };
@@ -2200,9 +2202,9 @@ function redrawChart3(useTransition = false) {
       .attr('pointer-events', 'none')
       .text('70%');
 
-    // Title centered inside rectangle — font size adaptive to available width
+    // Title centered inside rectangle — forced to fit with textLength
     const titleText = '🎯 Filières à prioriser pour les prospections - fidélisations';
-    const availWidth = xRight - xLeft - 80; // subtract 40% and 70% label space
+    const availWidth = xRight - xLeft - 80;
     const titleFontSize = Math.max(9, Math.min(12, availWidth / titleText.length * 1.6));
     bg.append('text')
       .attr('x', (xLeft + xRight) / 2)
@@ -2211,6 +2213,8 @@ function redrawChart3(useTransition = false) {
       .attr('font-size', titleFontSize.toFixed(1))
       .attr('font-weight', '700')
       .attr('fill', TENSION_COLOR)
+      .attr('textLength', Math.max(availWidth * 0.9, 10))
+      .attr('lengthAdjust', 'spacingAndGlyphs')
       .attr('pointer-events', 'none')
       .text(titleText);
   }
@@ -2235,35 +2239,25 @@ function redrawChart3(useTransition = false) {
     Math.floor(Math.min(quadrantW / 14, quadrantH / 5))
   ));
 
-  // Define clip regions for each quadrant
-  const quadClips = [
-    { id:'qclip0', x:0,     y:0,     w:gxPx,    h:gyPx },
-    { id:'qclip1', x:gxPx,  y:0,     w:iW-gxPx, h:gyPx },
-    { id:'qclip2', x:0,     y:gyPx,  w:gxPx,    h:iH-gyPx },
-    { id:'qclip3', x:gxPx,  y:gyPx,  w:iW-gxPx, h:iH-gyPx },
-  ];
-
-  // Add clip paths (remove old ones first)
-  svg.select('defs').selectAll('[id^=qclip]').remove();
-  quadClips.forEach(c => {
-    svg.select('defs').append('clipPath').attr('id', c.id)
-      .append('rect').attr('x', c.x + g.attr('transform').match(/translate\((\d+)/)?.[1] || 0)
-      .attr('y', c.y + (g.attr('transform').match(/,(\d+)/)?.[1] || 0))
-      .attr('width', c.w - 8).attr('height', c.h - 8);
-  });
+  // Zone labels: clipped by existing clip3, font size adaptive to quadrant size
+  zg.attr('clip-path', 'url(#clip3)');
 
   ZONE_DEFS.forEach((zone, qi) => {
+    const qW = qi % 2 === 0 ? gxPx : iW - gxPx;
+    const qH = qi < 2 ? gyPx : iH - gyPx;
+    if (qW < 60 || qH < 40) return;
+    const fontSize = Math.max(9, Math.min(15, Math.floor(Math.min(qW / 13, qH / (zone.lines.length * 1.8)))));
     const n = zone.lines.length;
     const t = zg.append('text')
       .attr('text-anchor','middle')
       .attr('x', zone.x).attr('y', zone.y)
       .attr('fill', zone.color)
       .attr('opacity', 0.28)
-      .attr('font-size', zoneFontSize)
+      .attr('font-size', fontSize)
       .attr('font-family',"'DM Sans',sans-serif")
       .attr('font-weight','700')
       .attr('pointer-events','none');
-    zone.lines.forEach((line,i) => {
+    zone.lines.forEach((line, i) => {
       t.append('tspan')
         .attr('x', zone.x)
         .attr('dy', i===0 ? `${-(n-1)*0.65}em` : '1.3em')
@@ -2755,9 +2749,10 @@ function initVeilleTab() {
     sel.appendChild(opt);
   });
   sel.addEventListener('change', () => {
-    document.getElementById('veille-search-btn').disabled = !sel.value;
+    const hasValue = !!sel.value;
+    document.getElementById('veille-search-btn').disabled = !hasValue;
     renderUserNews();
-    if (sel.value) fetchVeilleNews();
+    if (hasValue) fetchVeilleNews();
   });
 }
 
@@ -2780,7 +2775,12 @@ let _geminiKey = _cfg.geminiKey || '';
 
 function setGistStatus(msg, color) {
   const el = document.getElementById('gist-status');
-  if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--ft-muted)';
+  const hasNews = msg && msg.includes('news partagée');
+  el.style.cursor = hasNews ? 'pointer' : 'default';
+  el.style.textDecoration = hasNews ? 'underline dotted' : 'none';
 }
 
 async function loadUserNews() {
@@ -2914,7 +2914,12 @@ function getUserNewsForFiliere(code) {
 
 function setGistStatus(msg, color) {
   const el = document.getElementById('gist-status');
-  if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--ft-muted)';
+  const hasNews = msg && msg.includes('news partagée');
+  el.style.cursor = hasNews ? 'pointer' : 'default';
+  el.style.textDecoration = hasNews ? 'underline dotted' : 'none';
 }
 
 
@@ -3059,12 +3064,15 @@ function showAllUserNews() {
   if (!document.getElementById('tab-veille').classList.contains('active')) {
     switchTab('veille');
   }
-  // Reset filière select
+  // Reset filière select WITHOUT triggering change event
   const sel = document.getElementById('veille-filiere-select');
   if (sel) sel.value = '';
   document.getElementById('veille-search-btn').disabled = true;
 
-  // Show all news from all filières
+  // Hide keywords block
+  document.getElementById('veille-keywords').style.display = 'none';
+
+  // Show all news from all filières — only update user-news section, leave net news intact
   const allNews = Object.entries(userNewsDB).flatMap(([code, list]) =>
     list.map(n => ({ ...n, _filiere: ALL_FILIERES[code] || code }))
   );
