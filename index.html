@@ -2807,7 +2807,7 @@ async function saveUserNews() {
 
 async function addUserNews() {
   const filiereCode = getCurrentVeilleFiliere();
-  if (!filiereCode) { showUserNewsStatus('⚠️ Sélectionnez d'abord une filière.', 'error'); return; }
+  if (!filiereCode) { showUserNewsStatus('⚠️ Sélectionnez d\u2019abord une filière.', 'error'); return; }
 
   const input = document.getElementById('user-news-input');
   const btn   = document.getElementById('user-news-add-btn');
