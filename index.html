@@ -2052,7 +2052,7 @@ function initChart3() {
   const svg = d3.select('#chart-svg-3');
   svg.selectAll('*').remove();
 
-  const m = { top:52, right:30, bottom:56, left:66 };
+  const m = { top:56, right:30, bottom:56, left:66 };
   const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
   svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
   const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
@@ -2136,79 +2136,56 @@ function redrawChart3(useTransition = false) {
   const gxPx = xScale(gxVal3), gyPx = yScale(gyVal3);
 
   // ── Tension threshold lines at 40% and 70% ─────────────────────────────────
-  const TENSION_THRESHOLDS = [0.40, 0.70];
-  const TENSION_COLOR = '#1d4ed8'; // bleu
-  const tlg = g.select('.tension-lines');
-  tlg.selectAll('line').data(TENSION_THRESHOLDS)
-    .join('line')
-    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
-    .attr('y1', 0).attr('y2', iH)
-    .attr('stroke', TENSION_COLOR)
-    .attr('stroke-width', 1.5)
-    .attr('stroke-dasharray', '5,3')
-    .attr('opacity', 0.7)
-    .attr('pointer-events', 'none');
+  const TENSION_COLOR = '#1d4ed8';
 
-  // ── Brace + label above chart ───────────────────────────────────────────────
+  // ── Header rectangle above chart, aligned to x-scale ─────────────────────
   const bg = g.select('.tension-brace');
   bg.selectAll('*').remove();
+  g.select('.tension-lines').selectAll('*').remove();
 
   const x40  = xScale(0.40);
   const x70  = xScale(0.70);
-  const braceY = -16;  // distance below top of chart area (negative = above)
-  const braceH = 7;
-  const midX   = (x40 + x70) / 2;
-
-  // Only draw if both thresholds are in visible range
+  const RECT_H = 36;
   const [xDomMin, xDomMax] = xScale.domain();
+
   if (xDomMin <= 0.40 && xDomMax >= 0.70) {
+    const xLeft = Math.max(0, x40);
+    const xRight = Math.min(iW, x70);
 
-    // Blue highlight fill for the priority zone
+    // Filled rectangle above chart area
     bg.append('rect')
-      .attr('x', x40)
-      .attr('y', 0)
-      .attr('width', x70 - x40)
-      .attr('height', iH)
-      .attr('fill', '#eff6ff')
-      .attr('opacity', 0.55)
-      .attr('clip-path', 'url(#clip3)')
+      .attr('x', xLeft)
+      .attr('y', -RECT_H - 4)
+      .attr('width', xRight - xLeft)
+      .attr('height', RECT_H)
+      .attr('fill', '#bfdbfe')
+      .attr('rx', 4)
       .attr('pointer-events', 'none');
 
-    // Brace path
-    const bracePath = `M${x40},${braceY + braceH} L${x40},${braceY} L${midX},${braceY} L${midX},${braceY - braceH} M${midX},${braceY} L${x70},${braceY} L${x70},${braceY + braceH}`;
-    bg.append('path')
-      .attr('d', bracePath)
-      .attr('fill', 'none')
-      .attr('stroke', TENSION_COLOR)
-      .attr('stroke-width', 1.5)
-      .attr('pointer-events', 'none');
-
-    // Label above brace (two lines to fit)
-    const labelLines = ['Filières à prioriser pour les', 'prospections - fidélisations'];
-    labelLines.forEach((line, i) => {
-      bg.append('text')
-        .attr('x', midX)
-        .attr('y', braceY - braceH - 4 - (labelLines.length - 1 - i) * 13)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '10')
-        .attr('font-weight', '700')
-        .attr('fill', TENSION_COLOR)
-        .attr('pointer-events', 'none')
-        .text(line);
+    // Dashed vertical lines at 40% and 70% extending into chart
+    [xLeft, xRight].forEach(x => {
+      bg.append('line')
+        .attr('x1', x).attr('x2', x)
+        .attr('y1', -RECT_H - 4).attr('y2', iH)
+        .attr('stroke', TENSION_COLOR)
+        .attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '5,3')
+        .attr('opacity', 0.6)
+        .attr('pointer-events', 'none');
     });
 
-    // % labels at base of brace
-    [{ v: 0.40, x: x40 }, { v: 0.70, x: x70 }].forEach(({ v, x }) => {
-      bg.append('text')
-        .attr('x', x)
-        .attr('y', braceY + braceH + 12)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '9')
-        .attr('fill', TENSION_COLOR)
-        .attr('pointer-events', 'none')
-        .text(`${Math.round(v * 100)}%`);
-    });
+    // Label centered inside rectangle
+    bg.append('text')
+      .attr('x', (xLeft + xRight) / 2)
+      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '12')
+      .attr('font-weight', '700')
+      .attr('fill', TENSION_COLOR)
+      .attr('pointer-events', 'none')
+      .text('Filières à prioriser pour les prospections - fidélisations');
   }
+
   const ZONE_DEFS = [
     { x: gxPx / 2,       y: gyPx / 2,       color:'#16a34a',
       lines:['A consolider,','maintenir un partenariat efficace'] },
@@ -2750,9 +2727,9 @@ let _geminiKey = _cfg.geminiKey || '';
 
 // ── GEMINI SYNTHESIS ─────────────────────────────────────────────────────────
 const GEMINI_MODELS = [
-  'gemini-1.5-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-2.0-flash',
   'gemini-1.5-flash-8b',
-  'gemini-1.0-pro',
 ];
 
 async function generateChapo(articles, filiereLabel) {
@@ -3181,7 +3158,8 @@ const CORS_PROXIES = [
 
 // RSS2JSON: dedicated service for RSS → JSON, handles CORS, works from github.io
 async function fetchRssViaRss2Json(rssUrl, maxItems = 10) {
-  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${maxItems}&order_by=pubDate`;
+  const count  = Math.min(maxItems, 10); // rss2json free tier: max 10 per request
+  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${count}`;
   const res = await Promise.race([
     fetch(apiUrl),
     new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
@@ -3467,7 +3445,9 @@ function renderVeilleNews(articles, filiereLabel) {
     let image = null, desc = a.resume || '';
 
     try {
-      const html = await fetchWithProxy(a.url, 6000).catch(() => '');
+      // Skip OG fetch for Google News encoded article URLs (always blocked by proxies)
+      const isGoogleNewsUrl = a.url.includes('news.google.com');
+      const html = isGoogleNewsUrl ? '' : await fetchWithProxy(a.url, 6000).catch(() => '');
       if (html) {
         const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
                    || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
