@@ -2749,8 +2749,14 @@ let _gistId    = _cfg.gistId    || GIST_ID_DEFAULT;
 let _geminiKey = _cfg.geminiKey || '';
 
 // ── GEMINI SYNTHESIS ─────────────────────────────────────────────────────────
+const GEMINI_MODELS = [
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b',
+  'gemini-1.0-pro',
+];
+
 async function generateChapo(articles, filiereLabel) {
-  if (!_geminiKey) return; // No key configured
+  if (!_geminiKey) return;
   const chapoEl   = document.getElementById('veille-chapo');
   const textEl    = document.getElementById('veille-chapo-text');
   const spinnerEl = document.getElementById('veille-chapo-spinner');
@@ -2758,15 +2764,15 @@ async function generateChapo(articles, filiereLabel) {
   chapoEl.style.display   = 'block';
   spinnerEl.style.display = 'inline';
   textEl.textContent      = '';
+  textEl.style.color      = '#1e3a8a';
 
-  // Build context from article titles and summaries
   const context = articles.slice(0, 12).map((a, i) =>
     `${i+1}. ${a.titre}${a.resume ? ' — ' + a.resume.slice(0, 120) : ''}`
   ).join('\n');
 
   const prompt = `Tu es un expert en marché du travail et emploi en France.
 Voici ${articles.length} actualités récentes sur la filière "${filiereLabel}".
-Rédige un chapô de synthèse en 3-4 phrases en français, factuel et professionnel, qui résume les grandes tendances de ces actualités (emploi, recrutement, innovations, réglementation, formation).
+Rédige un chapô de synthèse en 3-4 phrases en français, factuel et professionnel, qui résume les grandes tendances (emploi, recrutement, innovations, réglementation, formation).
 Ne cite pas les sources. Ne commence pas par "Dans cet article" ou "Voici".
 
 Actualités :
@@ -2774,28 +2780,32 @@ ${context}
 
 Chapô :`;
 
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${_geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 300 }
-        })
-      }
-    );
-    if (!res.ok) throw new Error(`Gemini API ${res.status}`);
-    const data  = await res.json();
-    const text  = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    textEl.textContent = text.trim();
-  } catch (e) {
-    textEl.textContent = `⚠️ Synthèse indisponible : ${e.message}`;
-    textEl.style.color = '#b45309';
-  } finally {
-    spinnerEl.style.display = 'none';
+  const body = JSON.stringify({
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.4, maxOutputTokens: 300 }
+  });
+
+  for (const model of GEMINI_MODELS) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${_geminiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }
+      );
+      if (res.status === 429) continue; // quota exceeded → try next model
+      if (!res.ok) throw new Error(`Gemini ${res.status}`);
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (text) { textEl.textContent = text.trim(); spinnerEl.style.display = 'none'; return; }
+    } catch (e) {
+      if (!e.message.includes('429')) { textEl.textContent = `⚠️ ${e.message}`; textEl.style.color = '#b45309'; break; }
+    }
   }
+
+  // All models quota-exceeded or failed
+  if (!textEl.textContent) {
+    chapoEl.style.display = 'none'; // Hide silently if all failed
+  }
+  spinnerEl.style.display = 'none';
 }
 
 // Current filière context
