@@ -1,0 +1,3366 @@
+<script data-goatcounter="https://denisft.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrice &amp; Carte filières – France Travail</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003189'/%3E%3Crect x='4' y='4' width='24' height='4' rx='2' fill='%2300bfb3'/%3E%3Ctext x='16' y='26' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='14' fill='%23ffffff'%3EFT%3C/text%3E%3C/svg%3E">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script>
+    // Filières et leaders – construits dynamiquement depuis les fichiers du repo
+    let ALL_FILIERES = {};
+    let LEADERS_FILIERES = {};
+  </script>
+  <style>
+    :root {
+      --ft-blue:    #003189;
+      --ft-blue-lt: #0e5bca;
+      --ft-teal:    #00bfb3;
+      --ft-bg:      #f4f6fb;
+      --ft-card:    #ffffff;
+      --ft-border:  #d1d9ee;
+      --ft-text:    #111827;
+      --ft-muted:   #6b7280;
+      --col-e3-bas:  #dc2626;
+      --col-e3-mid:  #f59e0b;
+      --col-e3-haut: #16a34a;
+      --shadow:     0 2px 12px rgba(0,49,137,.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--ft-bg);
+      color: var(--ft-text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--ft-blue);
+      color: #fff;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      height: 62px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo-badge {
+      background: var(--ft-teal);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .04em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    /* ── TAB NAVIGATION ── */
+    .tab-nav {
+      background: #fff;
+      border-bottom: 2px solid var(--ft-border);
+      display: flex;
+      padding: 0 20px;
+      gap: 0;
+      position: sticky;
+      top: 62px;
+      z-index: 90;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 22px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ft-muted);
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      margin-bottom: -2px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--ft-blue-lt); }
+    .tab-btn.active { color: var(--ft-blue); border-bottom-color: var(--ft-blue); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── MAIN LAYOUT ── */
+    .page {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 0;
+      height: calc(100vh - 62px - 44px);
+      transition: grid-template-columns .3s cubic-bezier(.4,0,.2,1);
+    }
+    .page.sidebar-collapsed {
+      grid-template-columns: 2vw 1fr;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--ft-card);
+      border-right: 1px solid var(--ft-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+    }
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 44px 0 0 0;
+      background: var(--ft-card);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .05s;
+      z-index: 20;
+    }
+    .page.sidebar-collapsed .sidebar::after { opacity: 1; }
+
+    /* ── BURGER BUTTON ── */
+    .burger-btn {
+      flex-shrink: 0;
+      position: relative; z-index: 30;
+      display: flex; align-items: center; justify-content: center;
+      height: 44px; min-height: 44px; width: 44px;
+      border: none; background: var(--ft-card);
+      cursor: pointer; border-bottom: 1px solid var(--ft-border);
+      transition: background .15s;
+    }
+      border-bottom: 1px solid var(--ft-border);
+      cursor: pointer; width: 100%;
+      transition: background .15s;
+    }
+    .burger-btn:hover { background: #eff6ff; }
+    .burger-btn .bar {
+      display: block; width: 18px; height: 2px;
+      background: var(--ft-blue); border-radius: 1px;
+      transition: transform .25s, opacity .25s, width .25s;
+    }
+    .burger-btn .bars { display: flex; flex-direction: column; gap: 4px; }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(2) { opacity: 0; width: 0; }
+    .page.sidebar-collapsed .burger-btn .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    /* ── SIDEBAR INNER ── */
+    .sidebar-inner {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 14px 14px;
+      display: flex; flex-direction: column; gap: 14px;
+      width: 100%;
+    }
+    .sidebar-inner::-webkit-scrollbar { width: 4px; }
+    .sidebar-inner::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 2px; }
+
+    /* ── CHART AREA ── */
+    .chart-area {
+      padding: 0 20px 16px 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      min-width: 0;
+    }
+    .chart-card {
+      flex: 1;
+      min-height: 0;
+    }
+    /* In Tab 1, chart-main-row fills remaining space */
+    #tab-matrix .chart-area { overflow: hidden; }
+    #tab-matrix .chart-main-row { flex: 1; min-height: 0; overflow: hidden; }
+    #tab-matrix .chart-card { flex: 1; min-height: 0; overflow: hidden; }
+    .filter-section {
+      padding-top: 14px;
+      border-top: 1px solid var(--ft-border);
+    }
+    .filter-section h2 {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ft-muted);
+      margin-bottom: 8px;
+    }
+
+    /* ── TERRITORY SELECTOR ── */
+    .territory-selector {
+      background: #eff6ff;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .territory-selector h2 {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ft-blue);
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .territory-selector select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ft-text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .territory-selector select:focus { border-color: var(--ft-blue); }
+    .territory-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--ft-blue);
+      font-weight: 600;
+      background: rgba(14,91,202,.08);
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── CHIPS (évolution) ── */
+    .tension-chips { display: flex; flex-direction: column; gap: 6px; }
+    .chip {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 500;
+      border: 1.5px solid; cursor: pointer;
+      transition: opacity .15s;
+      user-select: none;
+    }
+    .chip.inactive { opacity: .4; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── FILIÈRE LIST ── */
+    .search-box {
+      display: flex; align-items: center; gap: 7px;
+      border: 1px solid var(--ft-border);
+      border-radius: 7px; padding: 5px 9px;
+      background: #fff;
+    }
+    .search-box input {
+      border: none; outline: none; font-size: 12px; width: 100%;
+      font-family: inherit; background: transparent; color: var(--ft-text);
+    }
+    .filiere-actions {
+      display: flex; gap: 6px; margin-bottom: 8px;
+    }
+    .btn-sm {
+      flex: 1; padding: 4px 0; font-size: 11px; font-family: inherit;
+      font-weight: 600; cursor: pointer; border-radius: 5px;
+      border: 1px solid var(--ft-border); background: #fff;
+      color: var(--ft-blue); transition: background .15s;
+    }
+    .btn-sm:hover { background: #eff6ff; }
+    .filiere-list { display: flex; flex-direction: column; gap: 2px; }
+    .filiere-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 6px; border-radius: 6px;
+      transition: background .1s;
+    }
+    .filiere-item:hover { background: #f8f9ff; }
+    .filiere-item.hidden { display: none; }
+    .filiere-item input[type="checkbox"] { flex-shrink: 0; accent-color: var(--ft-blue); cursor: pointer; }
+    .filiere-label-btn {
+      flex: 1; background: none; border: none;
+      font-family: inherit; font-size: 12px; color: var(--ft-text);
+      text-align: left; cursor: default; padding: 0;
+      display: flex; align-items: center; gap: 4px; min-width: 0;
+    }
+    .filiere-label-btn[title] { cursor: pointer; color: var(--ft-blue-lt); }
+    .filiere-label-btn[title]:hover { text-decoration: underline; }
+    .lbl-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filiere-info-icon { width: 12px; height: 12px; flex-shrink: 0; color: var(--ft-teal); }
+    .tension-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .count-badge {
+      background: var(--ft-blue); color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px; margin-left: 5px;
+    }
+
+    /* ── GRID INPUTS ── */
+    .grid-val-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .grid-val-row { display: flex; align-items: center; gap: 6px; }
+    .grid-val-lbl { font-size: 12px; width: 90px; flex-shrink: 0; }
+    .grid-val-eq { font-size: 13px; color: var(--ft-muted); }
+    .grid-val-inp {
+      width: 60px; padding: 4px 6px; border: 1px solid var(--ft-border);
+      border-radius: 5px; font-size: 12px; font-family: inherit; text-align: right;
+    }
+    .grid-val-unit { font-size: 12px; color: var(--ft-muted); }
+    .btn-bary {
+      width: 100%; padding: 6px 0; font-size: 12px; font-family: inherit;
+      font-weight: 600; cursor: pointer; border-radius: 7px;
+      border: 1px solid var(--ft-border); background: #fff; color: var(--ft-blue);
+      transition: background .15s;
+    }
+    .btn-bary:hover { background: #eff6ff; }
+
+    /* ── CHART HEADER ── */
+    .chart-header {
+      padding: 14px 0 2px 0;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-shrink: 0;
+    }
+    .chart-title { font-size: 15px; font-weight: 700; color: var(--ft-blue); margin-bottom: 3px; white-space: normal; }
+    .map-title-leader { font-weight: 500; color: var(--ft-teal); font-size: 13px; }
+    .chart-subtitle { font-size: 11px; color: var(--ft-muted); }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .size-legend {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--ft-muted);
+    }
+    .sl-item { display: flex; align-items: center; gap: 4px; }
+    .sl-circle { border-radius: 50%; background: #94a3b8; opacity: .5; flex-shrink: 0; }
+
+    /* ── SVG / CHART CARD ── */
+    .chart-card { position: relative; background: #fff; border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+    .chart-svg { display: block; width: 100%; }
+    .axis text { font-size: 11px; fill: var(--ft-muted); font-family: 'DM Sans',sans-serif; }
+    .axis-label { font-size: 12px; fill: var(--ft-muted); font-family: 'DM Sans',sans-serif; font-weight: 600; }
+    .grid-zone-line { stroke: var(--ft-blue); stroke-width: 1.5; stroke-dasharray: 5 3; opacity: 0.55; }
+    .zoom-rect { cursor: grab; }
+    .zoom-rect:active { cursor: grabbing; }
+
+    .zoom-reset-btn {
+      position: absolute; top: 8px; right: 8px;
+      display: none; align-items: center; gap: 5px;
+      background: #fff; border: 1px solid var(--ft-border);
+      border-radius: 6px; padding: 4px 9px;
+      font-size: 11px; font-family: inherit; font-weight: 600;
+      color: var(--ft-blue); cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: background .15s;
+    }
+    .zoom-reset-btn.visible { display: flex; }
+    .zoom-reset-btn:hover { background: #eff6ff; }
+    .zoom-hint {
+      position: absolute; bottom: 6px; right: 10px;
+      font-size: 10px; color: var(--ft-muted); opacity: .6;
+      pointer-events: none;
+    }
+    .empty-state {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: var(--ft-muted); font-size: 14px; font-weight: 500;
+    }
+    .empty-state svg { opacity: .3; }
+
+    /* ── TOOLTIP ── */
+    .tooltip {
+      position: fixed; z-index: 9999;
+      background: #fff; border: 1px solid var(--ft-border);
+      border-radius: 10px; padding: 11px 14px;
+      box-shadow: 0 4px 20px rgba(0,49,137,.13);
+      font-size: 12.5px; pointer-events: none;
+      opacity: 0; transition: opacity .1s;
+      max-width: 280px;
+    }
+    .tt-title { font-weight: 700; font-size: 13px; margin-bottom: 7px; color: var(--ft-blue); }
+    .tt-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px; }
+    .tt-row span:first-child { color: var(--ft-muted); }
+    .tt-val { font-weight: 600; }
+    .tt-rank { font-size: 11px; color: var(--ft-muted); margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--ft-border); }
+    .tt-rank strong { color: var(--ft-blue); }
+
+    /* ── NS PANEL ── */
+    .ns-panel {
+      background: #fffbeb; border: 1px solid #fcd34d;
+      border-radius: 10px; padding: 10px 14px; flex-shrink: 0;
+    }
+    .ns-panel.hidden { display: none; }
+    .ns-panel-header {
+      display: flex; align-items: center; gap: 7px;
+      cursor: pointer; user-select: none;
+    }
+    .ns-panel-header:hover .ns-panel-title { text-decoration: underline; }
+    .ns-panel-title { font-size: 12px; font-weight: 600; color: #92400e; flex: 1; }
+    .ns-chevron {
+      transition: transform .2s; color: #b45309; flex-shrink: 0;
+    }
+    .ns-panel.open .ns-chevron { transform: rotate(180deg); }
+    .ns-count {
+      background: #92400e; color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px;
+    }
+    .ns-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .ns-panel:not(.open) .ns-list { display: none; }
+    .ns-badge {
+      font-size: 11px; font-weight: 500;
+      background: #fef9c3; border: 1px solid #fde68a;
+      color: #78350f; padding: 2px 8px; border-radius: 12px;
+    }
+
+    /* ── INTERP BLOCK ── */
+    .interp-block {
+      background: #f0f4ff; border-left: 4px solid var(--ft-blue-lt);
+      border-radius: 0 8px 8px 0; padding: 11px 16px;
+      font-size: 12.5px; color: #1e3a6e; line-height: 1.6;
+      flex-shrink: 0;
+    }
+    .interp-block strong { font-weight: 700; }
+    .interp-label {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--ft-blue-lt); margin-bottom: 4px;
+    }
+    .side-legend-color,
+    .side-legend-size {
+      display: flex; flex-direction: column; gap: 5px;
+      margin-bottom: 4px;
+    }
+    .side-legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11.5px; color: #1e3a6e;
+    }
+    .side-divider {
+      border-top: 1px solid #c7d4f0;
+      margin: 14px 0;
+    }
+
+    /* ── LOADING OVERLAY ── */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(244,246,251,.92);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    .spinner {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 4px solid var(--ft-border);
+      border-top-color: var(--ft-blue);
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .load-msg { font-size: 14px; font-weight: 600; color: var(--ft-blue); }
+    .load-err {
+      background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px;
+      padding: 16px 20px; font-size: 13px; color: #7f1d1d;
+      max-width: 420px; text-align: center; line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    /* ── NAF MINI-TOOLTIP ── */
+    #naf-mini-tooltip {
+      position: fixed; z-index: 9999;
+      background: var(--ft-blue); color: #fff;
+      font-size: 11px; padding: 5px 10px; border-radius: 6px;
+      pointer-events: none; opacity: 0; transition: opacity .1s;
+      max-width: 220px;
+    }
+
+    /* ── NAF MODAL ── */
+    #naf-modal-overlay {
+      position: fixed; inset: 0; z-index: 9997;
+      background: rgba(0,0,0,.35);
+      display: none; align-items: center; justify-content: center;
+    }
+    #naf-modal-overlay.open { display: flex; }
+    #naf-modal {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.22);
+      width: 520px; max-width: 94vw; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .naf-modal-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--ft-border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .naf-modal-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #eff6ff; display: flex; align-items: center; justify-content: center;
+      color: var(--ft-blue); flex-shrink: 0;
+    }
+    .naf-modal-title h3 { font-size: 14px; font-weight: 700; color: var(--ft-blue); }
+    .naf-modal-title p { font-size: 12px; color: var(--ft-muted); margin-top: 2px; }
+    .naf-modal-close {
+      margin-left: auto; background: #f4f6fb; border: none;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 14px; cursor: pointer; color: var(--ft-muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s; flex-shrink: 0;
+    }
+    .naf-modal-close:hover { background: #e0e7ff; color: var(--ft-blue); }
+    .naf-modal-search {
+      padding: 10px 20px; border-bottom: 1px solid var(--ft-border);
+      display: flex; align-items: center; gap: 8px; background: #f9fafb;
+    }
+    .naf-search-icon { color: var(--ft-muted); flex-shrink: 0; }
+    .naf-modal-search input {
+      border: none; outline: none; font-size: 13px; font-family: inherit;
+      background: transparent; width: 100%; color: var(--ft-text);
+    }
+    .naf-modal-body { overflow-y: auto; padding: 12px 20px 16px; display: flex; flex-direction: column; gap: 5px; }
+    .naf-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 10px; border-radius: 6px; transition: background .1s;
+    }
+    .naf-row:hover { background: #f0f4ff; }
+    .naf-code { font-size: 12px; font-weight: 700; color: var(--ft-blue-lt); min-width: 48px; flex-shrink: 0; }
+    .naf-libelle { font-size: 12px; color: var(--ft-text); }
+    .naf-row.hidden { display: none; }
+
+    /* ════════════════════════════════════════════════
+       ── MAP TAB SPECIFIC STYLES ──
+    ════════════════════════════════════════════════ */
+
+    /* Filière selector for map */
+    .map-filiere-box {
+      background: #eff6ff;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .map-filiere-box h2 {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: var(--ft-blue); margin-bottom: 8px;
+    }
+    .map-filiere-box select {
+      width: 100%; padding: 8px 10px;
+      border: 1px solid var(--ft-blue-lt);
+      border-radius: 7px; font-size: 12px;
+      font-family: inherit; background: #fff;
+      color: var(--ft-text); outline: none; cursor: pointer;
+    }
+    .map-filiere-box select:focus { border-color: var(--ft-blue); }
+
+    /* Maille toggle */
+    .maille-toggle {
+      display: flex; border: 1px solid var(--ft-blue-lt); border-radius: 8px; overflow: hidden;
+    }
+    .maille-btn {
+      flex: 1; padding: 7px 0;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      border: none; cursor: pointer;
+      background: #fff; color: var(--ft-muted);
+      transition: background .15s, color .15s;
+    }
+    .maille-btn.active { background: var(--ft-blue); color: #fff; }
+
+    /* Indicator radios */
+    .indicator-list {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .indicator-list label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; cursor: pointer;
+      padding: 5px 8px; border-radius: 6px;
+      transition: background .1s;
+    }
+    .indicator-list label:hover { background: #f0f4ff; }
+    .indicator-list input[type="radio"] { accent-color: var(--ft-blue); cursor: pointer; }
+
+    /* Choropleth legend */
+    .choro-legend {
+      flex-shrink: 0;
+    }
+    .choro-legend-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--ft-muted); margin-bottom: 6px;
+    }
+    .choro-legend-bar {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .choro-legend-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .choro-legend-swatch {
+      width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
+    }
+    .choro-legend-range {
+      font-size: 10px; color: var(--ft-muted); white-space: nowrap;
+    }
+    .choro-missing-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 6px; font-size: 11px; color: var(--ft-muted);
+    }
+    .choro-missing-swatch {
+      width: 16px; height: 12px; border-radius: 3px;
+      background: #d1d5db; border: 1px solid #9ca3af; flex-shrink: 0;
+    }
+
+    /* ── SOURCES BUTTON ── */
+    .sources-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.30);
+      color: #fff; border-radius: 6px; padding: 5px 12px;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      margin-left: auto;
+    }
+    .sources-btn:hover { background: rgba(255,255,255,.22); }
+
+    /* ── SOURCES POPUP ── */
+    .sources-popup {
+      position: fixed; top: 68px; right: 18px; z-index: 500;
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 32px rgba(0,49,137,.18);
+      border: 1px solid var(--ft-border); width: 380px; max-width: 94vw;
+      animation: fadeInDown .18s ease;
+    }
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
+    .sources-popup.hidden { display: none; }
+    .sources-popup-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--ft-border);
+      font-size: 13px; color: var(--ft-blue);
+    }
+    .sources-popup-close {
+      background: none; border: none; cursor: pointer; color: var(--ft-muted);
+      font-size: 14px; padding: 2px 5px; border-radius: 4px; transition: background .15s;
+    }
+    .sources-popup-close:hover { background: #f0f4ff; color: var(--ft-blue); }
+    .sources-popup-body {
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+      font-size: 12px; line-height: 1.6; color: var(--ft-text);
+      max-height: 60vh; overflow-y: auto;
+    }
+    .sources-popup-body p { margin: 0; }
+    .sources-backdrop {
+      position: fixed; inset: 0; z-index: 499;
+    }
+    .sources-backdrop.hidden { display: none; }
+
+    /* ── INTERP BLOCK SIDE (Tab 1) ── */
+    .chart-main-row {
+      display: flex; gap: 12px; flex: 1; min-height: 0;
+    }
+    .interp-block-side {
+      width: 210px; flex-shrink: 0;
+      background: #f0f4ff; border-left: 4px solid var(--ft-blue-lt);
+      border-radius: 0 8px 8px 0; padding: 12px 14px;
+      font-size: 11.5px; color: #1e3a6e; line-height: 1.6;
+      overflow-y: auto; align-self: stretch;
+    }
+    .interp-block-side strong { font-weight: 700; }
+    .interp-label {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--ft-blue-lt); margin-bottom: 6px;
+    }
+
+    /* ── RANKING PANEL (Tab 2) ── */
+    .ranking-panel {
+      width: 230px; flex-shrink: 0;
+      background: #fff; border-radius: 12px; box-shadow: var(--shadow);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .ranking-panel-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--ft-border);
+      font-size: 10px; font-weight: 700; color: var(--ft-blue);
+      text-transform: uppercase; letter-spacing: .07em; flex-shrink: 0;
+    }
+    .ranking-panel-sub {
+      font-size: 10px; font-weight: 400; color: var(--ft-muted);
+      text-transform: none; letter-spacing: 0; margin-top: 2px;
+    }
+    #ranking-list { overflow-y: auto; flex: 1; }
+    .ranking-row {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 12px; border-bottom: 1px solid #f0f2f8;
+      font-size: 11px;
+    }
+    .ranking-row:last-child { border-bottom: none; }
+    .ranking-rank { color: var(--ft-muted); min-width: 16px; text-align: right; font-size: 10px; }
+    .ranking-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ranking-val { font-weight: 700; color: var(--ft-blue); white-space: nowrap; }
+    .ranking-empty { padding: 20px 14px; font-size: 11px; color: var(--ft-muted); text-align: center; }
+
+    /* ── MAP CONTAINER ROW ── */
+    .map-row { display: flex; gap: 12px; flex: 1; min-height: 0; }
+    #tab-carte .chart-area { overflow: hidden; }
+    #tab-carte .map-row { flex: 1; min-height: 0; }
+    #map-card { flex: 1; min-width: 0; position: relative; }
+
+    /* Map SVG styles */
+    .map-path {
+      stroke: #fff;
+      stroke-width: 0.5;
+      cursor: pointer;
+      transition: opacity .12s;
+    }
+    .map-path:hover { opacity: 0.75; stroke-width: 1.5; stroke: #1e3a8a; }
+    .map-path.no-data { fill: #d1d5db; stroke: #9ca3af; cursor: default; }
+    .map-path.no-data:hover { opacity: 1; stroke-width: 0.5; }
+
+    /* Map card fills full height */
+    #page-carte .chart-area { padding-top: 0; }
+    #map-card svg { width: 100%; height: 100%; display: block; }
+    /* ── VEILLE TAB ── */
+    #tab-veille { height: calc(100vh - 52px); display: none; flex-direction: column; }
+    #tab-veille.active { display: flex; }
+    .veille-layout { display: flex; gap: 0; flex: 1; min-height: 0; }
+    .veille-sidebar {
+      width: 260px; flex-shrink: 0; border-right: 1px solid var(--ft-border);
+      padding: 20px 16px; overflow-y: auto; background: var(--ft-bg);
+    }
+    .veille-sidebar h2 { font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ft-muted); margin-bottom: 10px; }
+    .veille-filiere-select {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--ft-border);
+      border-radius: 8px; font-size: 13px; color: var(--ft-text);
+      background: #fff; cursor: pointer; margin-bottom: 14px;
+    }
+    .veille-filiere-select:focus { outline: none; border-color: var(--ft-blue); }
+    .veille-search-btn {
+      width: 100%; padding: 9px 0; background: var(--ft-blue); color: #fff;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .15s;
+    }
+    .veille-search-btn:hover { background: #0026a8; }
+    .veille-search-btn:disabled { background: #93c5fd; cursor: default; }
+    .veille-keywords {
+      margin-top: 18px; padding: 10px 12px; background: #f0f9ff;
+      border: 1px solid #bae6fd; border-radius: 8px; font-size: 11px;
+      color: #075985; line-height: 1.6;
+    }
+    .veille-keywords strong { display: block; margin-bottom: 4px; color: var(--ft-blue); }
+    .veille-main { flex: 1; min-width: 0; overflow-y: auto; padding: 24px 28px; }
+    .veille-header { margin-bottom: 20px; }
+    .veille-header h1 { font-size: 18px; font-weight: 700; color: var(--ft-blue); }
+    .veille-header p { font-size: 12px; color: var(--ft-muted); margin-top: 3px; }
+    .veille-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .veille-empty { text-align: center; padding: 60px 20px; color: var(--ft-muted); }
+    .veille-empty svg { margin-bottom: 12px; opacity: .4; }
+    .veille-spinner {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 60px 20px; color: var(--ft-muted); font-size: 14px;
+    }
+    .veille-spinner-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--ft-blue);
+      animation: veilleBouce 1.2s ease-in-out infinite;
+    }
+    .veille-spinner-dot:nth-child(2) { animation-delay: .2s; }
+    .veille-spinner-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes veilleBouce { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+    .veille-error {
+      background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+      padding: 16px; color: #991b1b; font-size: 13px; margin-bottom: 20px;
+    }
+
+    /* ── USER NEWS SECTION ── */
+    .user-news-section {
+      margin-bottom: 28px;
+      border: 1.5px dashed var(--ft-border);
+      border-radius: 12px; padding: 18px 20px;
+      background: #f8faff;
+    }
+    .user-news-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+    }
+    .user-news-section-title {
+      font-size: 13px; font-weight: 700; color: var(--ft-blue);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .user-news-add-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .user-news-input {
+      flex: 1; padding: 8px 12px; border: 1px solid var(--ft-border);
+      border-radius: 8px; font-size: 12px; color: var(--ft-text);
+      background: #fff; min-width: 220px;
+    }
+    .user-news-input:focus { outline: none; border-color: var(--ft-blue); }
+    .user-news-input::placeholder { color: #9ca3af; }
+    .user-news-add-btn {
+      padding: 8px 14px; background: var(--ft-blue); color: #fff;
+      border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      transition: background .15s;
+    }
+    .user-news-add-btn:hover { background: #0026a8; }
+    .user-news-add-btn:disabled { background: #93c5fd; cursor: default; }
+    .user-news-empty-hint {
+      font-size: 12px; color: var(--ft-muted); text-align: center; padding: 8px 0;
+    }
+    .user-news-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+    }
+    .user-news-card {
+      background: #fff; border: 1px solid #bfdbfe; border-radius: 12px;
+      overflow: hidden; display: flex; flex-direction: column; position: relative;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .user-news-card:hover { box-shadow: 0 4px 18px rgba(0,49,137,.12); border-color: #93c5fd; }
+    .user-news-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .user-news-card-img-placeholder {
+      width: 100%; height: 110px; background: linear-gradient(135deg,#eff6ff,#dbeafe);
+      display: flex; align-items: center; justify-content: center; color: #bfdbfe;
+    }
+    .user-news-card-body { padding: 13px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+    .user-news-card-source {
+      font-size: 10px; font-weight: 700; color: var(--ft-teal);
+      text-transform: uppercase; letter-spacing:.06em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .user-news-card-title { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ft-text); }
+    .user-news-card-title a { color: inherit; text-decoration: none; }
+    .user-news-card-title a:hover { color: var(--ft-blue); text-decoration: underline; }
+    .user-news-card-desc { font-size: 11px; color: var(--ft-muted); line-height: 1.55; }
+    .user-news-card-domain { font-size: 10px; color: #9ca3af; margin-top: auto; padding-top: 6px; }
+    .user-news-delete-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(255,255,255,.88); border: none; cursor: pointer;
+      color: #9ca3af; padding: 4px; line-height: 1; border-radius: 6px;
+      transition: color .12s; backdrop-filter: blur(4px);
+    }
+    .user-news-delete-btn:hover { color: #ef4444; background: #fff; }
+    .user-news-card-skeleton {
+      background: #fff; border: 1px solid #bfdbfe; border-radius: 12px; overflow: hidden;
+      animation: skPulse 1.4s ease-in-out infinite;
+    }
+    .user-news-card-skeleton .sk-img { height: 110px; background: #dbeafe; }
+    .user-news-card-skeleton .sk-body { padding: 13px; display: flex; flex-direction: column; gap: 8px; }
+    .user-news-card-skeleton .sk-line { height: 9px; border-radius: 4px; background: #dbeafe; }
+    .user-news-card-skeleton .sk-line.w80 { width: 80%; }
+    .user-news-card-skeleton .sk-line.w60 { width: 60%; }
+    .user-news-card-skeleton .sk-line.w40 { width: 40%; }
+    @keyframes skPulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .user-news-loading {
+      font-size: 11px; color: var(--ft-muted); display: flex; align-items: center; gap: 5px;
+    }
+    .net-news-title {
+      font-size: 13px; font-weight: 700; color: var(--ft-blue);
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE MOBILE  (≤ 768px)
+    ══════════════════════════════════════════ */
+    /* ── Mobile-only elements hidden on desktop ── */
+    .sidebar-mobile-header { display: none; }
+    .mobile-fab { display: none !important; }
+
+    @media (max-width: 768px) {
+
+      /* Header */
+      header { padding: 0 12px; height: 50px; }
+      .header-title { font-size: 15px; }
+      .header-subtitle { display: none; }
+      .header-actions { gap: 6px; }
+      .header-actions .btn { padding: 5px 10px; font-size: 11px; }
+      .header-logo { width: 28px; height: 28px; }
+
+      /* Tab nav */
+      .tab-nav { padding: 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; top: 50px; }
+      .tab-btn { padding: 10px 14px; font-size: 12px; gap: 5px; white-space: nowrap; }
+      .tab-btn svg { width: 12px; height: 12px; }
+
+      /* Page: remove stacking context so position:fixed children escape to viewport */
+      .page {
+        display: block !important;
+        transition: none !important;
+        transform: none !important;
+        will-change: auto !important;
+      }
+
+      /* Sidebar: full-screen overlay drawer */
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100dvh !important;
+        width: 88vw !important;
+        max-width: 340px !important;
+        z-index: 300 !important;
+        transform: translateX(-110%) !important;
+        transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
+        box-shadow: 4px 0 24px rgba(0,0,0,.2) !important;
+        border-right: none !important;
+        overflow: hidden !important;
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+      .sidebar::after { display: none !important; }
+
+      /* Show close header */
+      .sidebar-mobile-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        height: 52px;
+        min-height: 52px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--ft-border);
+        background: var(--ft-bg);
+        box-sizing: border-box;
+      }
+      .sidebar-mobile-title { font-size: 13px; font-weight: 700; color: var(--ft-blue); }
+      .sidebar-mobile-close {
+        background: none; border: none; cursor: pointer; color: var(--ft-muted);
+        padding: 8px; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+      }
+
+      /* sidebar-inner: fixed height = drawer minus header, scrollable */
+      .sidebar-inner {
+        height: calc(100dvh - 52px) !important;
+        max-height: calc(100dvh - 52px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding: 12px 14px 40px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Backdrop */
+      .mobile-sidebar-backdrop {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,.4); z-index: 299;
+      }
+      .mobile-sidebar-backdrop.active { display: block; }
+
+      /* Desktop burger hidden, mobile FAB visible */
+      .desktop-burger { display: none !important; }
+      .mobile-fab {
+        display: flex !important;
+        position: fixed; bottom: 20px; left: 20px;
+        width: 54px; height: 54px; border-radius: 50%;
+        background: var(--ft-blue); color: #fff; border: none;
+        box-shadow: 0 4px 16px rgba(0,49,137,.35);
+        z-index: 250; cursor: pointer;
+        align-items: center; justify-content: center;
+      }
+      .mobile-fab[style*="display: none"] { display: none !important; }
+
+
+      /* Chart area */
+      .chart-area { padding: 10px 12px 90px !important; }
+
+      /* Matrice chart */
+      .chart-main-row { flex-direction: column !important; height: auto !important; }
+      #chart-card-3 { height: 75vw !important; min-height: 280px; }
+
+      /* Carte */
+      .map-row { flex-direction: column !important; height: auto !important; }
+      #map-card { height: 65vw !important; min-height: 260px; }
+      .ranking-panel { width: 100% !important; max-width: none !important; border-left: none !important; border-top: 1px solid var(--ft-border) !important; max-height: 260px; overflow-y: auto; }
+
+      /* Chart header */
+      .chart-header { flex-wrap: wrap; gap: 8px; padding: 8px 0; }
+      .chart-title { font-size: 13px; }
+      .interp-box { display: none; }
+
+      /* Tooltip */
+      .tooltip {
+        position: fixed !important;
+        left: 8px !important; right: 8px !important;
+        bottom: 80px !important; top: auto !important;
+        max-width: none !important; width: auto !important;
+        font-size: 11px !important;
+      }
+
+      /* NS panel */
+      .ns-panel { font-size: 11px; }
+      .filter-section h2 { font-size: 11px; }
+      .filiere-list { max-height: 200px; }
+      select { font-size: 14px; }
+      .chip { padding: 8px 10px; font-size: 12px; }
+
+      /* Veille */
+      #tab-veille { height: auto; }
+      .veille-layout { flex-direction: column; }
+      .veille-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--ft-border); padding: 14px 12px; }
+      .veille-main { padding: 14px 12px 90px; }
+      .veille-grid { grid-template-columns: 1fr; gap: 12px; }
+      .user-news-grid { grid-template-columns: 1fr; gap: 10px; }
+      .user-news-section { padding: 12px; }
+      .user-news-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .user-news-add-row { width: 100%; }
+      .user-news-input { min-width: 0; flex: 1; font-size: 16px; }
+
+      /* Popups */
+      #sources-popup { width: 92vw; left: 4vw !important; right: 4vw; }
+      #naf-modal { width: 95vw; max-height: 78vh; }
+
+      /* Legend */
+      .choro-legend-swatch { width: 18px; height: 18px; }
+      .choro-legend-range { font-size: 11px; }
+    }
+
+    @media (max-width: 400px) {
+      .tab-btn { padding: 10px 10px; font-size: 11px; }
+      .tab-btn svg { display: none; }
+      #chart-card-3 { height: 82vw !important; }
+      #map-card { height: 72vw !important; }
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner" id="spinner"></div>
+  <span class="load-msg" id="load-msg">Chargement des données…</span>
+</div>
+
+<header>
+  <div class="logo-badge">FT</div>
+  <h1>Filières – Quelle stratégie adopter ?</h1>
+  <button class="sources-btn" onclick="toggleSourcesPopup(event)" id="sources-btn" title="Afficher les sources">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Sources
+  </button>
+</header>
+
+<!-- ── SOURCES POPUP ── -->
+<div id="sources-popup" class="sources-popup hidden">
+  <div class="sources-popup-header">
+    <strong>Sources des données</strong>
+    <button onclick="closeSourcesPopup()" class="sources-popup-close">✕</button>
+  </div>
+  <div class="sources-popup-body">
+    <p><strong>DPAE</strong> : les déclarations préalables à l'embauche (DPAE) issues de l'Acoss et de la CCMSA. Pour éviter les contrats à la journée, un filtre ne conserve que les DPAE de plus d'un mois.</p>
+    <p>Le <strong>Poids relatif DPAE &gt; 1 mois</strong> correspond au nombre d'embauches dans la filière concernée rapporté au nombre d'embauches de l'ensemble des filières du territoire.</p>
+    <p>L'<strong>évolution de la DPAE</strong> est calculée entre les DPAE enregistrées en 2025 et celles de l'année précédente.</p>
+    <p><strong>Taux de recours</strong> : sur les 12 derniers mois, ratio du nombre d'établissements ayant fait appel aux services de France Travail (dépôt d'offres &gt; 30 jours, contrat aidé, promotion de profil suivie d'un recrutement, POEI) sur le nombre d'établissements ayant recruté ou ayant fait appel aux services de France Travail.</p>
+    <p><strong>Difficultés de recrutement</strong> : Part des projets d'embauche jugés difficiles par les employeurs de la filière (BMO 2026, affiché si a minima 40 embauches prévues).</p>
+  </div>
+</div>
+<div id="sources-backdrop" class="sources-backdrop hidden" onclick="closeSourcesPopup()"></div>
+
+<!-- ── TAB NAVIGATION ── -->
+<nav class="tab-nav">
+  <button class="tab-btn active" id="tab-btn-matrix" onclick="switchTab('matrix')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="16" r="3"/></svg>
+    Matrice filières
+  </button>
+  <button class="tab-btn" id="tab-btn-carte" onclick="switchTab('carte')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+    Carte par filière
+  </button>
+  <button class="tab-btn" id="tab-btn-veille" onclick="switchTab('veille')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Veille filières
+  </button>
+</nav>
+
+<!-- Mobile FAB buttons (outside sidebar, always visible) -->
+<button class="mobile-fab" id="mobile-fab-matrix" onclick="toggleSidebar('matrix')" title="Filtres" style="display:none">
+  <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<button class="mobile-fab" id="mobile-fab-carte" onclick="toggleSidebar('carte')" title="Filtres" style="display:none">
+  <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 : MATRICE
+══════════════════════════════════════════════ -->
+<div id="tab-matrix" class="tab-content active">
+<div class="page" id="page-matrix">
+
+  <aside class="sidebar" id="sidebar-matrix">
+    <div class="sidebar-mobile-header">
+        <span class="sidebar-mobile-title">🎛️ Filtres</span>
+        <button class="sidebar-mobile-close" onclick="toggleSidebar('matrix')" title="Fermer">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    <div class="sidebar-inner">
+      <div class="territory-selector">
+        <h2>📍 Territoire</h2>
+        <select id="territory-select" onchange="onTerritoryChange(this.value)">
+        <optgroup label="National">
+          <option value="00|National">🇫🇷 France entière</option>
+        </optgroup>
+        <optgroup label="Régions">
+          <option value="01|Régional">Guadeloupe</option>
+<option value="02|Régional">Martinique</option>
+<option value="03|Régional">Guyane</option>
+<option value="04|Régional">La Réunion</option>
+<option value="06|Régional">Mayotte</option>
+<option value="11|Régional">Île-de-France</option>
+<option value="24|Régional">Centre-Val de Loire</option>
+<option value="27|Régional">Bourgogne-Franche-Comté</option>
+<option value="28|Régional">Normandie</option>
+<option value="32|Régional">Hauts-de-France</option>
+<option value="44|Régional">Grand Est</option>
+<option value="52|Régional">Pays de la Loire</option>
+<option value="53|Régional">Bretagne</option>
+<option value="75|Régional">Nouvelle-Aquitaine</option>
+<option value="76|Régional">Occitanie</option>
+<option value="84|Régional">Auvergne-Rhône-Alpes</option>
+<option value="93|Régional">Provence-Alpes-Côte d'Azur</option>
+<option value="94|Régional">Corse</option>
+        </optgroup>
+        <optgroup label="Départements">
+          <option value="01|Départemental">01 – Ain</option>
+<option value="02|Départemental">02 – Aisne</option>
+<option value="03|Départemental">03 – Allier</option>
+<option value="04|Départemental">04 – Alpes-de-Haute-Provence</option>
+<option value="05|Départemental">05 – Hautes-Alpes</option>
+<option value="06|Départemental">06 – Alpes-Maritimes</option>
+<option value="07|Départemental">07 – Ardèche</option>
+<option value="08|Départemental">08 – Ardennes</option>
+<option value="09|Départemental">09 – Ariège</option>
+<option value="10|Départemental">10 – Aube</option>
+<option value="11|Départemental">11 – Aude</option>
+<option value="12|Départemental">12 – Aveyron</option>
+<option value="13|Départemental">13 – Bouches-du-Rhône</option>
+<option value="14|Départemental">14 – Calvados</option>
+<option value="15|Départemental">15 – Cantal</option>
+<option value="16|Départemental">16 – Charente</option>
+<option value="17|Départemental">17 – Charente-Maritime</option>
+<option value="18|Départemental">18 – Cher</option>
+<option value="19|Départemental">19 – Corrèze</option>
+<option value="21|Départemental">21 – Côte-d'Or</option>
+<option value="22|Départemental">22 – Côtes-d'Armor</option>
+<option value="23|Départemental">23 – Creuse</option>
+<option value="24|Départemental">24 – Dordogne</option>
+<option value="25|Départemental">25 – Doubs</option>
+<option value="26|Départemental">26 – Drôme</option>
+<option value="27|Départemental">27 – Eure</option>
+<option value="28|Départemental">28 – Eure-et-Loir</option>
+<option value="29|Départemental">29 – Finistère</option>
+<option value="2A|Départemental">2A – Corse-du-Sud</option>
+<option value="2B|Départemental">2B – Haute-Corse</option>
+<option value="30|Départemental">30 – Gard</option>
+<option value="31|Départemental">31 – Haute-Garonne</option>
+<option value="32|Départemental">32 – Gers</option>
+<option value="33|Départemental">33 – Gironde</option>
+<option value="34|Départemental">34 – Hérault</option>
+<option value="35|Départemental">35 – Ille-et-Vilaine</option>
+<option value="36|Départemental">36 – Indre</option>
+<option value="37|Départemental">37 – Indre-et-Loire</option>
+<option value="38|Départemental">38 – Isère</option>
+<option value="39|Départemental">39 – Jura</option>
+<option value="40|Départemental">40 – Landes</option>
+<option value="41|Départemental">41 – Loir-et-Cher</option>
+<option value="42|Départemental">42 – Loire</option>
+<option value="43|Départemental">43 – Haute-Loire</option>
+<option value="44|Départemental">44 – Loire-Atlantique</option>
+<option value="45|Départemental">45 – Loiret</option>
+<option value="46|Départemental">46 – Lot</option>
+<option value="47|Départemental">47 – Lot-et-Garonne</option>
+<option value="48|Départemental">48 – Lozère</option>
+<option value="49|Départemental">49 – Maine-et-Loire</option>
+<option value="50|Départemental">50 – Manche</option>
+<option value="51|Départemental">51 – Marne</option>
+<option value="52|Départemental">52 – Haute-Marne</option>
+<option value="53|Départemental">53 – Mayenne</option>
+<option value="54|Départemental">54 – Meurthe-et-Moselle</option>
+<option value="55|Départemental">55 – Meuse</option>
+<option value="56|Départemental">56 – Morbihan</option>
+<option value="57|Départemental">57 – Moselle</option>
+<option value="58|Départemental">58 – Nièvre</option>
+<option value="59|Départemental">59 – Nord</option>
+<option value="60|Départemental">60 – Oise</option>
+<option value="61|Départemental">61 – Orne</option>
+<option value="62|Départemental">62 – Pas-de-Calais</option>
+<option value="63|Départemental">63 – Puy-de-Dôme</option>
+<option value="64|Départemental">64 – Pyrénées-Atlantiques</option>
+<option value="65|Départemental">65 – Hautes-Pyrénées</option>
+<option value="66|Départemental">66 – Pyrénées-Orientales</option>
+<option value="67|Départemental">67 – Bas-Rhin</option>
+<option value="68|Départemental">68 – Haut-Rhin</option>
+<option value="69|Départemental">69 – Rhône</option>
+<option value="70|Départemental">70 – Haute-Saône</option>
+<option value="71|Départemental">71 – Saône-et-Loire</option>
+<option value="72|Départemental">72 – Sarthe</option>
+<option value="73|Départemental">73 – Savoie</option>
+<option value="74|Départemental">74 – Haute-Savoie</option>
+<option value="75|Départemental">75 – Paris</option>
+<option value="76|Départemental">76 – Seine-Maritime</option>
+<option value="77|Départemental">77 – Seine-et-Marne</option>
+<option value="78|Départemental">78 – Yvelines</option>
+<option value="79|Départemental">79 – Deux-Sèvres</option>
+<option value="80|Départemental">80 – Somme</option>
+<option value="81|Départemental">81 – Tarn</option>
+<option value="82|Départemental">82 – Tarn-et-Garonne</option>
+<option value="83|Départemental">83 – Var</option>
+<option value="84|Départemental">84 – Vaucluse</option>
+<option value="85|Départemental">85 – Vendée</option>
+<option value="86|Départemental">86 – Vienne</option>
+<option value="87|Départemental">87 – Haute-Vienne</option>
+<option value="88|Départemental">88 – Vosges</option>
+<option value="89|Départemental">89 – Yonne</option>
+<option value="90|Départemental">90 – Territoire de Belfort</option>
+<option value="91|Départemental">91 – Essonne</option>
+<option value="92|Départemental">92 – Hauts-de-Seine</option>
+<option value="93|Départemental">93 – Seine-Saint-Denis</option>
+<option value="94|Départemental">94 – Val-de-Marne</option>
+<option value="95|Départemental">95 – Val-d'Oise</option>
+<option value="971|Départemental">971 – Guadeloupe</option>
+<option value="972|Départemental">972 – Martinique</option>
+<option value="973|Départemental">973 – Guyane</option>
+<option value="974|Départemental">974 – La Réunion</option>
+<option value="976|Départemental">976 – Mayotte</option>
+        </optgroup>
+      </select>
+        <div class="territory-badge" id="territory-badge">🇫🇷 France entière</div>
+      </div><!-- /.territory-selector -->
+
+    <div class="filter-section">
+      <h2>Évolution DPAE &gt; 1 mois</h2>
+      <div class="tension-chips">
+        <div class="chip" data-e3="bas" onclick="toggleEvol3('bas')" style="color:var(--col-e3-bas);border-color:var(--col-e3-bas);background:#fef2f2">
+          <span class="dot" style="background:var(--col-e3-bas)"></span> Baisse (&lt; −1 %)
+        </div>
+        <div class="chip" data-e3="mid" onclick="toggleEvol3('mid')" style="color:#b45309;border-color:var(--col-e3-mid);background:#fffbeb">
+          <span class="dot" style="background:var(--col-e3-mid)"></span> Modérée (± 1 %)
+        </div>
+        <div class="chip" data-e3="haut" onclick="toggleEvol3('haut')" style="color:var(--col-e3-haut);border-color:var(--col-e3-haut);background:#f0fdf4">
+          <span class="dot" style="background:var(--col-e3-haut)"></span> Hausse (&gt; +1 %)
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h2>Lignes de grille</h2>
+      <div class="grid-val-rows">
+        <div class="grid-val-row">
+          <span class="grid-val-lbl">X (abscisses)</span>
+          <span class="grid-val-eq">=</span>
+          <input type="number" class="grid-val-inp" id="g3x" step="0.01" oninput="onManualGrid3('x')">
+          <span class="grid-val-unit">%</span>
+        </div>
+        <div class="grid-val-row">
+          <span class="grid-val-lbl">Y (ordonnées)</span>
+          <span class="grid-val-eq">=</span>
+          <input type="number" class="grid-val-inp" id="g3y" step="0.01" oninput="onManualGrid3('y')">
+          <span class="grid-val-unit">%</span>
+        </div>
+      </div>
+      <button class="btn-bary" onclick="resetToBarycenter3()">♻️ Position par défaut (barycentre)</button>
+    </div>
+
+    <div class="filter-section">
+      <h2>Filières <span class="count-badge" id="sel-count-3">0</span></h2>
+      <div class="search-box" style="margin-bottom:8px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="search-input-3" placeholder="Rechercher une filière…" oninput="filterSearch3(this.value)">
+      </div>
+      <div class="filiere-actions">
+        <button class="btn-sm" onclick="selectAll3()">Tout sélect.</button>
+        <button class="btn-sm" onclick="selectNone3()">Tout désélect.</button>
+      </div>
+      <div class="filiere-list" id="filiere-list-3"></div>
+    </div>
+
+    </div><!-- /.sidebar-inner -->
+  </aside>
+
+
+
+
+
+  <main class="chart-area">
+    <button class="burger-btn desktop-burger" id="burger-btn" onclick="toggleSidebar('matrix')" title="Masquer / afficher les filtres">
+      <div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </button>
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Difficultés de recrutement / Taux de recours</div>
+        <div class="chart-subtitle">Abscisse : Difficultés de recrutement · Ordonnée : Taux de recours</div>
+      </div>
+    </div>
+
+    <div class="ns-panel hidden" id="ns-panel">
+      <div class="ns-panel-header" onclick="toggleNsPanel()">
+        <svg width="16" height="16" fill="none" stroke="#b45309" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="ns-panel-title">Filières sans résultats significatifs sur ce territoire</span>
+        <span class="ns-count" id="ns-count">0</span>
+        <svg class="ns-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="ns-list" id="ns-list"></div>
+    </div>
+
+    <div class="chart-main-row">
+      <div class="chart-card" id="chart-card-3" style="flex:1;min-width:0;">
+        <svg class="chart-svg" id="chart-svg-3"></svg>
+        <button class="zoom-reset-btn" id="zoom-reset-3" onclick="resetZoom3()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser le zoom
+        </button>
+        <div class="zoom-hint">molette ou pincer · glisser pour déplacer</div>
+        <div class="empty-state" id="empty-state-3" style="display:none">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>
+          </svg>
+          <div>Aucune filière sélectionnée</div>
+        </div>
+      </div>
+      <div class="interp-block-side">
+
+        <div class="interp-label">🎨 Couleur — Évolution DPAE</div>
+        <div class="side-legend-color">
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-haut)"></div>
+            <span>Hausse (&gt; +1&nbsp;%)</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-mid)"></div>
+            <span>Modérée (± 1&nbsp;%)</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="legend-dot" style="background:var(--col-e3-bas)"></div>
+            <span>Baisse (&lt; −1&nbsp;%)</span>
+          </div>
+        </div>
+
+        <div class="interp-label" style="margin-top:14px">⚪ Taille — Nb DPAE &gt; 1 mois</div>
+        <div class="side-legend-size">
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:10px;height:10px;flex-shrink:0"></div>
+            <span>Petit volume</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:20px;height:20px;flex-shrink:0"></div>
+            <span>Volume moyen</span>
+          </div>
+          <div class="side-legend-item">
+            <div class="sl-circle" style="width:32px;height:32px;flex-shrink:0"></div>
+            <span>Grand volume</span>
+          </div>
+        </div>
+
+        <div class="side-divider"></div>
+
+        <div class="interp-label">💡 Exemple de lecture</div><br>
+        La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
+
+      </div>
+    </div>
+  </main>
+</div><!-- /.page#page-matrix -->
+</div><!-- /#tab-matrix -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 : CARTE PAR FILIÈRE
+══════════════════════════════════════════════ -->
+<div id="tab-carte" class="tab-content">
+<div class="page" id="page-carte">
+
+    <aside class="sidebar" id="sidebar-carte">
+    <div class="sidebar-mobile-header">
+        <span class="sidebar-mobile-title">🎛️ Filtres</span>
+        <button class="sidebar-mobile-close" onclick="toggleSidebar('carte')" title="Fermer">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    <div class="sidebar-inner">
+
+      <!-- Filière selector -->
+      <div class="map-filiere-box">
+        <h2>🏭 Filière</h2>
+        <select id="map-filiere-select" onchange="onMapChange()">
+          <!-- populated by JS -->
+        </select>
+      </div>
+
+      <!-- Maille toggle -->
+      <div class="filter-section">
+        <h2>🔲 Maille territoriale</h2>
+        <div class="maille-toggle">
+          <button class="maille-btn active" id="btn-reg" onclick="setMaille('Régional')">Régionale</button>
+          <button class="maille-btn" id="btn-dep" onclick="setMaille('Départemental')">Départementale</button>
+        </div>
+      </div>
+
+      <!-- Indicateur selector -->
+      <div class="filter-section">
+        <h2>📊 Indicateur</h2>
+        <div class="indicator-list" id="indicator-list">
+          <label>
+            <input type="radio" name="map-ind" value="poids_rel" checked onchange="onMapChange()">
+            Importance de la filière sur le territoire
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="diffRecruit" onchange="onMapChange()">
+            Difficultés de recrutement
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="ent" onchange="onMapChange()">
+            Taux de recours
+          </label>
+          <label>
+            <input type="radio" name="map-ind" value="evol" onchange="onMapChange()">
+            Évolution DPAE &gt; 1 mois
+          </label>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="filter-section">
+        <div class="choro-legend" id="choro-legend">
+          <div class="choro-legend-title">Légende</div>
+          <div class="choro-legend-bar" id="choro-bar"></div>
+          <div class="choro-missing-row">
+            <div class="choro-missing-swatch"></div>
+            Données absentes
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+
+
+  <main class="chart-area">
+    <button class="burger-btn desktop-burger" id="burger-btn-carte" onclick="toggleSidebar('carte')" title="Masquer / afficher les filtres">
+      <div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </button>
+    <div class="chart-header" style="padding-bottom:8px">
+      <div>
+        <div class="chart-title" id="map-title">Carte filière</div>
+        <div class="chart-subtitle" id="map-subtitle">Sélectionnez une filière et un indicateur</div>
+      </div>
+    </div>
+    <div class="map-row">
+      <div class="chart-card" id="map-card" style="flex:1;min-width:0;">
+        <svg id="map-svg" style="touch-action:none"></svg>
+        <div class="empty-state" id="map-empty" style="display:none">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+          <div>Chargement de la carte…</div>
+        </div>
+      </div>
+      <div class="ranking-panel">
+        <div class="ranking-panel-header">
+          🏆 Classement DPAE &gt; 1 mois
+          <div class="ranking-panel-sub" id="ranking-panel-sub">tous territoires</div>
+        </div>
+        <div id="ranking-list"></div>
+      </div>
+    </div>
+  </main>
+</div><!-- /.page#page-carte -->
+</div><!-- /#tab-carte -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 : VEILLE FILIÈRES
+══════════════════════════════════════════════ -->
+<div id="tab-veille" class="tab-content">
+  <div class="veille-layout">
+
+    <!-- Sidebar -->
+    <aside class="veille-sidebar">
+      <h2>🏭 Filière</h2>
+      <select id="veille-filiere-select" class="veille-filiere-select">
+        <option value="">— Sélectionnez —</option>
+      </select>
+
+      <button class="veille-search-btn" id="veille-search-btn" onclick="fetchVeilleNews()" disabled>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Rechercher les news
+      </button>
+
+      <div class="veille-keywords" id="veille-keywords" style="display:none">
+        <strong>Mots-clés utilisés</strong>
+        <span id="veille-keywords-list"></span>
+      </div>
+
+      <div id="gist-status" style="font-size:11px;margin-top:14px;color:var(--ft-muted);min-height:16px"></div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="veille-main">
+
+      <!-- ── Zone : Vos news ── -->
+      <div class="user-news-section">
+        <div class="user-news-section-header">
+          <div class="user-news-section-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+            Vos news
+            <span style="font-size:10px;font-weight:500;color:var(--ft-teal);background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:1px 7px;margin-left:4px">
+              🌐 Partagées
+            </span>
+          </div>
+          <div class="user-news-add-row">
+            <input type="url" id="user-news-input" class="user-news-input"
+              placeholder="Collez un lien d'article…"
+              onkeydown="if(event.key==='Enter') addUserNews()" />
+            <button class="user-news-add-btn" id="user-news-add-btn" onclick="addUserNews()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter
+            </button>
+          </div>
+        </div>
+        <div id="user-news-status"></div>
+        <div id="user-news-grid" class="user-news-grid" style="display:none"></div>
+        <div id="user-news-empty" class="user-news-empty-hint">Aucune news ajoutée — collez un lien ci-dessus.</div>
+      </div>
+
+      <!-- ── Zone : News du net ── -->
+      <div class="veille-empty" id="veille-empty">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p>Sélectionnez une filière et lancez la recherche<br>pour accéder aux 20 dernières actualités.</p>
+      </div>
+      <div id="veille-spinner" class="veille-spinner" style="display:none">
+        <div style="text-align:center">
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:14px">
+            <div class="veille-spinner-dot"></div>
+            <div class="veille-spinner-dot"></div>
+            <div class="veille-spinner-dot"></div>
+          </div>
+          <div id="veille-spinner-msg" style="font-size:13px;color:var(--ft-muted)">Recherche des actualités en cours…</div>
+          <div id="veille-spinner-sub" style="font-size:11px;color:#9ca3af;margin-top:6px"></div>
+        </div>
+      </div>
+      <div id="veille-rate-limit" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:32px;margin-bottom:12px">⏳</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ft-blue);margin-bottom:6px">Trop de requêtes simultanées</div>
+        <div style="font-size:12px;color:var(--ft-muted);margin-bottom:16px">Google News limite les appels fréquents. Nouvelle tentative dans :</div>
+        <div id="veille-countdown" style="font-size:36px;font-weight:700;color:var(--ft-blue);font-variant-numeric:tabular-nums">30</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:4px">secondes</div>
+        <button id="veille-retry-btn" onclick="fetchVeilleNews()" style="margin-top:18px;padding:8px 20px;background:var(--ft-blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:none">
+          Réessayer maintenant
+        </button>
+      </div>
+      <div id="veille-error" class="veille-error" style="display:none"></div>
+      <div class="veille-header" id="veille-result-header" style="display:none">
+        <div class="net-news-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          News du net — <span id="veille-result-title"></span>
+        </div>
+        <p id="veille-result-subtitle" style="font-size:12px;color:var(--ft-muted);margin-top:2px"></p>
+      </div>
+      <div class="veille-grid" id="veille-grid"></div>
+    </div>
+
+  </div>
+</div><!-- /#tab-veille -->
+
+<div class="tooltip" id="tooltip"></div>
+<div id="naf-mini-tooltip"></div>
+
+<!-- ── NAF MODAL ── -->
+<div id="naf-modal-overlay" onclick="closeNAFModal(event)">
+  <div id="naf-modal">
+    <div class="naf-modal-header">
+      <div class="naf-modal-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div class="naf-modal-title">
+        <h3 id="naf-modal-filiere-name">—</h3>
+        <p id="naf-modal-count">— codes NAF</p>
+      </div>
+      <button class="naf-modal-close" onclick="closeNAFModal()">✕</button>
+    </div>
+    <div class="naf-modal-search">
+      <svg class="naf-search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="naf-modal-search-input" placeholder="Filtrer par code ou libellé…" oninput="filterNAFModal(this.value)">
+    </div>
+    <div class="naf-modal-body" id="naf-modal-body"></div>
+  </div>
+</div>
+
+<script>
+const DATA_URL    = 'Data_DEP_REG.json';
+const NAF_URL     = 'Filieres-NAF.json';
+const DEP_URL     = 'dep.geojson';
+const REG_URL     = 'reg.geojson';
+const LEADERS_URL   = 'Leader_filieres.csv';
+const KEYWORDS_URL  = 'Filieres-Keywords.json';
+let KEYWORDS_DATA   = {}; // populated by loadKeywords()
+
+// ── DONNÉES ───────────────────────────────────────────────────────────────────
+let SOURCE_DATA = [];
+let RAW = [];
+let NAF_BY_FILIERE = {};
+
+const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
+
+// ── TOOLTIP POSITIONING ────────────────────────────────────────────────────────
+// Positions a fixed tooltip near the cursor while keeping it fully within the viewport.
+function clampTooltip(tip, event) {
+  const GAP = 14;
+  const TW = tip.offsetWidth  || 280;
+  const TH = tip.offsetHeight || 120;
+  const VW = window.innerWidth;
+  const VH = window.innerHeight;
+  let x = event.clientX + GAP;
+  let y = event.clientY - 10;
+  if (x + TW > VW - 8) x = event.clientX - TW - GAP;
+  if (x < 8) x = 8;
+  if (y + TH > VH - 8) y = VH - TH - 8;
+  if (y < 8) y = 8;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+
+function parseFr(str) {
+  if (typeof str === 'number') return str;
+  if (!str) return NaN;
+  return parseFloat(String(str).replace(',', '.'));
+}
+
+function mapRow(d) {
+  const diffRecruit = parseFr(d['Difficultés de recrutement']);
+  const ent         = parseFr(d['Taux de recours']);
+  const evol        = parseFr(d['Evolution DPAE > 1 mois']);
+  const poids       = +d['DPAE > 1 mois 2025'];
+  return {
+    code:        d['Filière'],
+    label:       d['Libellé Filière'],
+    diffRecruit,
+    ent,
+    evol,
+    poids,
+    evol3cat:    (evol < -0.01) ? 'bas' : (evol > 0.01) ? 'haut' : 'mid',
+  };
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
+    SOURCE_DATA = await res.json();
+    // Build filière label map from data (no hardcoded labels)
+    SOURCE_DATA.forEach(d => {
+      if (d['Filière'] && d['Libellé Filière']) {
+        ALL_FILIERES[d['Filière']] = d['Libellé Filière'];
+      }
+    });
+    console.log(`✅ ${DATA_URL} chargé : ${SOURCE_DATA.length} lignes, ${Object.keys(ALL_FILIERES).length} filières`);
+    return true;
+  } catch (err) {
+    console.error('❌', err);
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('load-msg').style.display = 'none';
+    const overlay = document.getElementById('loading-overlay');
+    overlay.innerHTML += `<div class="load-err">
+      ⚠️ Impossible de charger <code>${DATA_URL}</code>.<br>
+      Vérifiez que le fichier est présent dans le repo et que le serveur est accessible.<br>
+      <small style="opacity:.7">${err.message}</small>
+    </div>`;
+    return false;
+  }
+}
+
+async function loadLeaders() {
+  try {
+    const res = await fetch(LEADERS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // Decode as latin-1 (Windows-1252) to handle accented characters
+    const buffer = await res.arrayBuffer();
+    const text = new TextDecoder('windows-1252').decode(buffer);
+    // Columns: Code filière;Libellé filière majuscule;Région;DIRECTEUR REGIONAL
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    lines.slice(1).forEach(line => {
+      const [code, , region, directeur] = line.split(';');
+      if (code && region) {
+        LEADERS_FILIERES[code.trim()] = {
+          region: region.trim(),
+          directeur: (directeur || '').trim(),
+        };
+      }
+    });
+    console.log(`✅ ${LEADERS_URL} chargé : ${Object.keys(LEADERS_FILIERES).length} filières`);
+  } catch (err) {
+    console.warn('⚠️ Leaders non chargés :', err.message);
+  }
+}
+
+async function loadKeywords() {
+  try {
+    const res = await fetch(KEYWORDS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    KEYWORDS_DATA = await res.json();
+    console.log(`✅ ${KEYWORDS_URL} chargé : ${Object.keys(KEYWORDS_DATA).length} filières`);
+  } catch (err) {
+    console.warn('⚠️ Keywords non chargés :', err.message);
+  }
+}
+
+async function loadNAF() {
+  try {
+    const res = await fetch(NAF_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    raw.forEach(d => {
+      const fil = d['Code filière'];
+      if (!fil) return;
+      if (!NAF_BY_FILIERE[fil]) NAF_BY_FILIERE[fil] = [];
+      NAF_BY_FILIERE[fil].push({ code: d['Code NAF 2008 - Niv 5'], libelle: d['Libellé NAF 2008 - Niv 5'] || '' });
+    });
+    console.log(`✅ ${NAF_URL} chargé`);
+  } catch (err) {
+    console.warn('NAF non chargé :', err.message);
+  }
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+let mapInitialized = false;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('tab-btn-' + name).classList.add('active');
+
+  if (name === 'carte') {
+    if (!mapInitialized && SOURCE_DATA.length > 0) {
+      initMapTab();
+    }
+    setTimeout(() => { if (mapInitialized) renderMap(); }, 50);
+  }
+  if (name === 'veille') initVeilleTab();
+
+  // Show the right mobile FAB
+  if (window.innerWidth <= 768) {
+    const fabMatrix = document.getElementById('mobile-fab-matrix');
+    const fabCarte  = document.getElementById('mobile-fab-carte');
+    if (fabMatrix) fabMatrix.style.display = (name === 'matrix') ? 'flex' : 'none';
+    if (fabCarte)  fabCarte.style.display  = (name === 'carte')  ? 'flex' : 'none';
+  }
+
+  // Close any open mobile sidebar/backdrop
+  document.querySelectorAll('.sidebar.mobile-open').forEach(s => s.classList.remove('mobile-open'));
+  const bd = document.getElementById('mobile-sidebar-backdrop');
+  if (bd) bd.classList.remove('active');
+  if (name === 'matrix') {
+    setTimeout(initChart3, 50);
+  }
+}
+
+// ── SIDEBAR TOGGLE ────────────────────────────────────────────────────────────
+function toggleSidebar(which) {
+  const isMobile = window.innerWidth <= 768;
+  const page = document.getElementById('page-' + (which || 'matrix'));
+  const sidebar = page.querySelector('.sidebar');
+
+  if (isMobile) {
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    let backdrop = document.getElementById('mobile-sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'mobile-sidebar-backdrop';
+      backdrop.className = 'mobile-sidebar-backdrop';
+      backdrop.onclick = () => toggleSidebar(which);
+      document.body.appendChild(backdrop);
+    }
+    backdrop.classList.toggle('active', isOpen);
+  } else {
+    page.classList.toggle('sidebar-collapsed');
+    setTimeout(() => {
+      if (which === 'carte') renderMap();
+      else initChart3();
+    }, 320);
+  }
+}
+
+// ── TERRITORY (Tab 1) ─────────────────────────────────────────────────────────
+function loadTerritoryData(code, niveau) {
+  const territoryRows = SOURCE_DATA.filter(d =>
+    d['Code'] === code && d['Niveau'] === niveau
+  );
+  RAW = territoryRows.map(mapRow);
+
+  const presentCodes = new Set(RAW.map(d => d.code));
+  const absent = Object.entries(ALL_FILIERES)
+    .filter(([c]) => !presentCodes.has(c))
+    .map(([c, label]) => ({ code: c, label }));
+  updateNsPanel(absent);
+}
+
+function toggleNsPanel() {
+  document.getElementById('ns-panel').classList.toggle('open');
+}
+
+function updateNsPanel(absent) {
+  const panel = document.getElementById('ns-panel');
+  const list  = document.getElementById('ns-list');
+  const cnt   = document.getElementById('ns-count');
+  if (!absent.length) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  panel.classList.remove('open'); // collapsed by default
+  cnt.textContent = absent.length;
+  list.innerHTML = absent.map(a =>
+    `<span class="ns-badge" title="${a.code}">${a.label}</span>`
+  ).join('');
+}
+
+function onTerritoryChange(value) {
+  const [code, niveau] = value.split('|');
+  const sel = document.getElementById('territory-select');
+  const opt = sel.options[sel.selectedIndex];
+  const badge = document.getElementById('territory-badge');
+  const emoji = niveau === 'National' ? '🇫🇷' : niveau === 'Régional' ? '🗺️' : '📍';
+  badge.textContent = emoji + ' ' + opt.text;
+
+  loadTerritoryData(code, niveau);
+
+  state3.selectedCodes = new Set(RAW.map(d => d.code));
+  state3.activeEvol3   = new Set(['bas', 'mid', 'haut']);
+  document.querySelectorAll('.chip[data-e3]').forEach(c => c.classList.remove('inactive'));
+  document.getElementById('search-input-3').value = '';
+  gridState3.x = null; gridState3.y = null;
+
+  buildSidebar3();
+  initChart3();
+}
+
+// ── NAF MODAL ─────────────────────────────────────────────────────────────────
+function showNAFPreview(e, code, label) {
+  const tip = document.getElementById('naf-mini-tooltip');
+  const nafs = (NAF_BY_FILIERE[code] || []).slice(0,3);
+  if (!nafs.length) return;
+  tip.innerHTML = nafs.map(n => `<div>${n.code} – ${n.libelle}</div>`).join('') +
+    (NAF_BY_FILIERE[code].length > 3 ? `<div style="opacity:.7;margin-top:3px">… +${NAF_BY_FILIERE[code].length - 3} codes</div>` : '');
+  tip.style.opacity = '1';
+  positionNAFTip(e);
+}
+function positionNAFTip(e) {
+  const tip = document.getElementById('naf-mini-tooltip');
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY - 10) + 'px';
+}
+function hideNAFPreview() {
+  document.getElementById('naf-mini-tooltip').style.opacity = '0';
+}
+
+function openNAFModal(code, label) {
+  const modal = document.getElementById('naf-modal-overlay');
+  document.getElementById('naf-modal-filiere-name').textContent = label;
+  const nafs = NAF_BY_FILIERE[code] || [];
+  document.getElementById('naf-modal-count').textContent = `${nafs.length} code${nafs.length !== 1 ? 's' : ''} NAF`;
+  document.getElementById('naf-modal-search-input').value = '';
+  const body = document.getElementById('naf-modal-body');
+  body.innerHTML = nafs.map(n =>
+    `<div class="naf-row"><span class="naf-code">${n.code}</span><span class="naf-libelle">${n.libelle}</span></div>`
+  ).join('');
+  modal.classList.add('open');
+}
+function closeNAFModal(e) {
+  if (!e || e.target === document.getElementById('naf-modal-overlay'))
+    document.getElementById('naf-modal-overlay').classList.remove('open');
+}
+function filterNAFModal(q) {
+  const low = q.toLowerCase().trim();
+  document.querySelectorAll('#naf-modal-body .naf-row').forEach(row => {
+    const txt = row.textContent.toLowerCase();
+    row.classList.toggle('hidden', low && !txt.includes(low));
+  });
+}
+
+// ── STATE (Tab 1) ─────────────────────────────────────────────────────────────
+const state3 = {
+  selectedCodes: new Set(),
+  activeEvol3:   new Set(['bas', 'mid', 'haut']),
+};
+const gridState3 = { x: null, y: null, bx: null, by: null };
+
+function getGridX3() { return gridState3.x !== null ? gridState3.x : (gridState3.bx !== null ? gridState3.bx : 0.4); }
+function getGridY3() { return gridState3.y !== null ? gridState3.y : (gridState3.by !== null ? gridState3.by : 0.3); }
+function syncGridInputs3() {
+  const fmt = v => v !== null ? (v * 100).toFixed(2) : '';
+  document.getElementById('g3x').value = fmt(gridState3.x !== null ? gridState3.x : gridState3.bx);
+  document.getElementById('g3y').value = fmt(gridState3.y !== null ? gridState3.y : gridState3.by);
+}
+function onManualGrid3(axis) {
+  const v = parseFloat(document.getElementById(`g3${axis}`).value);
+  if (axis === 'x') gridState3.x = isNaN(v) ? null : v / 100;
+  else              gridState3.y = isNaN(v) ? null : v / 100;
+  if (chart3.g) redrawChart3(false);
+}
+
+function computeBarycenter(data, xFn, yFn, wFn) {
+  const totalW = d3.sum(data, wFn) || 1;
+  return {
+    x: d3.sum(data, d => xFn(d) * wFn(d)) / totalW,
+    y: d3.sum(data, d => yFn(d) * wFn(d)) / totalW,
+  };
+}
+
+// ── SIDEBAR (Tab 1) ────────────────────────────────────────────────────────────
+function buildSidebar3() {
+  const list = document.getElementById('filiere-list-3');
+  list.innerHTML = '';
+  RAW.forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'filiere-item';
+    item.dataset.code  = d.code;
+    item.dataset.label = d.label.toLowerCase();
+    const cbId = `cb-3-${d.code}`;
+    const hasNAF = (NAF_BY_FILIERE[d.code] || []).length > 0;
+    item.innerHTML = `
+      <input type="checkbox" id="${cbId}" checked>
+      <button class="filiere-label-btn" data-code="${d.code}" data-label="${d.label.replace(/"/g,'&quot;')}" ${hasNAF ? 'title="Voir les codes NAF"' : ''}>
+        <span class="lbl-text">${d.label}</span>
+        ${hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/>
+          <line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/>
+        </svg>` : ''}
+      </button>
+      <span class="tension-dot" style="background:${COL_EVOL3[d.evol3cat]}"></span>
+    `;
+    item.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) state3.selectedCodes.add(d.code);
+      else state3.selectedCodes.delete(d.code);
+      updateChart3();
+      document.getElementById('sel-count-3').textContent = filteredData3().length;
+    });
+    if (hasNAF) {
+      const btn = item.querySelector('.filiere-label-btn');
+      btn.addEventListener('mouseenter', e => showNAFPreview(e, d.code, d.label));
+      btn.addEventListener('mousemove',  e => positionNAFTip(e));
+      btn.addEventListener('mouseleave', () => hideNAFPreview());
+      btn.addEventListener('click', () => openNAFModal(d.code, d.label));
+    }
+    list.appendChild(item);
+  });
+  document.getElementById('sel-count-3').textContent = RAW.length;
+}
+
+function filterSearch3(q) {
+  const low = q.toLowerCase().trim();
+  document.querySelectorAll('#filiere-list-3 .filiere-item').forEach(el => {
+    el.classList.toggle('hidden', low && !el.dataset.label.includes(low));
+  });
+}
+
+function selectAll3() {
+  RAW.forEach(d => {
+    const item = document.querySelector(`#filiere-list-3 .filiere-item[data-code="${d.code}"]`);
+    if (item && !item.classList.contains('hidden')) {
+      item.querySelector('input').checked = true;
+      state3.selectedCodes.add(d.code);
+    }
+  });
+  updateChart3();
+  document.getElementById('sel-count-3').textContent = filteredData3().length;
+}
+
+function selectNone3() {
+  RAW.forEach(d => {
+    const item = document.querySelector(`#filiere-list-3 .filiere-item[data-code="${d.code}"]`);
+    if (item && !item.classList.contains('hidden')) {
+      item.querySelector('input').checked = false;
+      state3.selectedCodes.delete(d.code);
+    }
+  });
+  updateChart3();
+  document.getElementById('sel-count-3').textContent = filteredData3().length;
+}
+
+function toggleEvol3(cat) {
+  if (state3.activeEvol3.has(cat)) state3.activeEvol3.delete(cat);
+  else state3.activeEvol3.add(cat);
+  document.querySelector(`.chip[data-e3="${cat}"]`).classList.toggle('inactive', !state3.activeEvol3.has(cat));
+  updateChart3();
+}
+
+function filteredData3() {
+  return RAW.filter(d => state3.selectedCodes.has(d.code) && state3.activeEvol3.has(d.evol3cat));
+}
+
+// ── CHART 3 ───────────────────────────────────────────────────────────────────
+const R_MIN = 5, R_MAX = 35;
+let chart3 = {};
+
+function initChart3() {
+  const card = document.getElementById('chart-card-3');
+  const W = card.clientWidth  || 800;
+  const H = card.clientHeight || Math.max(400, window.innerHeight - 300);
+
+  const svg = d3.select('#chart-svg-3');
+  svg.selectAll('*').remove();
+
+  const m = { top:28, right:30, bottom:56, left:66 };
+  const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  svg.append('defs').append('clipPath').attr('id','clip3')
+    .append('rect').attr('width', iW).attr('height', iH);
+
+  chart3 = {
+    svg, g, iW, iH,
+    xScaleBase: d3.scaleLinear().range([0, iW]),
+    yScaleBase: d3.scaleLinear().range([iH, 0]),
+    xScale:     d3.scaleLinear().range([0, iW]),
+    yScale:     d3.scaleLinear().range([iH, 0]),
+    rScale: d3.scaleSqrt().domain([0, d3.max(RAW, d => d.poids) || 1]).range([R_MIN, R_MAX]),
+  };
+
+  g.append('rect').attr('width',iW).attr('height',iH).attr('fill','#f9fafb').attr('rx',4);
+  g.append('g').attr('class','grid-y');
+  g.append('g').attr('class','grid-x').attr('transform',`translate(0,${iH})`);
+  g.append('g').attr('class','zone-labels');
+  g.append('g').attr('class','zone-lines');
+  g.append('g').attr('class','zone-lines-y');
+  g.append('g').attr('class','axis axis-x').attr('transform',`translate(0,${iH})`);
+  g.append('g').attr('class','axis axis-y');
+  g.append('text').attr('class','axis-label').attr('x',iW/2).attr('y',iH+46).attr('text-anchor','middle').text('Difficultés de recrutement (%)');
+  g.append('text').attr('class','axis-label').attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-52).attr('text-anchor','middle').text('Taux de recours (%)');
+
+  chart3.zoom = d3.zoom()
+    .scaleExtent([1, 12])
+    .translateExtent([[0,0],[iW,iH]])
+    .on('zoom', (event) => {
+      chart3.xScale = event.transform.rescaleX(chart3.xScaleBase);
+      chart3.yScale = event.transform.rescaleY(chart3.yScaleBase);
+      redrawChart3();
+      const isZoomed = event.transform.k !== 1 || event.transform.x !== 0 || event.transform.y !== 0;
+      document.getElementById('zoom-reset-3').classList.toggle('visible', isZoomed);
+    });
+
+  g.append('rect').attr('class','zoom-rect')
+    .attr('width',iW).attr('height',iH)
+    .attr('fill','transparent')
+    .call(chart3.zoom);
+
+  g.append('g').attr('class','bubbles').attr('clip-path','url(#clip3)');
+  g.append('g').attr('class','drag-handles-x');
+  g.append('g').attr('class','drag-handles-y');
+
+  updateChart3();
+}
+
+function redrawChart3(useTransition = false) {
+  const { g, iW, iH, xScale, yScale } = chart3;
+  const dur = useTransition ? 400 : 0;
+  const T    = dur > 0 ? (sel) => sel.transition('redraw').duration(dur) : (sel) => sel;
+  const Tbub = dur > 0 ? (sel) => sel.transition('bubble').duration(dur) : (sel) => sel;
+  const xFmt = d3.format('.0%'), yFmt = d3.format('.0%');
+
+  T(g.select('.axis-x')).call(d3.axisBottom(xScale).ticks(7).tickFormat(xFmt))
+    .call(ax => { ax.select('.domain').attr('stroke','#d1d9ee'); ax.selectAll('line').attr('stroke','#d1d9ee'); });
+  T(g.select('.axis-y')).call(d3.axisLeft(yScale).ticks(7).tickFormat(yFmt))
+    .call(ax => { ax.select('.domain').attr('stroke','#d1d9ee'); ax.selectAll('line').attr('stroke','#d1d9ee'); });
+
+  T(g.select('.grid-y')).call(d3.axisLeft(yScale).ticks(7).tickSize(-iW).tickFormat(''))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').attr('stroke','#e9ecf4').attr('stroke-width',1); });
+  T(g.select('.grid-x')).call(d3.axisBottom(xScale).ticks(7).tickSize(-iH).tickFormat(''))
+    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').attr('stroke','#e9ecf4').attr('stroke-width',1); });
+
+  const gxVal3 = getGridX3(), gyVal3 = getGridY3();
+
+  g.select('.zone-lines').selectAll('line').data([gxVal3])
+    .join('line').attr('class','grid-zone-line')
+    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
+    .attr('y1', 0).attr('y2', iH);
+  g.select('.zone-lines-y').selectAll('line').data([gyVal3])
+    .join('line').attr('class','grid-zone-line')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', v => yScale(v)).attr('y2', v => yScale(v));
+
+  const gxPx = xScale(gxVal3), gyPx = yScale(gyVal3);
+  const ZONE_DEFS = [
+    { x: gxPx / 2,       y: gyPx / 2,       color:'#16a34a',
+      lines:['A consolider,','maintenir un partenariat efficace'] },
+    { x:(gxPx+iW)/2,     y: gyPx / 2,       color:'#dc2626',
+      lines:['Proposer des services adaptés','pour réduire les tensions'] },
+    { x: gxPx / 2,       y:(gyPx+iH)/2,     color:'#d97706',
+      lines:['Chercher des opportunités de partenariats','pour certains recrutements'] },
+    { x:(gxPx+iW)/2,     y:(gyPx+iH)/2,     color:'#dc2626',
+      lines:['\u00c0 prioriser dans l\u2019\u00ab\u202faller vers\u202f\u00bb,','pour proposer des solutions',
+             'visant \u00e0 r\u00e9duire les tensions'] },
+  ];
+  const zg = g.select('.zone-labels');
+  zg.selectAll('*').remove();
+  ZONE_DEFS.forEach(zone => {
+    const n = zone.lines.length;
+    const t = zg.append('text')
+      .attr('text-anchor','middle')
+      .attr('x', zone.x).attr('y', zone.y)
+      .attr('fill', zone.color)
+      .attr('opacity', 0.28)
+      .attr('font-size','16')
+      .attr('font-family',"'DM Sans',sans-serif")
+      .attr('font-weight','700')
+      .attr('pointer-events','none');
+    zone.lines.forEach((line,i) => {
+      t.append('tspan')
+        .attr('x', zone.x)
+        .attr('dy', i===0 ? `${-(n-1)*0.65}em` : '1.3em')
+        .text(line);
+    });
+  });
+
+  const dragX3 = d3.drag()
+    .on('start', (e) => { e.sourceEvent.stopPropagation(); })
+    .on('drag',  (e) => {
+      const [xmin, xmax] = chart3.xScale.domain();
+      gridState3.x = Math.max(xmin, Math.min(xmax, chart3.xScale.invert(e.x)));
+      syncGridInputs3(); redrawChart3(false);
+    });
+  g.select('.drag-handles-x').selectAll('line').data([gxVal3])
+    .join('line')
+    .attr('stroke','transparent').attr('stroke-width',16)
+    .attr('pointer-events','stroke').style('cursor','ew-resize')
+    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
+    .attr('y1', 0).attr('y2', iH)
+    .call(dragX3);
+
+  const dragY3 = d3.drag()
+    .on('start', (e) => { e.sourceEvent.stopPropagation(); })
+    .on('drag',  (e) => {
+      const [ymin, ymax] = chart3.yScale.domain();
+      gridState3.y = Math.max(ymin, Math.min(ymax, chart3.yScale.invert(e.y)));
+      syncGridInputs3(); redrawChart3(false);
+    });
+  g.select('.drag-handles-y').selectAll('line').data([gyVal3])
+    .join('line')
+    .attr('stroke','transparent').attr('stroke-width',16)
+    .attr('pointer-events','stroke').style('cursor','ns-resize')
+    .attr('x1', 0).attr('x2', iW)
+    .attr('y1', v => yScale(v)).attr('y2', v => yScale(v))
+    .call(dragY3);
+
+  Tbub(g.select('.bubbles').selectAll('.bubble'))
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r',  d => chart3.rScale(d.poids));
+}
+
+function updateChart3() {
+  if (!chart3.g) return;
+  const data = filteredData3();
+  document.getElementById('empty-state-3').style.display = data.length === 0 ? 'flex' : 'none';
+  document.getElementById('sel-count-3').textContent = data.length;
+
+  chart3.svg.select('.zoom-rect').call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById('zoom-reset-3').classList.remove('visible');
+
+  if (data.length > 0) {
+    const [xMin, xMax] = d3.extent(data, d => d.diffRecruit);
+    const xSpan = (xMax - xMin) || Math.abs(xMax) || 1;
+    chart3.xScaleBase.domain([xMin - (R_MAX/chart3.iW)*xSpan*2, xMax + (R_MAX/chart3.iW)*xSpan*2]).nice();
+
+    const [yMin, yMax] = d3.extent(data, d => d.ent);
+    const ySpan = (yMax - yMin) || Math.abs(yMax) || 1;
+    chart3.yScaleBase.domain([yMin - (R_MAX/chart3.iH)*ySpan*2, yMax + (R_MAX/chart3.iH)*ySpan*2]).nice();
+
+    chart3.xScale = chart3.xScaleBase.copy();
+    chart3.yScale = chart3.yScaleBase.copy();
+
+    const bary = computeBarycenter(data, d => d.diffRecruit, d => d.ent, d => d.poids);
+    gridState3.bx = bary.x; gridState3.by = bary.y;
+    syncGridInputs3();
+  }
+
+  const tooltip = document.getElementById('tooltip');
+  const fmt = d3.format('.1%'), fmtEvol = d3.format('+.1%');
+  const { g, xScale, yScale } = chart3;
+  const EVOL3_LABEL = { bas:'Baisse', mid:'Évolution modérée', haut:'Hausse' };
+
+  const bubbles = g.select('.bubbles').selectAll('.bubble').data(data, d => d.code);
+  bubbles.exit().transition('exit').duration(200).attr('r',0).remove();
+
+  bubbles.enter().append('circle')
+    .attr('class','bubble')
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r', 0)
+    .attr('fill', d => COL_EVOL3[d.evol3cat])
+    .attr('fill-opacity', 0.55)
+    .attr('stroke', d => COL_EVOL3[d.evol3cat])
+    .attr('stroke-width', 1.2)
+    .attr('stroke-opacity', 0.8)
+    .on('mousemove', function(event, d) {
+      tooltip.style.opacity = '1';
+      tooltip.style.left = '0px'; tooltip.style.top = '0px'; // measure at origin
+      const leader = LEADERS_FILIERES[d.code] || {};
+      const leaderHtml = leader.directeur && leader.directeur !== '-'
+        ? `<div class="tt-row" style="margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb"><span>Région leader</span><span class="tt-val">${leader.region}</span></div>
+           <div class="tt-row"><span>Dir. régional</span><span class="tt-val" style="color:var(--ft-blue)">${leader.directeur}</span></div>`
+        : `<div class="tt-row" style="margin-top:4px;padding-top:4px;border-top:1px solid #e5e7eb"><span>Leader</span><span class="tt-val">${leader.region || '—'}</span></div>`;
+      tooltip.innerHTML = `
+        <div class="tt-title">${d.label}</div>
+        <div class="tt-row"><span>Difficultés de recrutement</span><span class="tt-val">${fmt(d.diffRecruit)}</span></div>
+        <div class="tt-row"><span>Taux de recours</span><span class="tt-val">${fmt(d.ent)}</span></div>
+        <div class="tt-row"><span>Nb DPAE &gt; 1 mois</span><span class="tt-val">${d.poids.toLocaleString('fr-FR')}</span></div>
+        <div class="tt-row"><span>Évolution DPAE &gt; 1 mois</span><span class="tt-val" style="color:${COL_EVOL3[d.evol3cat]}">${fmtEvol(d.evol)} (${EVOL3_LABEL[d.evol3cat]})</span></div>
+        ${leaderHtml}
+      `;
+      clampTooltip(tooltip, event);
+      d3.select(this).attr('stroke-width',2.5).attr('fill-opacity',0.8);
+    })
+    .on('mouseleave', function() {
+      tooltip.style.opacity = '0';
+      d3.select(this).attr('stroke-width',1.2).attr('fill-opacity',0.55);
+    })
+    .merge(bubbles)
+    .transition('bubble').duration(400)
+    .attr('cx', d => xScale(d.diffRecruit))
+    .attr('cy', d => yScale(d.ent))
+    .attr('r',  d => chart3.rScale(d.poids));
+
+  redrawChart3(true);
+}
+
+function resetToBarycenter3() {
+  gridState3.x = null; gridState3.y = null;
+  syncGridInputs3();
+  if (chart3.g) redrawChart3(false);
+}
+
+function resetZoom3() {
+  chart3.xScale = chart3.xScaleBase.copy();
+  chart3.yScale = chart3.yScaleBase.copy();
+  chart3.svg.select('.zoom-rect').transition().duration(400).call(chart3.zoom.transform, d3.zoomIdentity);
+  document.getElementById('zoom-reset-3').classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  CARTE PAR FILIÈRE (Tab 2)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// 8-color diverging scale: dark red → dark blue
+// Index 0 = worst (red context), Index 7 = best (blue context)
+const CHORO_COLORS = [
+  '#7f1d1d', // 1 – rouge très foncé
+  '#b91c1c', // 2 – rouge foncé
+  '#ef4444', // 3 – rouge
+  '#fca5a5', // 4 – rouge clair
+  '#93c5fd', // 5 – bleu clair
+  '#3b82f6', // 6 – bleu
+  '#1d4ed8', // 7 – bleu foncé
+  '#1e3a8a', // 8 – bleu très foncé
+];
+
+// Per-indicator color palettes (low → high value)
+const CHORO_COLORS_BY_IND = {
+  poids_rel:   ['#bae6fd','#38bdf8','#0284c7','#075985','#0c4a6e'], // cyan → bleu pétrole
+  diffRecruit: ['#fef9c3','#fde047','#f59e0b','#d97706','#92400e'], // jaune → ambre foncé
+  ent:         ['#bbf7d0','#4ade80','#22c55e','#15803d','#14532d'], // vert clair → vert forêt
+  poids:       ['#fecdd3','#fb7185','#f43f5e','#be123c','#881337'], // rose → rouge framboise
+  evol:        ['#e9d5ff','#c084fc','#a855f7','#7e22ce','#581c87'], // mauve clair → violet foncé
+};
+
+// Indicateur config: label, format function, invert (true = high value is bad = red)
+const IND_CONFIG = {
+  poids_rel:   { label: 'Importance de la filière sur le territoire', fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false },
+  poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false },
+  evol:        { label: 'Évolution DPAE > 1 mois',     fmt: v => (v >= 0 ? '+' : '') + (v*100).toFixed(1)+'%', invert: false },
+};
+
+// Map state
+const stateMap = {
+  filiere:    null,  // selected filière code
+  indicateur: 'poids_rel',
+  maille:     'Régional',
+};
+
+// Loaded GeoJSON
+const GEO = { reg: null, dep: null };
+
+// Precomputed totals DPAE by territory
+let totalDPAEByTerr = {};
+
+// Map data for current filière + maille: { code → { nom, diffRecruit, ent, evol, poids, poids_rel } }
+let mapDataByCode = {};
+
+async function initMapTab() {
+  mapInitialized = true;
+
+  // Compute total DPAE per territory
+  totalDPAEByTerr = {};
+  SOURCE_DATA.forEach(d => {
+    const p = +d['DPAE > 1 mois 2025'];
+    if (isNaN(p) || p <= 0) return;
+    const key = d['Code'] + '|' + d['Niveau'];
+    totalDPAEByTerr[key] = (totalDPAEByTerr[key] || 0) + p;
+  });
+
+  // Find default filière: highest DPAE > 1 mois at national level
+  const natRows = SOURCE_DATA.filter(d => d['Code'] === '00' && d['Niveau'] === 'National');
+  let bestCode = null, bestPoids = -1;
+  natRows.forEach(d => {
+    const p = +d['DPAE > 1 mois 2025'];
+    if (p > bestPoids) { bestPoids = p; bestCode = d['Filière']; }
+  });
+  stateMap.filiere = bestCode || 'FIL01';
+
+  // Populate filière select
+  const sel = document.getElementById('map-filiere-select');
+  sel.innerHTML = '';
+  Object.entries(ALL_FILIERES).forEach(([code, label]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = `${code} – ${label}`;
+    if (code === stateMap.filiere) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  // Load GeoJSON files
+  document.getElementById('map-empty').style.display = 'flex';
+  document.getElementById('map-empty').querySelector('div').textContent = 'Chargement des données géographiques…';
+
+  await Promise.all([
+    fetch(REG_URL).then(r => r.json()).then(d => { GEO.reg = d; }),
+    fetch(DEP_URL).then(r => r.json()).then(d => { GEO.dep = d; }),
+  ]).catch(err => {
+    document.getElementById('map-empty').querySelector('div').textContent = '⚠️ Impossible de charger les fichiers GeoJSON (dep.geojson / reg.geojson)';
+    console.error('GeoJSON error:', err);
+  });
+
+  if (GEO.reg && GEO.dep) {
+    document.getElementById('map-empty').style.display = 'none';
+    renderMap();
+  }
+}
+
+function onMapChange() {
+  stateMap.filiere    = document.getElementById('map-filiere-select').value;
+  stateMap.indicateur = document.querySelector('input[name="map-ind"]:checked').value;
+  renderMap();
+}
+
+function setMaille(maille) {
+  stateMap.maille = maille;
+  document.getElementById('btn-reg').classList.toggle('active', maille === 'Régional');
+  document.getElementById('btn-dep').classList.toggle('active', maille === 'Départemental');
+  onMapChange();
+}
+
+function buildMapData() {
+  const { filiere, maille } = stateMap;
+  const rows = SOURCE_DATA.filter(d => d['Filière'] === filiere && d['Niveau'] === maille);
+  mapDataByCode = {};
+  rows.forEach(d => {
+    const code = d['Code'];
+    const key  = code + '|' + maille;
+    const total = totalDPAEByTerr[key] || 0;
+    const poids = +d['DPAE > 1 mois 2025'];
+    const poids_rel = (total > 0 && !isNaN(poids)) ? poids / total : NaN;
+    mapDataByCode[code] = {
+      nom:         d['Territoire'] || code,
+      diffRecruit: parseFr(d['Difficultés de recrutement']),
+      ent:         parseFr(d['Taux de recours']),
+      evol:        parseFr(d['Evolution DPAE > 1 mois']),
+      poids:       isNaN(poids) ? NaN : poids,
+      poids_rel,
+    };
+  });
+}
+
+function getIndValue(row, ind) {
+  if (!row) return NaN;
+  return row[ind];
+}
+
+function renderMap() {
+  if (!GEO.reg || !GEO.dep) return;
+  const { maille, indicateur } = stateMap;
+  const geo = maille === 'Régional' ? GEO.reg : GEO.dep;
+  const cfg = IND_CONFIG[indicateur];
+
+  buildMapData();
+  updateRanking();
+  const values = [];
+  geo.features.forEach(f => {
+    const code = f.properties.code_insee;
+    const row = mapDataByCode[code];
+    const v = getIndValue(row, indicateur);
+    if (!isNaN(v) && isFinite(v)) values.push(v);
+  });
+
+  // Compute ranks (for tooltip)
+  const sorted = [...values].sort((a, b) => a - b);
+  const rankOf = v => {
+    if (isNaN(v)) return null;
+    const pos = sorted.indexOf(v);
+    return pos >= 0 ? pos + 1 : null;
+  };
+  const n = sorted.length;
+
+  // Color scale: 5 classes
+  //   class 0 → exact minimum value
+  //   classes 1-3 → equal-count split of middle observations
+  //   class 4 → exact maximum value
+  const indColors = CHORO_COLORS_BY_IND[indicateur] || CHORO_COLORS_BY_IND.poids_rel;
+  const palette = cfg.invert ? [...indColors].reverse() : indColors;
+  let colorScale;
+  let classBounds = []; // [[lo, hi], ...] per class, for legend
+
+  if (values.length < 2) {
+    colorScale = () => palette[2];
+    classBounds = palette.map(() => [null, null]);
+  } else {
+    const sorted = [...values].sort((a, b) => a - b);
+    const minV = sorted[0];
+    const maxV = sorted[sorted.length - 1];
+
+    // Middle observations: everything strictly between min and max
+    const middle = sorted.filter(v => v > minV && v < maxV);
+    const mLen = middle.length;
+
+    let t1, t2;
+    if (mLen === 0) {
+      t1 = minV; t2 = minV;
+    } else {
+      t1 = middle[Math.floor(mLen / 3)];
+      t2 = middle[Math.floor(2 * mLen / 3)];
+    }
+
+    classBounds = [
+      [minV, minV],
+      [minV, t1],
+      [t1,   t2],
+      [t2,   maxV],
+      [maxV, maxV],
+    ];
+
+    colorScale = v => {
+      if (v === minV) return palette[0];
+      if (v === maxV) return palette[4];
+      if (v <= t1)    return palette[1];
+      if (v <= t2)    return palette[2];
+      return palette[3];
+    };
+  }
+
+  // Update legend
+  updateLegend(values, cfg, palette, classBounds);
+
+  // Update map title/subtitle
+  const filiereLabel = ALL_FILIERES[stateMap.filiere] || stateMap.filiere;
+  const leaderInfo = LEADERS_FILIERES[stateMap.filiere];
+  const leaderSuffix = leaderInfo
+    ? (leaderInfo.directeur && leaderInfo.directeur !== '-'
+        ? ` · ${leaderInfo.region} – ${leaderInfo.directeur}`
+        : ` · ${leaderInfo.region}`)
+    : '';
+  document.getElementById('map-title').innerHTML =
+    `${filiereLabel}${leaderSuffix ? `<span class="map-title-leader">${leaderSuffix}</span>` : ''}`;
+  document.getElementById('map-subtitle').textContent =
+    `${cfg.label} · Maille ${maille === 'Régional' ? 'régionale' : 'départementale'}`;
+
+  // D3 render
+  const card  = document.getElementById('map-card');
+  const W = card.clientWidth  || 700;
+  const H = card.clientHeight || 500;
+  const pad = 20;
+
+  const svg = d3.select('#map-svg');
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('width', W).attr('height', H);
+  svg.selectAll('*').remove();
+
+  // Projection: geoMercator fitted to all features
+  const projection = d3.geoMercator()
+    .fitExtent([[pad, pad], [W - pad, H - pad]], geo);
+  const path = d3.geoPath().projection(projection);
+
+  const tooltip = document.getElementById('tooltip');
+  const fmtInd  = cfg.fmt;
+  const fmtPct  = v => (v*100).toFixed(1) + '%';
+  const fmtEvol = v => (v >= 0 ? '+' : '') + (v*100).toFixed(1) + '%';
+  const fmtNb   = v => Math.round(v).toLocaleString('fr-FR');
+
+  svg.selectAll('.map-path')
+    .data(geo.features)
+    .join('path')
+    .attr('class', d => {
+      const code = d.properties.code_insee;
+      const row  = mapDataByCode[code];
+      const v    = getIndValue(row, indicateur);
+      return 'map-path' + ((!row || isNaN(v) || !isFinite(v)) ? ' no-data' : '');
+    })
+    .attr('d', path)
+    .attr('fill', d => {
+      const code = d.properties.code_insee;
+      const row  = mapDataByCode[code];
+      if (!row) return '#d1d5db';
+      const v = getIndValue(row, indicateur);
+      if (isNaN(v) || !isFinite(v)) return '#d1d5db';
+      return colorScale(v);
+    })
+    .on('mousemove', function(event, d) {
+      const code = d.properties.code_insee;
+      const nom  = d.properties.nom_officiel || code;
+      const row  = mapDataByCode[code];
+
+      if (!row) {
+        tooltip.style.opacity = '1';
+        tooltip.innerHTML = `<div class="tt-title">${nom}</div><div style="color:#9ca3af;font-size:12px">Données absentes pour cette filière</div>`;
+        clampTooltip(tooltip, event);
+        return;
+      }
+
+      const v = getIndValue(row, indicateur);
+      const rank = isNaN(v) ? null : rankOf(v);
+      const rankDir = cfg.invert ? 'décroissant (1 = le plus élevé)' : 'croissant (1 = le plus faible)';
+
+      // Build all-indicator rows
+      const hasData = r => !isNaN(r) && isFinite(r);
+      const rows = [
+        { label:'Importance de la filière sur le territoire', val: hasData(row.poids_rel)   ? fmtPct(row.poids_rel)   : '—', key:'poids_rel' },
+        { label:'Difficultés de recrutement', val: hasData(row.diffRecruit) ? fmtPct(row.diffRecruit) : '—', key:'diffRecruit' },
+        { label:'Taux de recours',    val: hasData(row.ent)         ? fmtPct(row.ent)         : '—', key:'ent' },
+        { label:'Nb DPAE > 1 mois',  val: hasData(row.poids)       ? fmtNb(row.poids)        : '—', key:'poids' },
+        { label:'Évolution DPAE > 1 mois', val: hasData(row.evol)  ? fmtEvol(row.evol)       : '—', key:'evol' },
+      ];
+
+      const leader = LEADERS_FILIERES[stateMap.filiere] || {};
+      const leaderHtml = leader.directeur && leader.directeur !== '-'
+        ? `<div class="tt-row" style="margin-top:5px;padding-top:5px;border-top:1px solid #e5e7eb"><span>Région leader</span><span class="tt-val">${leader.region}</span></div>
+           <div class="tt-row"><span>Dir. régional</span><span class="tt-val" style="color:var(--ft-blue)">${leader.directeur}</span></div>`
+        : (leader.region ? `<div class="tt-row" style="margin-top:5px;padding-top:5px;border-top:1px solid #e5e7eb"><span>Leader</span><span class="tt-val">${leader.region}</span></div>` : '');
+
+      tooltip.style.opacity = '1';
+      tooltip.innerHTML = `
+        <div class="tt-title">${nom}</div>
+        ${rows.map(r => `
+          <div class="tt-row" style="${r.key === indicateur ? 'font-weight:700;color:var(--ft-blue)' : ''}">
+            <span>${r.label}</span>
+            <span class="tt-val">${r.val}</span>
+          </div>`).join('')}
+        ${rank !== null ? `<div class="tt-rank">Classement sur « ${cfg.label} » : <strong>${rank}/${n}</strong> <span style="font-size:10px">(ordre ${rankDir})</span></div>` : ''}
+        ${leaderHtml}
+      `;
+      clampTooltip(tooltip, event);
+      d3.select(this).raise();
+    })
+    .on('mouseleave', function() {
+      tooltip.style.opacity = '0';
+    });
+}
+
+function updateLegend(values, cfg, palette, classBounds) {
+  const bar = document.getElementById('choro-bar');
+
+  if (!values || values.length < 2 || !classBounds.length) {
+    bar.innerHTML = `<div class="choro-legend-row">
+      <div class="choro-legend-swatch" style="background:${palette[2]}"></div>
+      <span class="choro-legend-range">—</span>
+    </div>`;
+    return;
+  }
+
+  bar.innerHTML = palette.map((color, i) => {
+    const [lo, hi] = classBounds[i];
+    if (lo === null) return '';
+    const label = (lo === hi)
+      ? cfg.fmt(lo)
+      : `${cfg.fmt(lo)} – ${cfg.fmt(hi)}`;
+    return `<div class="choro-legend-row">
+      <div class="choro-legend-swatch" style="background:${color}"></div>
+      <span class="choro-legend-range">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── VEILLE FILIÈRES ───────────────────────────────────────────────────────────
+
+let veilleTabInitialized = false;
+
+function initVeilleTab() {
+  if (veilleTabInitialized) return; // Only initialize once
+  veilleTabInitialized = true;
+
+  const sel = document.getElementById('veille-filiere-select');
+  // Populate from ALL_FILIERES (already loaded)
+  const sorted = Object.entries(ALL_FILIERES).sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+  sorted.forEach(([code, label]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    document.getElementById('veille-search-btn').disabled = !sel.value;
+  });
+}
+
+// ── USER NEWS ─────────────────────────────────────────────────────────────────
+
+// ── USER NEWS – stockage partagé via GitHub Gist ─────────────────────────────
+// À configurer une fois par l'administrateur dans le repo :
+const GIST_FILENAME  = 'user_news.json';
+const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
+let userNewsList = [];
+
+// Load token + gistId from localStorage (set once by admin via hidden panel)
+const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+let _token    = _cfg.token  || '';
+let _gistId   = _cfg.gistId || '';
+
+function setGistStatus(msg, color) {
+  const el = document.getElementById('gist-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
+}
+
+async function loadUserNews() {
+  if (!_gistId) { renderUserNews(); return; }
+  try {
+    const headers = { Accept: 'application/vnd.github.v3+json' };
+    if (_token) headers['Authorization'] = `token ${_token}`;
+    const res = await fetch(`https://api.github.com/gists/${_gistId}`, { headers });
+    if (!res.ok) throw new Error(`GitHub ${res.status}`);
+    const data = await res.json();
+    const content = data.files?.[GIST_FILENAME]?.content;
+    if (content) userNewsList = JSON.parse(content);
+    setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+  } catch (e) {
+    setGistStatus('⚠️ ' + e.message, '#b45309');
+  }
+  renderUserNews();
+}
+
+async function saveUserNews() {
+  if (!_token) { return; } // Read-only if no token
+  try {
+    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsList) } } };
+    if (!_gistId) {
+      // First save: create the gist
+      body.description = 'Matrice Filières – News partagées';
+      body.public = false;
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+      const data = await res.json();
+      _gistId = data.id;
+      // Log the new Gist ID so the admin can hardcode it
+      console.info(`✅ Gist créé — ajoutez cet ID dans le HTML : ${data.id}`);
+      setGistStatus(`✅ Gist créé (voir console)`, '#15803d');
+    } else {
+      const res = await fetch(`https://api.github.com/gists/${_gistId}`, {
+        method: 'PATCH',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+      setGistStatus(`🌐 ${userNewsList.length} news partagées`, '#15803d');
+    }
+  } catch (e) {
+    setGistStatus('⚠️ Sauvegarde : ' + e.message, '#b45309');
+  }
+}
+
+async function addUserNews() {
+  const input = document.getElementById('user-news-input');
+  const btn   = document.getElementById('user-news-add-btn');
+  const url   = input.value.trim();
+
+  if (!url) return;
+  try { new URL(url); } catch {
+    showUserNewsStatus('⚠️ URL invalide.', 'error'); return;
+  }
+  if (userNewsList.find(n => n.url === url)) {
+    showUserNewsStatus('⚠️ Ce lien est déjà ajouté.', 'error'); return;
+  }
+
+  btn.disabled = true;
+  input.value = '';
+  showUserNewsStatus('', '');
+
+  // Insert skeleton card immediately
+  const id = Date.now();
+  userNewsList.unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, loading: true });
+  renderUserNews();
+
+  const domain  = extractDomain(url);
+  const favicon = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+  let titre = '', source = domain, image = null, desc = '';
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await Promise.race([
+      fetch(proxyUrl),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 7000))
+    ]);
+    if (res.ok) {
+      const data = await res.json();
+      const html = data.contents || '';
+
+      // og:title > title tag
+      const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"'<>]+)["']/i)
+                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:title["']/i);
+      if (ogTitle) titre = ogTitle[1].trim();
+      if (!titre) {
+        const t = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (t) titre = t[1].trim();
+      }
+
+      // og:description
+      const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
+                  || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
+      if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
+
+      // og:image
+      const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
+                 || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
+      if (ogImg) image = ogImg[1].trim();
+
+      // og:site_name
+      const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"'<>]+)["']/i)
+                  || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:site_name["']/i);
+      if (ogSite) source = ogSite[1].trim();
+    }
+  } catch (_) { /* use domain as fallback */ }
+
+  if (!titre) titre = url;
+
+  // Update card in place
+  const idx = userNewsList.findIndex(n => n.id === id);
+  if (idx !== -1) {
+    userNewsList[idx] = { url, titre, source, favicon, image, desc, id, loading: false };
+  }
+  btn.disabled = false;
+  await saveUserNews();
+  renderUserNews();
+}
+
+async function deleteUserNews(id) {
+  userNewsList = userNewsList.filter(n => n.id !== id);
+  await saveUserNews();
+  renderUserNews();
+}
+
+function showUserNewsStatus(msg, type) {
+  const el = document.getElementById('user-news-status');
+  if (!msg) { el.innerHTML = ''; return; }
+  const color = type === 'error' ? '#991b1b' : 'var(--ft-muted)';
+  el.innerHTML = `<div style="font-size:11px;color:${color};margin-bottom:8px">${msg}</div>`;
+}
+
+function renderUserNews() {
+  const grid  = document.getElementById('user-news-grid');
+  const empty = document.getElementById('user-news-empty');
+  if (!userNewsList.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.style.display  = 'grid';
+  grid.innerHTML = userNewsList.map(n => {
+    if (n.loading) return `
+      <div class="user-news-card-skeleton">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line w40"></div>
+          <div class="sk-line w80"></div>
+          <div class="sk-line w60"></div>
+        </div>
+      </div>`;
+
+    const imgHtml = n.image
+      ? `<img class="user-news-card-img" src="${escHtml(n.image)}" alt="" onerror="this.parentElement.querySelector('.user-news-card-img-placeholder')&&(this.style.display='none');this.nextElementSibling&&(this.nextElementSibling.style.display='flex')" loading="lazy">`
+      : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+    return `
+      <div class="user-news-card" onclick="window.open('${escHtml(n.url)}','_blank','noopener')">
+        <button class="user-news-delete-btn" onclick="event.stopPropagation();deleteUserNews(${n.id})" title="Supprimer">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        ${imgHtml}
+        <div class="user-news-card-body">
+          <div class="user-news-card-source">
+            <img src="${escHtml(n.favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
+            ${escHtml(n.source)}
+          </div>
+          <div class="user-news-card-title">${escHtml(n.titre)}</div>
+          ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
+          <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── VEILLE RSS ─────────────────────────────────────────────────────────────────
+
+// RSS feeds spécialisés par filière (flux publics gratuits)
+const FILIERE_RSS_FEEDS = {
+  'FIL01': ['https://www.pleinchamp.com/rss', 'https://www.reussir.fr/rss.xml'],
+  'FIL05': ['https://www.batiweb.com/rss/flux-rss.xml', 'https://www.lemoniteur.fr/rss/'],
+  'FIL06': ['https://www.francetvinfo.fr/culture.rss'],
+  'FIL08': ['https://www.actu-environnement.com/rss/actu.xml', 'https://www.enerzine.com/feed'],
+  'FIL09': ['https://www.foretpriveefrancaise.com/rss'],
+  'FIL10': ['https://www.lhôtellerie-restauration.fr/rss'],
+  'FIL11': ['https://www.process-alimentaire.com/rss.xml', 'https://www.usinenouvelle.com/rss/secteur/agroalimentaire.xml'],
+  'FIL12': ['https://www.automobile-entreprise.com/rss'],
+  'FIL13': ['https://www.aerobuzz.fr/feed/', 'https://www.usinenouvelle.com/rss/secteur/aeronautique.xml'],
+  'FIL15': ['https://www.lequotidiendumedecin.fr/rss', 'https://www.usinenouvelle.com/rss/secteur/pharmacie-biotechnologie.xml'],
+  'FIL22': ['https://www.sfen.org/feed/', 'https://www.world-nuclear-news.org/rss'],
+  'FIL23': ['https://www.silicon.fr/feed', 'https://www.journaldunet.com/rss/jdn.xml'],
+  'FIL25': ['https://www.hospimedia.fr/rss', 'https://www.gazette-sante-social.fr/rss'],
+  'FIL30': ['https://www.vecteurplus.com/rss', 'https://www.wk-transport-logistique.fr/rss'],
+};
+
+function buildVeilleKeywords(filiereCode) {
+  const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
+
+  // Primary: curated keywords from Filieres-Keywords.json
+  const curatedKws = (KEYWORDS_DATA[filiereCode] && KEYWORDS_DATA[filiereCode].keywords) || [];
+
+  // Fallback: extract from NAF libellés if JSON not loaded
+  let topWords = curatedKws.length ? curatedKws : (() => {
+    const nafs = NAF_BY_FILIERE[filiereCode] || [];
+    const stop = new Set(['les','des','une','pour','dans','avec','sur','par','aux','de','du','la','le','et','en','au','autres','fabrication','activités','services','travaux','production','commerce','gestion','location','vente','achat','traitement','réparation','installation','construction','exploitation','mise','sous']);
+    const freq = {};
+    nafs.forEach(n => n.libelle.toLowerCase().split(/[\s,;()\-\/''«»]+/).filter(w => w.length > 4 && !stop.has(w) && !/^\d/.test(w)).forEach(w => { freq[w] = (freq[w]||0)+1; }));
+    return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([w])=>w);
+  })();
+
+  const THEMES = [
+    'emploi recrutement',
+    'métiers compétences',
+    'formation professionnelle',
+    'entreprises économie',
+    'innovations technologies',
+    'réglementation législation',
+    'marché du travail',
+    'conditions de travail',
+  ];
+
+  const queries = [];
+
+  // 1. Filière × chaque thème
+  THEMES.forEach(theme => queries.push(`${filiereLabel} ${theme} France`));
+
+  // 2. Groupes de mots-clés sectoriels × thèmes prioritaires
+  if (topWords.length >= 4) {
+    const g1 = topWords.slice(0, 5).join(' ');
+    const g2 = topWords.slice(5, 10).join(' ');
+    const g3 = topWords.slice(10, 15).join(' ');
+    queries.push(`${g1} emploi recrutement métiers France`);
+    queries.push(`${g2} formation compétences`);
+    queries.push(`${g1} innovations réglementation`);
+    queries.push(`${g3} entreprises marché travail`);
+  }
+
+  // 3. Mots-clés individuels forts × thèmes
+  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France`));
+
+  const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
+  return { filiereLabel, queries, topWords, rssFeeds };
+}
+
+
+// Fetch a direct RSS feed URL (specialized sectorial sources)
+async function fetchDirectRss(feedUrl, maxItems = 8) {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+  const res = await Promise.race([
+    fetch(proxyUrl),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+  ]);
+  if (!res.ok) throw new Error(`Direct RSS error ${res.status}`);
+  const data = await res.json();
+  const xml = data.contents || '';
+  if (!xml) throw new Error('Réponse vide');
+
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const items = [...doc.querySelectorAll('item, entry')].slice(0, maxItems);
+
+  return items.map(item => {
+    const getText = tag => item.querySelector(tag)?.textContent?.trim() || '';
+    const link = item.querySelector('link')?.getAttribute('href')
+              || item.querySelector('link')?.textContent?.trim()
+              || getText('guid');
+    return {
+      titre:  getText('title').replace(/\s*-\s*[^-]+$/, ''),
+      source: extractDomain(feedUrl),
+      url:    link || '',
+      date:   formatRssDate(getText('pubDate') || getText('updated')),
+      resume: stripHtml(getText('description') || getText('summary') || getText('content')).slice(0, 280),
+    };
+  }).filter(a => a.titre && a.url);
+}
+
+// Fetch Google News RSS via allorigins CORS proxy + DOMParser
+async function fetchRssFeed(query, maxItems = 12) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=fr&gl=FR&ceid=FR:fr`;
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+
+  const res = await Promise.race([
+    fetch(proxyUrl),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+  ]);
+  if (!res.ok) throw new Error(`Proxy error ${res.status}`);
+  const data = await res.json();
+  const xml = data.contents || '';
+  if (!xml) throw new Error('Réponse vide');
+
+  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const items = [...doc.querySelectorAll('item')].slice(0, maxItems);
+
+  return items.map(item => {
+    const getText = tag => item.querySelector(tag)?.textContent?.trim() || '';
+    const rawLink = getText('link') || item.querySelector('guid')?.textContent?.trim() || '';
+    const srcUrl  = extractSourceUrl({ link: rawLink, guid: rawLink, description: getText('description') });
+    return {
+      titre:  getText('title').replace(/\s*-\s*[^-]+$/, ''),
+      source: getText('source') || extractDomain(srcUrl),
+      url:    srcUrl,
+      date:   formatRssDate(getText('pubDate')),
+      resume: stripHtml(getText('description')).slice(0, 280),
+    };
+  }).filter(a => a.titre && a.url);
+}
+// Google News RSS wraps the real URL — try to extract it from the <description> HTML
+function extractSourceUrl(item) {
+  // Try guid first (sometimes contains real URL)
+  if (item.guid && item.guid.startsWith('http') && !item.guid.includes('news.google.com')) {
+    return item.guid;
+  }
+  // Try to parse the real link from description HTML (Google News embeds it as an <a> tag)
+  if (item.description) {
+    const match = item.description.match(/href="(https?:\/\/(?!news\.google\.com)[^"]+)"/);
+    if (match) return match[1];
+  }
+  // Fall back to link even if it's a Google News redirect
+  return item.link || '';
+}
+
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return '—'; }
+}
+
+function formatRssDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function stripHtml(html) {
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+let _veilleCountdownTimer = null;
+
+function showVeilleRateLimit(seconds = 30) {
+  document.getElementById('veille-spinner').style.display = 'none';
+  const rl = document.getElementById('veille-rate-limit');
+  rl.style.display = 'block';
+
+  const countEl  = document.getElementById('veille-countdown');
+  const retryBtn = document.getElementById('veille-retry-btn');
+  retryBtn.style.display = 'none';
+  let remaining = seconds;
+  countEl.textContent = remaining;
+
+  clearInterval(_veilleCountdownTimer);
+  _veilleCountdownTimer = setInterval(() => {
+    remaining--;
+    countEl.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(_veilleCountdownTimer);
+      retryBtn.style.display = 'inline-block';
+      countEl.textContent = '0';
+    }
+  }, 1000);
+}
+
+function hideVeilleRateLimit() {
+  clearInterval(_veilleCountdownTimer);
+  document.getElementById('veille-rate-limit').style.display = 'none';
+}
+
+const SPINNER_MESSAGES = [
+  'Recherche des actualités en cours…',
+  'Interrogation de Google News…',
+  'Analyse des flux RSS sectoriels…',
+  'Collecte des résultats…',
+  'Déduplication des articles…',
+  'Presque terminé…',
+];
+
+async function fetchVeilleNews() {
+  const filiereCode = document.getElementById('veille-filiere-select').value;
+  if (!filiereCode) return;
+
+  const btn = document.getElementById('veille-search-btn');
+  btn.disabled = true;
+
+  hideVeilleRateLimit();
+  document.getElementById('veille-empty').style.display = 'none';
+  document.getElementById('veille-error').style.display = 'none';
+  document.getElementById('veille-result-header').style.display = 'none';
+  document.getElementById('veille-grid').innerHTML = '';
+
+  // Animated spinner messages
+  const spinnerEl = document.getElementById('veille-spinner');
+  const msgEl     = document.getElementById('veille-spinner-msg');
+  const subEl     = document.getElementById('veille-spinner-sub');
+  spinnerEl.style.display = 'flex';
+  msgEl.textContent = SPINNER_MESSAGES[0];
+  subEl.textContent = '';
+  let msgIdx = 0;
+  const msgTimer = setInterval(() => {
+    msgIdx = (msgIdx + 1) % SPINNER_MESSAGES.length;
+    msgEl.textContent = SPINNER_MESSAGES[msgIdx];
+  }, 2500);
+
+  const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
+
+  // Show keywords
+  const kwBox = document.getElementById('veille-keywords');
+  document.getElementById('veille-keywords-list').textContent =
+    [filiereLabel, ...topWords.slice(0, 6)].join(' · ');
+  kwBox.style.display = 'block';
+  subEl.textContent = `${queries.length} requêtes · ${rssFeeds.length} flux RSS spécialisés`;
+
+  try {
+    // Stagger Google News queries slightly to avoid rate-limit (200ms apart)
+    const googlePromises = queries.map((q, i) =>
+      new Promise(resolve => setTimeout(
+        () => resolve(fetchRssFeed(q, i < 3 ? 10 : 6)),
+        i * 220
+      ))
+    );
+    const rssFetches = rssFeeds.map(url => fetchDirectRss(url, 8));
+
+    const results = await Promise.allSettled([...googlePromises, ...rssFetches]);
+
+    clearInterval(msgTimer);
+
+    // Detect rate-limit: all Google fetches returned empty
+    const googleResults = results.slice(0, queries.length);
+    const rssResults    = results.slice(queries.length);
+    const googleEmpty   = googleResults.every(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.length === 0));
+    const rssOk         = rssResults.some(r => r.status === 'fulfilled' && r.value.length > 0);
+
+    const seen = new Set();
+    const articles = [];
+
+    // Keywords that must appear in title or summary for an article to be kept
+    const FILTER_KEYWORDS = [
+      'emploi','recrutement','métier','compétence','formation','apprentissage','alternance',
+      'entreprise','économi','innovation','technologi','règlement','législation','loi',
+      'travail','salarié','embauche','chômage','marché','secteur','industrie','filière',
+      'qualification','diplôme','certification','contrat','convention','accord','syndicat',
+    ];
+
+    results.forEach(r => {
+      if (r.status === 'fulfilled') {
+        r.value.forEach(a => {
+          if (!a.url || seen.has(a.url) || !a.titre) return;
+          // Keep if title or resume contains at least one thematic keyword
+          const text = (a.titre + ' ' + (a.resume || '')).toLowerCase();
+          const relevant = FILTER_KEYWORDS.some(kw => text.includes(kw));
+          if (relevant) {
+            seen.add(a.url);
+            articles.push(a);
+          }
+        });
+      }
+    });
+
+    if (!articles.length) {
+      spinnerEl.style.display = 'none';
+      if (googleEmpty && !rssOk) {
+        // Likely rate-limited
+        showVeilleRateLimit(30);
+      } else {
+        const errEl = document.getElementById('veille-error');
+        errEl.style.display = 'block';
+        errEl.textContent = '⚠️ Aucune actualité trouvée pour cette filière. Réessayez dans quelques instants.';
+      }
+    } else {
+      renderVeilleNews(articles.slice(0, 20), filiereLabel);
+    }
+
+  } catch (err) {
+    clearInterval(msgTimer);
+    spinnerEl.style.display = 'none';
+    const errEl = document.getElementById('veille-error');
+    errEl.style.display = 'block';
+    errEl.textContent = `⚠️ ${err.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderVeilleNews(articles, filiereLabel) {
+  document.getElementById('veille-spinner').style.display = 'none';
+
+  const header = document.getElementById('veille-result-header');
+  document.getElementById('veille-result-title').textContent = filiereLabel;
+  document.getElementById('veille-result-subtitle').textContent =
+    `${articles.length} actualités récentes · Source : Google News`;
+  header.style.display = 'block';
+
+  const grid = document.getElementById('veille-grid');
+
+  // Show skeletons immediately
+  grid.innerHTML = articles.map((_, i) => `
+    <div class="user-news-card-skeleton" id="vn-card-${i}">
+      <div class="sk-img"></div>
+      <div class="sk-body">
+        <div class="sk-line w40"></div>
+        <div class="sk-line w80"></div>
+        <div class="sk-line w60"></div>
+      </div>
+    </div>`).join('');
+
+  // Enrich each article with OG metadata in parallel
+  articles.forEach(async (a, i) => {
+    const domain  = extractDomain(a.url);
+    const favicon = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+    let image = null, desc = a.resume || '';
+
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(a.url)}`;
+      const res = await Promise.race([
+        fetch(proxyUrl),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+      ]);
+      if (res.ok) {
+        const data = await res.json();
+        const html = data.contents || '';
+        const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
+                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
+        if (ogImg) image = ogImg[1].trim();
+        if (!desc) {
+          const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
+                      || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
+          if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
+        }
+      }
+    } catch (_) {}
+
+    const imgHtml = image
+      ? `<img class="user-news-card-img" src="${escHtml(image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+    const card = document.getElementById(`vn-card-${i}`);
+    if (!card) return;
+    card.className = 'user-news-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => window.open(a.url, '_blank', 'noopener');
+    card.innerHTML = `
+      ${imgHtml}
+      <div class="user-news-card-body">
+        <div class="user-news-card-source">
+          <img src="${escHtml(favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
+          ${escHtml(a.source)}
+        </div>
+        <div class="user-news-card-title">${escHtml(a.titre)}</div>
+        ${desc ? `<div class="user-news-card-desc">${escHtml(desc)}</div>` : ''}
+        <div class="user-news-card-domain">${escHtml(a.date)} · ${escHtml(domain)}</div>
+      </div>`;
+  });
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── SOURCES POPUP ─────────────────────────────────────────────────────────────
+function toggleSourcesPopup(event) {
+  event.stopPropagation();
+  const popup = document.getElementById('sources-popup');
+  const backdrop = document.getElementById('sources-backdrop');
+  const isHidden = popup.classList.contains('hidden');
+  popup.classList.toggle('hidden', !isHidden);
+  backdrop.classList.toggle('hidden', !isHidden);
+}
+function closeSourcesPopup() {
+  document.getElementById('sources-popup').classList.add('hidden');
+  document.getElementById('sources-backdrop').classList.add('hidden');
+}
+
+// ── RANKING PANEL (Tab 2) ─────────────────────────────────────────────────────
+function updateRanking() {
+  const { filiere, maille } = stateMap;
+  const list = document.getElementById('ranking-list');
+  const sub  = document.getElementById('ranking-panel-sub');
+  if (!filiere || !SOURCE_DATA.length) { list.innerHTML = '<div class="ranking-empty">Données non disponibles</div>'; return; }
+
+  const mailleLabel = maille === 'Régional' ? 'régions' : 'départements';
+  sub.textContent = mailleLabel;
+
+  // Get all rows for this filiere + maille, sorted by DPAE > 1 mois desc
+  const rows = SOURCE_DATA
+    .filter(d => d['Filière'] === filiere && d['Niveau'] === maille)
+    .map(d => ({ nom: d['Territoire'] || d['Code'], poids: +d['DPAE > 1 mois 2025'] }))
+    .filter(d => !isNaN(d.poids) && d.poids > 0)
+    .sort((a, b) => b.poids - a.poids);
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="ranking-empty">Aucune donnée disponible</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map((r, i) => `
+    <div class="ranking-row">
+      <span class="ranking-rank">${i + 1}</span>
+      <span class="ranking-name" title="${r.nom}">${r.nom}</span>
+      <span class="ranking-val">${Math.round(r.poids).toLocaleString('fr-FR')}</span>
+    </div>
+  `).join('');
+}
+
+// ── CHART AREA HEIGHT PATCH FOR TAB1 ──────────────────────────────────────────
+// The chart-main-row takes the chart-card flex:1, so initChart3 must target its parent
+
+(async () => {
+  const [ok] = await Promise.all([loadData(), loadNAF(), loadLeaders(), loadKeywords()]);
+  document.getElementById('loading-overlay').style.display = 'none';
+  if (!ok) return;
+
+  loadTerritoryData('00', 'National');
+
+  state3.selectedCodes = new Set(RAW.map(d => d.code));
+  buildSidebar3();
+  initChart3();
+
+  // Init mobile FAB visibility
+  if (window.innerWidth <= 768) {
+    const fabMatrix = document.getElementById('mobile-fab-matrix');
+    if (fabMatrix) fabMatrix.style.display = 'flex';
+  }
+
+  // Load shared user news once at startup
+  loadUserNews();
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      // On desktop: clean up any leftover mobile drawer state
+      if (window.innerWidth > 768) {
+        document.querySelectorAll('.sidebar.mobile-open').forEach(s => s.classList.remove('mobile-open'));
+        const bd = document.getElementById('mobile-sidebar-backdrop');
+        if (bd) bd.classList.remove('active');
+        // Hide mobile FABs
+        document.querySelectorAll('.mobile-fab').forEach(f => f.style.display = 'none');
+      }
+      // On mobile: clean up desktop sidebar-collapsed (drawer handles open/close)
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('.page.sidebar-collapsed').forEach(p => p.classList.remove('sidebar-collapsed'));
+      }
+      initChart3();
+      if (mapInitialized) renderMap();
+    }, 120);
+  });
+  setTimeout(initChart3, 250);
+})();
+</script>
+<!-- ── ADMIN PANEL (Ctrl+Shift+A) ── -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:380px;max-width:92vw;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="font-weight:700;font-size:15px;color:var(--ft-blue);margin-bottom:4px">⚙️ Configuration admin</div>
+    <div style="font-size:11px;color:var(--ft-muted);margin-bottom:18px">Ces informations sont stockées uniquement dans votre navigateur.</div>
+
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Token GitHub (scope : gist)</label>
+    <input id="admin-token" type="password" placeholder="ghp_…"
+      style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;font-family:monospace">
+
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Gist ID <span style="font-weight:400">(laisser vide = créé au 1er enregistrement)</span></label>
+    <input id="admin-gist-id" type="text" placeholder="abc1234…"
+      style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:20px;box-sizing:border-box;font-family:monospace">
+
+    <div style="display:flex;gap:10px">
+      <button onclick="adminSave()" style="flex:1;padding:10px;background:var(--ft-blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Enregistrer</button>
+      <button onclick="adminClose()" style="padding:10px 16px;background:#f3f4f6;border:none;border-radius:8px;font-size:13px;cursor:pointer">Annuler</button>
+    </div>
+    <div id="admin-status" style="font-size:11px;margin-top:10px;min-height:16px;text-align:center"></div>
+  </div>
+</div>
+
+<script>
+// Admin panel — Ctrl+Shift+A
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    if (panel.style.display === 'flex') {
+      const cfg = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+      document.getElementById('admin-token').value   = cfg.token  || '';
+      document.getElementById('admin-gist-id').value = cfg.gistId || '';
+      document.getElementById('admin-status').textContent = '';
+    }
+  }
+  if (e.key === 'Escape') adminClose();
+});
+document.getElementById('admin-panel').addEventListener('click', e => {
+  if (e.target === e.currentTarget) adminClose();
+});
+
+function adminClose() {
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
+async function adminSave() {
+  const token  = document.getElementById('admin-token').value.trim();
+  const gistId = document.getElementById('admin-gist-id').value.trim();
+  const status = document.getElementById('admin-status');
+
+  if (!token) { status.textContent = '⚠️ Token requis.'; status.style.color = '#b45309'; return; }
+
+  // Test token validity
+  status.textContent = 'Vérification…'; status.style.color = 'var(--ft-muted)';
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) throw new Error(`Token invalide (${res.status})`);
+    const user = await res.json();
+
+    localStorage.setItem(GIST_LS_KEY, JSON.stringify({ token, gistId }));
+    _token  = token;
+    _gistId = gistId;
+
+    status.textContent = `✅ Connecté en tant que @${user.login}`;
+    status.style.color = '#15803d';
+
+    setTimeout(() => { adminClose(); loadUserNews(); }, 1200);
+  } catch(e) {
+    status.textContent = '⚠️ ' + e.message;
+    status.style.color = '#991b1b';
+  }
+}
+</script>
+
+</body>
+</html>
