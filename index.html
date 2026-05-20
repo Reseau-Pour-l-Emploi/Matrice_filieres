@@ -2186,16 +2186,19 @@ function redrawChart3(useTransition = false) {
       .attr('pointer-events', 'none')
       .text('70%');
 
-    // Title centered inside rectangle
+    // Title centered inside rectangle — font size adaptive to available width
+    const titleText = '🎯 Filières à prioriser pour les prospections - fidélisations';
+    const availWidth = xRight - xLeft - 80; // subtract 40% and 70% label space
+    const titleFontSize = Math.max(9, Math.min(12, availWidth / titleText.length * 1.6));
     bg.append('text')
       .attr('x', (xLeft + xRight) / 2)
       .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
       .attr('text-anchor', 'middle')
-      .attr('font-size', '12')
+      .attr('font-size', titleFontSize.toFixed(1))
       .attr('font-weight', '700')
       .attr('fill', TENSION_COLOR)
       .attr('pointer-events', 'none')
-      .text('🎯 Filières à prioriser pour les prospections - fidélisations');
+      .text(titleText);
   }
 
   const ZONE_DEFS = [
@@ -2210,6 +2213,14 @@ function redrawChart3(useTransition = false) {
   ];
   const zg = g.select('.zone-labels');
   zg.selectAll('*').remove();
+
+  // Adaptive font size: fits longest line in its quadrant
+  const quadrantW = Math.min(gxPx, iW - gxPx);
+  const quadrantH = Math.min(gyPx, iH - gyPx);
+  const zoneFontSize = Math.max(10, Math.min(16,
+    Math.floor(Math.min(quadrantW / 14, quadrantH / 5))
+  ));
+
   ZONE_DEFS.forEach(zone => {
     const n = zone.lines.length;
     const t = zg.append('text')
@@ -2217,7 +2228,7 @@ function redrawChart3(useTransition = false) {
       .attr('x', zone.x).attr('y', zone.y)
       .attr('fill', zone.color)
       .attr('opacity', 0.28)
-      .attr('font-size','16')
+      .attr('font-size', zoneFontSize)
       .attr('font-family',"'DM Sans',sans-serif")
       .attr('font-weight','700')
       .attr('pointer-events','none');
@@ -2723,19 +2734,76 @@ function initVeilleTab() {
 
 // ── USER NEWS – stockage partagé via GitHub Gist ─────────────────────────────
 // À configurer une fois par l'administrateur dans le repo :
-const GIST_FILENAME  = 'user_news.json';
-const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
-// ⬇️ Renseignez ici l'ID du Gist après la première création (Ctrl+Shift+A)
-const GIST_ID_DEFAULT = '6e1f3e290eb9ae508e93af151a46daa9';
+// ── GITHUB GIST STORAGE ─────────────────────────────────────────────────────
+const STORAGE_LS_KEY  = 'mf_gist_cfg';
+const GIST_FILENAME   = 'user_news.json';
+// ⬇️ ID du Gist partagé — tous les utilisateurs lisent/écrivent ici
+const GIST_ID_DEFAULT = '4a0f31fe223274c6e0ce7126f220314f';
 
-// Structure: { FIL01: [{id, url, titre, ...}, ...], FIL02: [...], ... }
 let userNewsDB = {};
 
-// Load token + gistId from localStorage, fallback to GIST_ID_DEFAULT for read
-const _cfg    = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+const _cfg     = JSON.parse(localStorage.getItem(STORAGE_LS_KEY) || '{}');
 let _token     = _cfg.token     || '';
 let _gistId    = _cfg.gistId    || GIST_ID_DEFAULT;
 let _geminiKey = _cfg.geminiKey || '';
+
+function setGistStatus(msg, color) {
+  const el = document.getElementById('gist-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
+}
+
+async function loadUserNews() {
+  if (!_gistId) { renderUserNews(); return; }
+  try {
+    const headers = { Accept: 'application/vnd.github.v3+json' };
+    if (_token) headers['Authorization'] = `token ${_token}`;
+    const res = await fetch(`https://api.github.com/gists/${_gistId}`, { headers });
+    if (!res.ok) throw new Error(`GitHub ${res.status}`);
+    const data = await res.json();
+    const raw = data.files?.[GIST_FILENAME]?.content;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      userNewsDB = Array.isArray(parsed) ? { GENERAL: parsed } : parsed;
+    }
+    const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
+    setGistStatus(`🌐 ${total} news partagées`, '#15803d');
+  } catch (e) {
+    setGistStatus('⚠️ ' + e.message, '#b45309');
+  }
+  renderUserNews();
+}
+
+async function saveUserNews() {
+  if (!_token) { return; }
+  try {
+    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsDB) } } };
+    if (!_gistId) {
+      body.description = 'Matrice Filières – News partagées';
+      body.public = false;
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+      const data = await res.json();
+      _gistId = data.id;
+      console.info(`✅ Gist créé — ID : ${data.id}`);
+    } else {
+      const res = await fetch(`https://api.github.com/gists/${_gistId}`, {
+        method: 'PATCH',
+        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`GitHub ${res.status}`);
+    }
+    const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
+    setGistStatus(`🌐 ${total} news partagées`, '#15803d');
+  } catch (e) {
+    setGistStatus('⚠️ Sauvegarde : ' + e.message, '#b45309');
+  }
+}
+
 
 // ── GEMINI SYNTHESIS ─────────────────────────────────────────────────────────
 const GEMINI_MODELS = [
@@ -2818,64 +2886,7 @@ function setGistStatus(msg, color) {
   if (el) { el.textContent = msg; el.style.color = color || 'var(--ft-muted)'; }
 }
 
-async function loadUserNews() {
-  if (!_gistId) { renderUserNews(); return; }
-  try {
-    const headers = { Accept: 'application/vnd.github.v3+json' };
-    if (_token) headers['Authorization'] = `token ${_token}`;
-    const res = await fetch(`https://api.github.com/gists/${_gistId}`, { headers });
-    if (!res.ok) throw new Error(`GitHub ${res.status}`);
-    const data = await res.json();
-    const raw = data.files?.[GIST_FILENAME]?.content;
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Support both old flat array and new per-filière dict
-      if (Array.isArray(parsed)) {
-        // Migrate old format: put all in 'GENERAL' key
-        userNewsDB = { GENERAL: parsed };
-      } else {
-        userNewsDB = parsed;
-      }
-    }
-    const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
-    setGistStatus(`🌐 ${total} news partagées`, '#15803d');
-  } catch (e) {
-    setGistStatus('⚠️ ' + e.message, '#b45309');
-  }
-  renderUserNews();
-}
 
-async function saveUserNews() {
-  if (!_token) { return; }
-  try {
-    const body = { files: { [GIST_FILENAME]: { content: JSON.stringify(userNewsDB) } } };
-    if (!_gistId) {
-      body.description = 'Matrice Filières – News partagées';
-      body.public = false;
-      const res = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) throw new Error(`GitHub ${res.status}`);
-      const data = await res.json();
-      _gistId = data.id;
-      console.info(`✅ Gist créé — ID : ${data.id}`);
-      setGistStatus(`✅ Gist créé (voir console)`, '#15803d');
-    } else {
-      const res = await fetch(`https://api.github.com/gists/${_gistId}`, {
-        method: 'PATCH',
-        headers: { Authorization: `token ${_token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) throw new Error(`GitHub ${res.status}`);
-      const total = Object.values(userNewsDB).reduce((s, a) => s + a.length, 0);
-      setGistStatus(`🌐 ${total} news partagées`, '#15803d');
-    }
-  } catch (e) {
-    setGistStatus('⚠️ Sauvegarde : ' + e.message, '#b45309');
-  }
-}
 
 async function addUserNews() {
   const filiereCode = getCurrentVeilleFiliere();
@@ -3614,8 +3625,8 @@ function updateRanking() {
     <input id="admin-token" type="password" placeholder="ghp_…"
       style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;font-family:monospace">
 
-    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Gist ID <span style="font-weight:400">(laisser vide = créé au 1er enregistrement)</span></label>
-    <input id="admin-gist-id" type="text" placeholder="abc1234…"
+    <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Gist ID <span style="font-weight:400">(automatique)</span></label>
+    <input id="admin-gist-id" type="text" placeholder="4a0f31fe223274c6e0ce7126f220314f"
       style="width:100%;padding:9px 12px;border:1px solid var(--ft-border);border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;font-family:monospace">
 
     <label style="font-size:11px;font-weight:600;color:var(--ft-muted);display:block;margin-bottom:4px">Clé API Google Gemini <span style="font-weight:400">(<a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ft-blue)">aistudio.google.com</a>)</span></label>
@@ -3637,9 +3648,9 @@ document.addEventListener('keydown', e => {
     const panel = document.getElementById('admin-panel');
     panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
     if (panel.style.display === 'flex') {
-      const cfg = JSON.parse(localStorage.getItem(GIST_LS_KEY) || '{}');
+      const cfg = JSON.parse(localStorage.getItem(STORAGE_LS_KEY) || '{}');
       document.getElementById('admin-token').value      = cfg.token     || '';
-      document.getElementById('admin-gist-id').value    = cfg.gistId    || '';
+      document.getElementById('admin-gist-id').value    = cfg.gistId    || GIST_ID_DEFAULT;
       document.getElementById('admin-gemini-key').value = cfg.geminiKey || '';
       document.getElementById('admin-status').textContent = '';
     }
@@ -3656,13 +3667,12 @@ function adminClose() {
 
 async function adminSave() {
   const token     = document.getElementById('admin-token').value.trim();
-  const gistId    = document.getElementById('admin-gist-id').value.trim();
+  const gistId    = document.getElementById('admin-gist-id').value.trim() || GIST_ID_DEFAULT;
   const geminiKey = document.getElementById('admin-gemini-key').value.trim();
   const status    = document.getElementById('admin-status');
 
   if (!token) { status.textContent = '⚠️ Token requis.'; status.style.color = '#b45309'; return; }
 
-  // Test token validity
   status.textContent = 'Vérification…'; status.style.color = 'var(--ft-muted)';
   try {
     const res = await fetch('https://api.github.com/user', {
@@ -3671,7 +3681,7 @@ async function adminSave() {
     if (!res.ok) throw new Error(`Token invalide (${res.status})`);
     const user = await res.json();
 
-    localStorage.setItem(GIST_LS_KEY, JSON.stringify({ token, gistId, geminiKey }));
+    localStorage.setItem(STORAGE_LS_KEY, JSON.stringify({ token, gistId, geminiKey }));
     _token     = token;
     _gistId    = gistId;
     _geminiKey = geminiKey;
