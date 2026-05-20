@@ -1378,15 +1378,15 @@
 
         <div class="side-divider" style="margin-top:14px"></div>
 
-        <div class="interp-label" style="margin-top:12px;color:#7c3aed">🎯 Filières à prioriser pour les prospections - fidélisations</div>
-        <div style="font-size:11px;line-height:1.6;margin-top:6px;color:#4c1d95">
+        <div class="interp-label" style="margin-top:12px;color:#1d4ed8">🎯 Filières à prioriser pour les prospections - fidélisations</div>
+        <div style="font-size:11px;line-height:1.6;margin-top:6px;color:#1e3a8a">
           Afin d'optimiser le rendement des actions de prospections&#8209;fidélisations, il est préférable de cibler les filières&nbsp;/ secteurs pour lesquels les tensions sont <strong>intermédiaires</strong>&nbsp;:
           <ul style="margin:6px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:4px">
             <li><strong>Ni trop fortes (&lt;&nbsp;70&nbsp;%)</strong> — car il sera difficile de pourvoir les postes, occasionnant inefficience et insatisfaction.</li>
             <li><strong>Ni trop faibles (&gt;&nbsp;40&nbsp;%)</strong> — car l'impact sera moindre étant donné que les recruteurs parviennent déjà à pourvoir leurs postes sans aide.</li>
           </ul>
-          <div style="margin-top:6px;padding:5px 8px;background:#ede9fe;border-left:3px solid #7c3aed;border-radius:0 4px 4px 0;font-size:10.5px">
-            Zone cible : tensions comprises entre <strong>40&nbsp;%</strong> et <strong>70&nbsp;%</strong> (zone délimitée par les lignes pointillées violettes sur la matrice).
+          <div style="margin-top:6px;padding:5px 8px;background:#eff6ff;border-left:3px solid #1d4ed8;border-radius:0 4px 4px 0;font-size:10.5px">
+            Zone cible : tensions comprises entre <strong>40&nbsp;%</strong> et <strong>70&nbsp;%</strong> (zone délimitée par les lignes pointillées bleues sur la matrice).
           </div>
         </div>
 
@@ -2042,7 +2042,7 @@ function initChart3() {
   const svg = d3.select('#chart-svg-3');
   svg.selectAll('*').remove();
 
-  const m = { top:28, right:30, bottom:56, left:66 };
+  const m = { top:52, right:30, bottom:56, left:66 };
   const iW = W - m.left - m.right, iH = H - m.top - m.bottom;
   svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
   const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
@@ -2127,7 +2127,7 @@ function redrawChart3(useTransition = false) {
 
   // ── Tension threshold lines at 40% and 70% ─────────────────────────────────
   const TENSION_THRESHOLDS = [0.40, 0.70];
-  const TENSION_COLOR = '#7c3aed'; // violet
+  const TENSION_COLOR = '#1d4ed8'; // bleu
   const tlg = g.select('.tension-lines');
   tlg.selectAll('line').data(TENSION_THRESHOLDS)
     .join('line')
@@ -2143,44 +2143,58 @@ function redrawChart3(useTransition = false) {
   const bg = g.select('.tension-brace');
   bg.selectAll('*').remove();
 
-  const x40 = xScale(0.40);
-  const x70 = xScale(0.70);
-  const braceY  = -12; // just above chart area
-  const braceH  = 6;   // brace arm height
-  const midX    = (x40 + x70) / 2;
-  const BRACE_COLOR = '#7c3aed';
+  const x40  = xScale(0.40);
+  const x70  = xScale(0.70);
+  const braceY = -16;  // distance below top of chart area (negative = above)
+  const braceH = 7;
+  const midX   = (x40 + x70) / 2;
 
   // Only draw if both thresholds are in visible range
   const [xDomMin, xDomMax] = xScale.domain();
   if (xDomMin <= 0.40 && xDomMax >= 0.70) {
-    // Brace path: ├──────────────┤ style with center tick pointing up
+
+    // Blue highlight fill for the priority zone
+    bg.append('rect')
+      .attr('x', x40)
+      .attr('y', 0)
+      .attr('width', x70 - x40)
+      .attr('height', iH)
+      .attr('fill', '#eff6ff')
+      .attr('opacity', 0.55)
+      .attr('clip-path', 'url(#clip3)')
+      .attr('pointer-events', 'none');
+
+    // Brace path
     const bracePath = `M${x40},${braceY + braceH} L${x40},${braceY} L${midX},${braceY} L${midX},${braceY - braceH} M${midX},${braceY} L${x70},${braceY} L${x70},${braceY + braceH}`;
     bg.append('path')
       .attr('d', bracePath)
       .attr('fill', 'none')
-      .attr('stroke', BRACE_COLOR)
+      .attr('stroke', TENSION_COLOR)
       .attr('stroke-width', 1.5)
       .attr('pointer-events', 'none');
 
-    // Label above brace
-    bg.append('text')
-      .attr('x', midX)
-      .attr('y', braceY - braceH - 4)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', '10')
-      .attr('font-weight', '700')
-      .attr('fill', BRACE_COLOR)
-      .attr('pointer-events', 'none')
-      .text('Filières à prioriser pour les prospections - fidélisations');
+    // Label above brace (two lines to fit)
+    const labelLines = ['Filières à prioriser pour les', 'prospections - fidélisations'];
+    labelLines.forEach((line, i) => {
+      bg.append('text')
+        .attr('x', midX)
+        .attr('y', braceY - braceH - 4 - (labelLines.length - 1 - i) * 13)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '10')
+        .attr('font-weight', '700')
+        .attr('fill', TENSION_COLOR)
+        .attr('pointer-events', 'none')
+        .text(line);
+    });
 
-    // Tick labels at 40% and 70%
+    // % labels at base of brace
     [{ v: 0.40, x: x40 }, { v: 0.70, x: x70 }].forEach(({ v, x }) => {
       bg.append('text')
         .attr('x', x)
         .attr('y', braceY + braceH + 12)
         .attr('text-anchor', 'middle')
         .attr('font-size', '9')
-        .attr('fill', BRACE_COLOR)
+        .attr('fill', TENSION_COLOR)
         .attr('pointer-events', 'none')
         .text(`${Math.round(v * 100)}%`);
     });
@@ -2193,8 +2207,7 @@ function redrawChart3(useTransition = false) {
     { x: gxPx / 2,       y:(gyPx+iH)/2,     color:'#d97706',
       lines:['Chercher des opportunités de partenariats','pour certains recrutements'] },
     { x:(gxPx+iW)/2,     y:(gyPx+iH)/2,     color:'#dc2626',
-      lines:['\u00c0 prioriser dans l\u2019\u00ab\u202faller vers\u202f\u00bb,','pour proposer des solutions',
-             'visant \u00e0 r\u00e9duire les tensions'] },
+      lines:['Aller vers si en capacité','de proposer le bon service'] },
   ];
   const zg = g.select('.zone-labels');
   zg.selectAll('*').remove();
