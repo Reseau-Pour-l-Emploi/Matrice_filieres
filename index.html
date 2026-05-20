@@ -882,7 +882,15 @@
       .tab-btn { padding: 10px 14px; font-size: 12px; gap: 5px; white-space: nowrap; }
       .tab-btn svg { width: 12px; height: 12px; }
 
-      /* Sidebar: overlay drawer — ONLY position/transform, keep desktop display/flex intact */
+      /* Page: remove stacking context so position:fixed children escape to viewport */
+      .page {
+        display: block !important;
+        transition: none !important;
+        transform: none !important;
+        will-change: auto !important;
+      }
+
+      /* Sidebar: full-screen overlay drawer */
       .sidebar {
         position: fixed !important;
         top: 0 !important;
@@ -895,7 +903,7 @@
         transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
         box-shadow: 4px 0 24px rgba(0,0,0,.2) !important;
         border-right: none !important;
-        /* Keep desktop flex layout — just fix the height */
+        overflow: hidden !important;
       }
       .sidebar.mobile-open {
         transform: translateX(0) !important;
@@ -922,13 +930,16 @@
         display: flex; align-items: center; justify-content: center;
       }
 
-      /* sidebar-inner scrolls within the remaining drawer height */
+      /* sidebar-inner: fixed height = drawer minus header, scrollable */
       .sidebar-inner {
-        flex: 1 1 auto !important;
+        height: calc(100dvh - 52px) !important;
+        max-height: calc(100dvh - 52px) !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior: contain !important;
         padding: 12px 14px 40px !important;
+        box-sizing: border-box !important;
       }
 
       /* Backdrop */
@@ -951,8 +962,6 @@
       }
       .mobile-fab[style*="display: none"] { display: none !important; }
 
-      /* Page: block layout, no transition */
-      .page { display: block !important; transition: none !important; }
 
       /* Chart area */
       .chart-area { padding: 10px 12px 90px !important; }
@@ -1078,7 +1087,9 @@
      TAB 1 : MATRICE
 ══════════════════════════════════════════════ -->
 <div id="tab-matrix" class="tab-content active">
-<aside class="sidebar" id="sidebar-matrix">
+<div class="page" id="page-matrix">
+
+  <aside class="sidebar" id="sidebar-matrix">
     <div class="sidebar-mobile-header">
         <span class="sidebar-mobile-title">🎛️ Filtres</span>
         <button class="sidebar-mobile-close" onclick="toggleSidebar('matrix')" title="Fermer">
@@ -1271,7 +1282,7 @@
     </div><!-- /.sidebar-inner -->
   </aside>
 
-<div class="page" id="page-matrix">
+
 
 
 
@@ -1365,7 +1376,9 @@
      TAB 2 : CARTE PAR FILIÈRE
 ══════════════════════════════════════════════ -->
 <div id="tab-carte" class="tab-content">
-<aside class="sidebar" id="sidebar-carte">
+<div class="page" id="page-carte">
+
+    <aside class="sidebar" id="sidebar-carte">
     <div class="sidebar-mobile-header">
         <span class="sidebar-mobile-title">🎛️ Filtres</span>
         <button class="sidebar-mobile-close" onclick="toggleSidebar('carte')" title="Fermer">
@@ -1429,7 +1442,7 @@
     </div>
   </aside>
 
-<div class="page" id="page-carte">
+
 
   <main class="chart-area">
     <button class="burger-btn desktop-burger" id="burger-btn-carte" onclick="toggleSidebar('carte')" title="Masquer / afficher les filtres">
