@@ -1552,7 +1552,9 @@ const DATA_URL    = 'Data_DEP_REG.json';
 const NAF_URL     = 'Filieres-NAF.json';
 const DEP_URL     = 'dep.geojson';
 const REG_URL     = 'reg.geojson';
-const LEADERS_URL = 'Leader_filieres.csv';
+const LEADERS_URL   = 'Leader_filieres.csv';
+const KEYWORDS_URL  = 'Filieres-Keywords.json';
+let KEYWORDS_DATA   = {}; // populated by loadKeywords()
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];
@@ -1649,6 +1651,17 @@ async function loadLeaders() {
     console.log(`✅ ${LEADERS_URL} chargé : ${Object.keys(LEADERS_FILIERES).length} filières`);
   } catch (err) {
     console.warn('⚠️ Leaders non chargés :', err.message);
+  }
+}
+
+async function loadKeywords() {
+  try {
+    const res = await fetch(KEYWORDS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    KEYWORDS_DATA = await res.json();
+    console.log(`✅ ${KEYWORDS_URL} chargé : ${Object.keys(KEYWORDS_DATA).length} filières`);
+  } catch (err) {
+    console.warn('⚠️ Keywords non chargés :', err.message);
   }
 }
 
@@ -2759,41 +2772,19 @@ const FILIERE_RSS_FEEDS = {
 
 function buildVeilleKeywords(filiereCode) {
   const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
-  const nafs = NAF_BY_FILIERE[filiereCode] || [];
 
-  // Stopwords étendus
-  const stopwords = new Set([
-    'les','des','une','pour','dans','avec','sur','par','aux','que','qui','de','du',
-    'la','le','et','en','au','autres','fabrication','activités','services','travaux',
-    'production','commerce','gestion','location','vente','achat','traitement','transport',
-    'réparation','installation','construction','exploitation','mise','sous'
-  ]);
+  // Primary: curated keywords from Filieres-Keywords.json
+  const curatedKws = (KEYWORDS_DATA[filiereCode] && KEYWORDS_DATA[filiereCode].keywords) || [];
 
-  // 1. Extract frequent significant words across all NAF libellés
-  const wordFreq = {};
-  nafs.forEach(n => {
-    n.libelle.toLowerCase()
-      .split(/[\s,;()\-\/''«»]+/)
-      .filter(w => w.length > 4 && !stopwords.has(w) && !/^\d/.test(w) && !/^[a-z]{1,2}$/.test(w))
-      .forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
-  });
-  const topWords = Object.entries(wordFreq)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 15)
-    .map(([w]) => w);
+  // Fallback: extract from NAF libellés if JSON not loaded
+  let topWords = curatedKws.length ? curatedKws : (() => {
+    const nafs = NAF_BY_FILIERE[filiereCode] || [];
+    const stop = new Set(['les','des','une','pour','dans','avec','sur','par','aux','de','du','la','le','et','en','au','autres','fabrication','activités','services','travaux','production','commerce','gestion','location','vente','achat','traitement','réparation','installation','construction','exploitation','mise','sous']);
+    const freq = {};
+    nafs.forEach(n => n.libelle.toLowerCase().split(/[\s,;()\-\/''«»]+/).filter(w => w.length > 4 && !stop.has(w) && !/^\d/.test(w)).forEach(w => { freq[w] = (freq[w]||0)+1; }));
+    return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([w])=>w);
+  })();
 
-  // 2. Extract representative NAF sector groups (first meaningful words of each libellé)
-  const nafSectors = [...new Set(
-    nafs.map(n => {
-      const words = n.libelle
-        .split(/[\s,;()\-\/]+/)
-        .filter(w => w.length > 5 && !stopwords.has(w.toLowerCase()) && !/^\d/.test(w));
-      return words.slice(0, 3).join(' ');
-    }).filter(s => s.length > 5)
-  )].slice(0, 12);
-
-  // 3. Build diverse queries
-  // Thèmes métier — chaque requête croise la filière avec l'un d'eux
   const THEMES = [
     'emploi recrutement',
     'métiers compétences',
@@ -2807,33 +2798,27 @@ function buildVeilleKeywords(filiereCode) {
 
   const queries = [];
 
-  // 1. Filière × chaque thème (8 requêtes de base)
-  THEMES.forEach(theme => {
-    queries.push(`${filiereLabel} ${theme} France`);
-  });
+  // 1. Filière × chaque thème
+  THEMES.forEach(theme => queries.push(`${filiereLabel} ${theme} France`));
 
-  // 2. Top mots-clés NAF × thèmes prioritaires
-  if (topWords.length >= 3) {
-    const kwGroup1 = topWords.slice(0, 4).join(' ');
-    const kwGroup2 = topWords.slice(4, 8).join(' ');
-    queries.push(`${kwGroup1} emploi recrutement métiers`);
-    queries.push(`${kwGroup2} formation compétences`);
-    queries.push(`${kwGroup1} innovations réglementation`);
-    queries.push(`${kwGroup2} entreprises marché travail`);
+  // 2. Groupes de mots-clés sectoriels × thèmes prioritaires
+  if (topWords.length >= 4) {
+    const g1 = topWords.slice(0, 5).join(' ');
+    const g2 = topWords.slice(5, 10).join(' ');
+    const g3 = topWords.slice(10, 15).join(' ');
+    queries.push(`${g1} emploi recrutement métiers France`);
+    queries.push(`${g2} formation compétences`);
+    queries.push(`${g1} innovations réglementation`);
+    queries.push(`${g3} entreprises marché travail`);
   }
 
-  // 3. Secteurs NAF représentatifs × thèmes (jusqu'à 4 requêtes supplémentaires)
-  const step = Math.max(1, Math.floor(nafSectors.length / 4));
-  THEMES.slice(0, 4).forEach((theme, i) => {
-    const sector = nafSectors[i * step];
-    if (sector) queries.push(`${sector} ${theme}`);
-  });
+  // 3. Mots-clés individuels forts × thèmes
+  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France`));
 
-  // Specialized RSS feeds
   const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
-
-  return { filiereLabel, queries, topWords, nafSectors, rssFeeds };
+  return { filiereLabel, queries, topWords, rssFeeds };
 }
+
 
 // Fetch a direct RSS feed URL (specialized sectorial sources)
 async function fetchDirectRss(feedUrl, maxItems = 8) {
@@ -2990,7 +2975,7 @@ async function fetchVeilleNews() {
     msgEl.textContent = SPINNER_MESSAGES[msgIdx];
   }, 2500);
 
-  const { filiereLabel, queries, topWords, nafSectors, rssFeeds } = buildVeilleKeywords(filiereCode);
+  const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
 
   // Show keywords
   const kwBox = document.getElementById('veille-keywords');
@@ -3194,7 +3179,7 @@ function updateRanking() {
 // The chart-main-row takes the chart-card flex:1, so initChart3 must target its parent
 
 (async () => {
-  const [ok] = await Promise.all([loadData(), loadNAF(), loadLeaders()]);
+  const [ok] = await Promise.all([loadData(), loadNAF(), loadLeaders(), loadKeywords()]);
   document.getElementById('loading-overlay').style.display = 'none';
   if (!ok) return;
 
