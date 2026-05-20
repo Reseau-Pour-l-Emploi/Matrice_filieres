@@ -2180,23 +2180,23 @@ function redrawChart3(useTransition = false) {
 
 
 
-    // 40% label at left edge inside rectangle
+    // 40% label outside rectangle, below left edge
     bg.append('text')
-      .attr('x', xLeft + 6)
-      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
-      .attr('text-anchor', 'start')
-      .attr('font-size', '11')
+      .attr('x', xLeft)
+      .attr('y', 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '10')
       .attr('font-weight', '700')
       .attr('fill', TENSION_COLOR)
       .attr('pointer-events', 'none')
       .text('40%');
 
-    // 70% label at right edge inside rectangle
+    // 70% label outside rectangle, below right edge
     bg.append('text')
-      .attr('x', xRight - 6)
-      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
-      .attr('text-anchor', 'end')
-      .attr('font-size', '11')
+      .attr('x', xRight)
+      .attr('y', 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '10')
       .attr('font-weight', '700')
       .attr('fill', TENSION_COLOR)
       .attr('pointer-events', 'none')
