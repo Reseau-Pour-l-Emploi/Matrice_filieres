@@ -716,6 +716,146 @@
     /* Map card fills full height */
     #page-carte .chart-area { padding-top: 0; }
     #map-card svg { width: 100%; height: 100%; display: block; }
+    /* ── VEILLE TAB ── */
+    #tab-veille { height: calc(100vh - 52px); display: none; flex-direction: column; }
+    #tab-veille.active { display: flex; }
+    .veille-layout { display: flex; gap: 0; flex: 1; min-height: 0; }
+    .veille-sidebar {
+      width: 260px; flex-shrink: 0; border-right: 1px solid var(--ft-border);
+      padding: 20px 16px; overflow-y: auto; background: var(--ft-bg);
+    }
+    .veille-sidebar h2 { font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ft-muted); margin-bottom: 10px; }
+    .veille-filiere-select {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--ft-border);
+      border-radius: 8px; font-size: 13px; color: var(--ft-text);
+      background: #fff; cursor: pointer; margin-bottom: 14px;
+    }
+    .veille-filiere-select:focus { outline: none; border-color: var(--ft-blue); }
+    .veille-search-btn {
+      width: 100%; padding: 9px 0; background: var(--ft-blue); color: #fff;
+      border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .15s;
+    }
+    .veille-search-btn:hover { background: #0026a8; }
+    .veille-search-btn:disabled { background: #93c5fd; cursor: default; }
+    .veille-keywords {
+      margin-top: 18px; padding: 10px 12px; background: #f0f9ff;
+      border: 1px solid #bae6fd; border-radius: 8px; font-size: 11px;
+      color: #075985; line-height: 1.6;
+    }
+    .veille-keywords strong { display: block; margin-bottom: 4px; color: var(--ft-blue); }
+    .veille-main { flex: 1; min-width: 0; overflow-y: auto; padding: 24px 28px; }
+    .veille-header { margin-bottom: 20px; }
+    .veille-header h1 { font-size: 18px; font-weight: 700; color: var(--ft-blue); }
+    .veille-header p { font-size: 12px; color: var(--ft-muted); margin-top: 3px; }
+    .veille-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .veille-empty { text-align: center; padding: 60px 20px; color: var(--ft-muted); }
+    .veille-empty svg { margin-bottom: 12px; opacity: .4; }
+    .veille-spinner {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 60px 20px; color: var(--ft-muted); font-size: 14px;
+    }
+    .veille-spinner-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--ft-blue);
+      animation: veilleBouce 1.2s ease-in-out infinite;
+    }
+    .veille-spinner-dot:nth-child(2) { animation-delay: .2s; }
+    .veille-spinner-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes veilleBouce { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+    .veille-error {
+      background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+      padding: 16px; color: #991b1b; font-size: 13px; margin-bottom: 20px;
+    }
+
+    /* ── USER NEWS SECTION ── */
+    .user-news-section {
+      margin-bottom: 28px;
+      border: 1.5px dashed var(--ft-border);
+      border-radius: 12px; padding: 18px 20px;
+      background: #f8faff;
+    }
+    .user-news-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+    }
+    .user-news-section-title {
+      font-size: 13px; font-weight: 700; color: var(--ft-blue);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .user-news-add-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .user-news-input {
+      flex: 1; padding: 8px 12px; border: 1px solid var(--ft-border);
+      border-radius: 8px; font-size: 12px; color: var(--ft-text);
+      background: #fff; min-width: 220px;
+    }
+    .user-news-input:focus { outline: none; border-color: var(--ft-blue); }
+    .user-news-input::placeholder { color: #9ca3af; }
+    .user-news-add-btn {
+      padding: 8px 14px; background: var(--ft-blue); color: #fff;
+      border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      transition: background .15s;
+    }
+    .user-news-add-btn:hover { background: #0026a8; }
+    .user-news-add-btn:disabled { background: #93c5fd; cursor: default; }
+    .user-news-empty-hint {
+      font-size: 12px; color: var(--ft-muted); text-align: center; padding: 8px 0;
+    }
+    .user-news-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+    }
+    .user-news-card {
+      background: #fff; border: 1px solid #bfdbfe; border-radius: 12px;
+      overflow: hidden; display: flex; flex-direction: column; position: relative;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .user-news-card:hover { box-shadow: 0 4px 18px rgba(0,49,137,.12); border-color: #93c5fd; }
+    .user-news-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .user-news-card-img-placeholder {
+      width: 100%; height: 110px; background: linear-gradient(135deg,#eff6ff,#dbeafe);
+      display: flex; align-items: center; justify-content: center; color: #bfdbfe;
+    }
+    .user-news-card-body { padding: 13px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+    .user-news-card-source {
+      font-size: 10px; font-weight: 700; color: var(--ft-teal);
+      text-transform: uppercase; letter-spacing:.06em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .user-news-card-title { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ft-text); }
+    .user-news-card-title a { color: inherit; text-decoration: none; }
+    .user-news-card-title a:hover { color: var(--ft-blue); text-decoration: underline; }
+    .user-news-card-desc { font-size: 11px; color: var(--ft-muted); line-height: 1.55; }
+    .user-news-card-domain { font-size: 10px; color: #9ca3af; margin-top: auto; padding-top: 6px; }
+    .user-news-delete-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(255,255,255,.88); border: none; cursor: pointer;
+      color: #9ca3af; padding: 4px; line-height: 1; border-radius: 6px;
+      transition: color .12s; backdrop-filter: blur(4px);
+    }
+    .user-news-delete-btn:hover { color: #ef4444; background: #fff; }
+    .user-news-card-skeleton {
+      background: #fff; border: 1px solid #bfdbfe; border-radius: 12px; overflow: hidden;
+      animation: skPulse 1.4s ease-in-out infinite;
+    }
+    .user-news-card-skeleton .sk-img { height: 110px; background: #dbeafe; }
+    .user-news-card-skeleton .sk-body { padding: 13px; display: flex; flex-direction: column; gap: 8px; }
+    .user-news-card-skeleton .sk-line { height: 9px; border-radius: 4px; background: #dbeafe; }
+    .user-news-card-skeleton .sk-line.w80 { width: 80%; }
+    .user-news-card-skeleton .sk-line.w60 { width: 60%; }
+    .user-news-card-skeleton .sk-line.w40 { width: 40%; }
+    @keyframes skPulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .user-news-loading {
+      font-size: 11px; color: var(--ft-muted); display: flex; align-items: center; gap: 5px;
+    }
+    .net-news-title {
+      font-size: 13px; font-weight: 700; color: var(--ft-blue);
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+
   </style>
 </head>
 <body>
@@ -759,6 +899,10 @@
   <button class="tab-btn" id="tab-btn-carte" onclick="switchTab('carte')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
     Carte par filière
+  </button>
+  <button class="tab-btn" id="tab-btn-veille" onclick="switchTab('veille')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Veille filières
   </button>
 </nav>
 
@@ -1142,6 +1286,84 @@
 </div><!-- /.page#page-carte -->
 </div><!-- /#tab-carte -->
 
+<!-- ══════════════════════════════════════════════
+     TAB 3 : VEILLE FILIÈRES
+══════════════════════════════════════════════ -->
+<div id="tab-veille" class="tab-content">
+  <div class="veille-layout">
+
+    <!-- Sidebar -->
+    <aside class="veille-sidebar">
+      <h2>🏭 Filière</h2>
+      <select id="veille-filiere-select" class="veille-filiere-select">
+        <option value="">— Sélectionnez —</option>
+      </select>
+
+      <button class="veille-search-btn" id="veille-search-btn" onclick="fetchVeilleNews()" disabled>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Rechercher les news
+      </button>
+
+      <div class="veille-keywords" id="veille-keywords" style="display:none">
+        <strong>Mots-clés utilisés</strong>
+        <span id="veille-keywords-list"></span>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="veille-main">
+
+      <!-- ── Zone : Vos news ── -->
+      <div class="user-news-section">
+        <div class="user-news-section-header">
+          <div class="user-news-section-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+            Vos news
+          </div>
+          <div class="user-news-add-row">
+            <input type="url" id="user-news-input" class="user-news-input"
+              placeholder="Collez un lien d'article…"
+              onkeydown="if(event.key==='Enter') addUserNews()" />
+            <button class="user-news-add-btn" id="user-news-add-btn" onclick="addUserNews()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter
+            </button>
+          </div>
+        </div>
+        <div id="user-news-status"></div>
+        <div id="user-news-grid" class="user-news-grid" style="display:none"></div>
+        <div id="user-news-empty" class="user-news-empty-hint">Aucune news ajoutée — collez un lien ci-dessus.</div>
+      </div>
+
+      <!-- ── Zone : News du net ── -->
+      <div class="veille-empty" id="veille-empty">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p>Sélectionnez une filière et lancez la recherche<br>pour accéder aux 20 dernières actualités.</p>
+      </div>
+      <div id="veille-spinner" class="veille-spinner" style="display:none">
+        <div class="veille-spinner-dot"></div>
+        <div class="veille-spinner-dot"></div>
+        <div class="veille-spinner-dot"></div>
+        <span>Recherche des actualités en cours…</span>
+      </div>
+      <div id="veille-error" class="veille-error" style="display:none"></div>
+      <div class="veille-header" id="veille-result-header" style="display:none">
+        <div class="net-news-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          News du net — <span id="veille-result-title"></span>
+        </div>
+        <p id="veille-result-subtitle" style="font-size:12px;color:var(--ft-muted);margin-top:2px"></p>
+      </div>
+      <div class="veille-grid" id="veille-grid"></div>
+    </div>
+
+  </div>
+</div><!-- /#tab-veille -->
+
 <div class="tooltip" id="tooltip"></div>
 <div id="naf-mini-tooltip"></div>
 
@@ -1308,6 +1530,7 @@ function switchTab(name) {
     }
     setTimeout(() => { if (mapInitialized) renderMap(); }, 50);
   }
+  if (name === 'veille') initVeilleTab();
   if (name === 'matrix') {
     setTimeout(initChart3, 50);
   }
@@ -2116,6 +2339,371 @@ function updateLegend(values, cfg, palette, classBounds) {
       <span class="choro-legend-range">${label}</span>
     </div>`;
   }).join('');
+}
+
+// ── VEILLE FILIÈRES ───────────────────────────────────────────────────────────
+
+function initVeilleTab() {
+  const sel = document.getElementById('veille-filiere-select');
+  // Populate from ALL_FILIERES (already loaded)
+  const sorted = Object.entries(ALL_FILIERES).sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+  sorted.forEach(([code, label]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    document.getElementById('veille-search-btn').disabled = !sel.value;
+  });
+}
+
+// ── USER NEWS ─────────────────────────────────────────────────────────────────
+
+let userNewsList = []; // { url, titre, source, favicon }
+
+async function addUserNews() {
+  const input = document.getElementById('user-news-input');
+  const btn   = document.getElementById('user-news-add-btn');
+  const url   = input.value.trim();
+
+  if (!url) return;
+  try { new URL(url); } catch {
+    showUserNewsStatus('⚠️ URL invalide.', 'error'); return;
+  }
+  if (userNewsList.find(n => n.url === url)) {
+    showUserNewsStatus('⚠️ Ce lien est déjà ajouté.', 'error'); return;
+  }
+
+  btn.disabled = true;
+  input.value = '';
+  showUserNewsStatus('', '');
+
+  // Insert skeleton card immediately
+  const id = Date.now();
+  userNewsList.unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, loading: true });
+  renderUserNews();
+
+  const domain  = extractDomain(url);
+  const favicon = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+  let titre = '', source = domain, image = null, desc = '';
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await Promise.race([
+      fetch(proxyUrl),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 7000))
+    ]);
+    if (res.ok) {
+      const data = await res.json();
+      const html = data.contents || '';
+
+      // og:title > title tag
+      const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"'<>]+)["']/i)
+                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:title["']/i);
+      if (ogTitle) titre = ogTitle[1].trim();
+      if (!titre) {
+        const t = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (t) titre = t[1].trim();
+      }
+
+      // og:description
+      const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
+                  || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
+      if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
+
+      // og:image
+      const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
+                 || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
+      if (ogImg) image = ogImg[1].trim();
+
+      // og:site_name
+      const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"'<>]+)["']/i)
+                  || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:site_name["']/i);
+      if (ogSite) source = ogSite[1].trim();
+    }
+  } catch (_) { /* use domain as fallback */ }
+
+  if (!titre) titre = url;
+
+  // Update card in place
+  const idx = userNewsList.findIndex(n => n.id === id);
+  if (idx !== -1) {
+    userNewsList[idx] = { url, titre, source, favicon, image, desc, id, loading: false };
+  }
+  btn.disabled = false;
+  renderUserNews();
+}
+
+function deleteUserNews(id) {
+  userNewsList = userNewsList.filter(n => n.id !== id);
+  renderUserNews();
+}
+
+function showUserNewsStatus(msg, type) {
+  const el = document.getElementById('user-news-status');
+  if (!msg) { el.innerHTML = ''; return; }
+  const color = type === 'error' ? '#991b1b' : 'var(--ft-muted)';
+  el.innerHTML = `<div style="font-size:11px;color:${color};margin-bottom:8px">${msg}</div>`;
+}
+
+function renderUserNews() {
+  const grid  = document.getElementById('user-news-grid');
+  const empty = document.getElementById('user-news-empty');
+  if (!userNewsList.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.style.display  = 'grid';
+  grid.innerHTML = userNewsList.map(n => {
+    if (n.loading) return `
+      <div class="user-news-card-skeleton">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line w40"></div>
+          <div class="sk-line w80"></div>
+          <div class="sk-line w60"></div>
+        </div>
+      </div>`;
+
+    const imgHtml = n.image
+      ? `<img class="user-news-card-img" src="${escHtml(n.image)}" alt="" onerror="this.parentElement.querySelector('.user-news-card-img-placeholder')&&(this.style.display='none');this.nextElementSibling&&(this.nextElementSibling.style.display='flex')" loading="lazy">`
+      : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+    return `
+      <div class="user-news-card" onclick="window.open('${escHtml(n.url)}','_blank','noopener')">
+        <button class="user-news-delete-btn" onclick="event.stopPropagation();deleteUserNews(${n.id})" title="Supprimer">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        ${imgHtml}
+        <div class="user-news-card-body">
+          <div class="user-news-card-source">
+            <img src="${escHtml(n.favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
+            ${escHtml(n.source)}
+          </div>
+          <div class="user-news-card-title">${escHtml(n.titre)}</div>
+          ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
+          <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── VEILLE RSS ─────────────────────────────────────────────────────────────────
+
+function buildVeilleKeywords(filiereCode) {
+  const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
+  const nafs = NAF_BY_FILIERE[filiereCode] || [];
+
+  // Extract significant words from NAF libellés (skip short/common words)
+  const stopwords = new Set(['les','des','une','pour','dans','avec','sur','par','aux','que','qui','les','de','du','la','le','et','en','au','à','d']);
+  const wordFreq = {};
+  nafs.forEach(n => {
+    n.libelle.toLowerCase()
+      .split(/[\s,;()\-\/'']+/)
+      .filter(w => w.length > 4 && !stopwords.has(w) && !/^\d/.test(w))
+      .forEach(w => { wordFreq[w] = (wordFreq[w] || 0) + 1; });
+  });
+  // Top keywords by frequency
+  const topWords = Object.entries(wordFreq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([w]) => w);
+
+  // Build multiple Google News RSS queries to get ~20 articles
+  // Query 1: filière name + emploi/recrutement
+  // Query 2: top sector keywords
+  const queries = [
+    `${filiereLabel} emploi recrutement France`,
+    `${filiereLabel} actualités marché travail`,
+  ];
+  if (topWords.length >= 2) {
+    queries.push(`${topWords.slice(0, 3).join(' ')} actualités France`);
+  }
+
+  return { filiereLabel, queries, topWords };
+}
+
+// Fetch one Google News RSS feed via rss2json proxy
+async function fetchRssFeed(query, maxItems = 10) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=fr&gl=FR&ceid=FR:fr`;
+  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${maxItems}`;
+  const res = await fetch(apiUrl);
+  if (!res.ok) throw new Error(`RSS fetch error ${res.status}`);
+  const data = await res.json();
+  return (data.items || []).map(item => {
+    // rss2json sometimes puts the real URL in item.link, sometimes in item.guid
+    // Google News wraps links — try to extract the real source URL from description
+    const srcUrl = extractSourceUrl(item) || item.link || '';
+    return {
+      titre: item.title || '',
+      source: item.author || extractDomain(srcUrl || item.link),
+      url: srcUrl,
+      date: formatRssDate(item.pubDate),
+      resume: stripHtml(item.description || item.content || '').slice(0, 280),
+    };
+  });
+}
+
+// Google News RSS wraps the real URL — try to extract it from the <description> HTML
+function extractSourceUrl(item) {
+  // Try guid first (sometimes contains real URL)
+  if (item.guid && item.guid.startsWith('http') && !item.guid.includes('news.google.com')) {
+    return item.guid;
+  }
+  // Try to parse the real link from description HTML (Google News embeds it as an <a> tag)
+  if (item.description) {
+    const match = item.description.match(/href="(https?:\/\/(?!news\.google\.com)[^"]+)"/);
+    if (match) return match[1];
+  }
+  // Fall back to link even if it's a Google News redirect
+  return item.link || '';
+}
+
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return '—'; }
+}
+
+function formatRssDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function stripHtml(html) {
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+async function fetchVeilleNews() {
+  const filiereCode = document.getElementById('veille-filiere-select').value;
+  if (!filiereCode) return;
+
+  const btn = document.getElementById('veille-search-btn');
+  btn.disabled = true;
+
+  document.getElementById('veille-empty').style.display = 'none';
+  document.getElementById('veille-error').style.display = 'none';
+  document.getElementById('veille-result-header').style.display = 'none';
+  document.getElementById('veille-grid').innerHTML = '';
+  document.getElementById('veille-spinner').style.display = 'flex';
+
+  const { filiereLabel, queries, topWords } = buildVeilleKeywords(filiereCode);
+
+  // Show keywords
+  const kwBox = document.getElementById('veille-keywords');
+  document.getElementById('veille-keywords-list').textContent =
+    [filiereLabel, ...topWords].join(' · ');
+  kwBox.style.display = 'block';
+
+  try {
+    // Fetch from multiple queries in parallel, deduplicate by URL
+    const results = await Promise.allSettled(
+      queries.map((q, i) => fetchRssFeed(q, i === 0 ? 12 : 8))
+    );
+
+    const seen = new Set();
+    const articles = [];
+    results.forEach(r => {
+      if (r.status === 'fulfilled') {
+        r.value.forEach(a => {
+          if (a.url && !seen.has(a.url) && a.titre) {
+            seen.add(a.url);
+            articles.push(a);
+          }
+        });
+      }
+    });
+
+    if (!articles.length) throw new Error('Aucune actualité trouvée. Réessayez dans quelques instants.');
+
+    renderVeilleNews(articles.slice(0, 20), filiereLabel);
+
+  } catch (err) {
+    document.getElementById('veille-spinner').style.display = 'none';
+    const errEl = document.getElementById('veille-error');
+    errEl.style.display = 'block';
+    errEl.textContent = `⚠️ ${err.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderVeilleNews(articles, filiereLabel) {
+  document.getElementById('veille-spinner').style.display = 'none';
+
+  const header = document.getElementById('veille-result-header');
+  document.getElementById('veille-result-title').textContent = filiereLabel;
+  document.getElementById('veille-result-subtitle').textContent =
+    `${articles.length} actualités récentes · Source : Google News`;
+  header.style.display = 'block';
+
+  const grid = document.getElementById('veille-grid');
+
+  // Show skeletons immediately
+  grid.innerHTML = articles.map((_, i) => `
+    <div class="user-news-card-skeleton" id="vn-card-${i}">
+      <div class="sk-img"></div>
+      <div class="sk-body">
+        <div class="sk-line w40"></div>
+        <div class="sk-line w80"></div>
+        <div class="sk-line w60"></div>
+      </div>
+    </div>`).join('');
+
+  // Enrich each article with OG metadata in parallel
+  articles.forEach(async (a, i) => {
+    const domain  = extractDomain(a.url);
+    const favicon = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+    let image = null, desc = a.resume || '';
+
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(a.url)}`;
+      const res = await Promise.race([
+        fetch(proxyUrl),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+      ]);
+      if (res.ok) {
+        const data = await res.json();
+        const html = data.contents || '';
+        const ogImg = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"'<>]+)["']/i)
+                   || html.match(/<meta[^>]+content=["']([^"'<>]+)["'][^>]+property=["']og:image["']/i);
+        if (ogImg) image = ogImg[1].trim();
+        if (!desc) {
+          const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"'<>]{10,})/i)
+                      || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"'<>]{10,})/i);
+          if (ogDesc) desc = ogDesc[1].trim().slice(0, 200);
+        }
+      }
+    } catch (_) {}
+
+    const imgHtml = image
+      ? `<img class="user-news-card-img" src="${escHtml(image)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="user-news-card-img-placeholder"><svg width="32" height="32" fill="none" stroke="#93c5fd" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+    const card = document.getElementById(`vn-card-${i}`);
+    if (!card) return;
+    card.className = 'user-news-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => window.open(a.url, '_blank', 'noopener');
+    card.innerHTML = `
+      ${imgHtml}
+      <div class="user-news-card-body">
+        <div class="user-news-card-source">
+          <img src="${escHtml(favicon)}" width="12" height="12" style="border-radius:2px" onerror="this.style.display='none'" loading="lazy">
+          ${escHtml(a.source)}
+        </div>
+        <div class="user-news-card-title">${escHtml(a.titre)}</div>
+        ${desc ? `<div class="user-news-card-desc">${escHtml(desc)}</div>` : ''}
+        <div class="user-news-card-domain">${escHtml(a.date)} · ${escHtml(domain)}</div>
+      </div>`;
+  });
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── SOURCES POPUP ─────────────────────────────────────────────────────────────
