@@ -2162,19 +2162,40 @@ function redrawChart3(useTransition = false) {
       .attr('rx', 4)
       .attr('pointer-events', 'none');
 
-    // Dashed vertical lines at 40% and 70% extending into chart
+    // Solid vertical lines at 40% and 70% (no dash)
     [xLeft, xRight].forEach(x => {
       bg.append('line')
         .attr('x1', x).attr('x2', x)
         .attr('y1', -RECT_H - 4).attr('y2', iH)
         .attr('stroke', TENSION_COLOR)
         .attr('stroke-width', 1.5)
-        .attr('stroke-dasharray', '5,3')
-        .attr('opacity', 0.6)
+        .attr('opacity', 0.5)
         .attr('pointer-events', 'none');
     });
 
-    // Label centered inside rectangle
+    // 40% label at left edge inside rectangle
+    bg.append('text')
+      .attr('x', xLeft + 6)
+      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
+      .attr('text-anchor', 'start')
+      .attr('font-size', '11')
+      .attr('font-weight', '700')
+      .attr('fill', TENSION_COLOR)
+      .attr('pointer-events', 'none')
+      .text('40%');
+
+    // 70% label at right edge inside rectangle
+    bg.append('text')
+      .attr('x', xRight - 6)
+      .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
+      .attr('text-anchor', 'end')
+      .attr('font-size', '11')
+      .attr('font-weight', '700')
+      .attr('fill', TENSION_COLOR)
+      .attr('pointer-events', 'none')
+      .text('70%');
+
+    // Title centered inside rectangle
     bg.append('text')
       .attr('x', (xLeft + xRight) / 2)
       .attr('y', -RECT_H - 4 + RECT_H / 2 + 5)
@@ -2183,7 +2204,7 @@ function redrawChart3(useTransition = false) {
       .attr('font-weight', '700')
       .attr('fill', TENSION_COLOR)
       .attr('pointer-events', 'none')
-      .text('Filières à prioriser pour les prospections - fidélisations');
+      .text('🎯 Filières à prioriser pour les prospections - fidélisations');
   }
 
   const ZONE_DEFS = [
@@ -2714,7 +2735,7 @@ function initVeilleTab() {
 const GIST_FILENAME  = 'user_news.json';
 const GIST_LS_KEY    = 'mf_gist_cfg'; // localStorage key
 // ⬇️ Renseignez ici l'ID du Gist après la première création (Ctrl+Shift+A)
-const GIST_ID_DEFAULT = '6e1f3e290eb9ae508e93af151a46daa9'; // ex: 'abc1234567890abcdef'
+const GIST_ID_DEFAULT = '6e1f3e290eb9ae508e93af151a46daa9';
 
 // Structure: { FIL01: [{id, url, titre, ...}, ...], FIL02: [...], ... }
 let userNewsDB = {};
