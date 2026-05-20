@@ -1376,6 +1376,20 @@
         <div class="interp-label">💡 Exemple de lecture</div><br>
         La position de la bulle <strong>Commerce et Distribution</strong> indique que cette filière connaît des difficultés de recrutement moyennes (~44 %) et son taux de recours est légèrement inférieur au taux de recours moyen (~20 %). Sa couleur <strong style="color:#dc2626">rouge</strong> indique une évolution à la baisse. Sa grande taille traduit un volume de recrutements très élevé.
 
+        <div class="side-divider" style="margin-top:14px"></div>
+
+        <div class="interp-label" style="margin-top:12px;color:#7c3aed">🎯 Filières à prioriser pour les prospections - fidélisations</div>
+        <div style="font-size:11px;line-height:1.6;margin-top:6px;color:#4c1d95">
+          Afin d'optimiser le rendement des actions de prospections&#8209;fidélisations, il est préférable de cibler les filières&nbsp;/ secteurs pour lesquels les tensions sont <strong>intermédiaires</strong>&nbsp;:
+          <ul style="margin:6px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:4px">
+            <li><strong>Ni trop fortes (&lt;&nbsp;70&nbsp;%)</strong> — car il sera difficile de pourvoir les postes, occasionnant inefficience et insatisfaction.</li>
+            <li><strong>Ni trop faibles (&gt;&nbsp;40&nbsp;%)</strong> — car l'impact sera moindre étant donné que les recruteurs parviennent déjà à pourvoir leurs postes sans aide.</li>
+          </ul>
+          <div style="margin-top:6px;padding:5px 8px;background:#ede9fe;border-left:3px solid #7c3aed;border-radius:0 4px 4px 0;font-size:10.5px">
+            Zone cible : tensions comprises entre <strong>40&nbsp;%</strong> et <strong>70&nbsp;%</strong> (zone délimitée par les lignes pointillées violettes sur la matrice).
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -2051,6 +2065,8 @@ function initChart3() {
   g.append('g').attr('class','zone-labels');
   g.append('g').attr('class','zone-lines');
   g.append('g').attr('class','zone-lines-y');
+  g.append('g').attr('class','tension-lines'); // new: 40% and 70% threshold lines
+  g.append('g').attr('class','tension-brace');  // new: brace + label
   g.append('g').attr('class','axis axis-x').attr('transform',`translate(0,${iH})`);
   g.append('g').attr('class','axis axis-y');
   g.append('text').attr('class','axis-label').attr('x',iW/2).attr('y',iH+46).attr('text-anchor','middle').text('Difficultés de recrutement (%)');
@@ -2108,6 +2124,67 @@ function redrawChart3(useTransition = false) {
     .attr('y1', v => yScale(v)).attr('y2', v => yScale(v));
 
   const gxPx = xScale(gxVal3), gyPx = yScale(gyVal3);
+
+  // ── Tension threshold lines at 40% and 70% ─────────────────────────────────
+  const TENSION_THRESHOLDS = [0.40, 0.70];
+  const TENSION_COLOR = '#7c3aed'; // violet
+  const tlg = g.select('.tension-lines');
+  tlg.selectAll('line').data(TENSION_THRESHOLDS)
+    .join('line')
+    .attr('x1', v => xScale(v)).attr('x2', v => xScale(v))
+    .attr('y1', 0).attr('y2', iH)
+    .attr('stroke', TENSION_COLOR)
+    .attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '5,3')
+    .attr('opacity', 0.7)
+    .attr('pointer-events', 'none');
+
+  // ── Brace + label above chart ───────────────────────────────────────────────
+  const bg = g.select('.tension-brace');
+  bg.selectAll('*').remove();
+
+  const x40 = xScale(0.40);
+  const x70 = xScale(0.70);
+  const braceY  = -12; // just above chart area
+  const braceH  = 6;   // brace arm height
+  const midX    = (x40 + x70) / 2;
+  const BRACE_COLOR = '#7c3aed';
+
+  // Only draw if both thresholds are in visible range
+  const [xDomMin, xDomMax] = xScale.domain();
+  if (xDomMin <= 0.40 && xDomMax >= 0.70) {
+    // Brace path: ├──────────────┤ style with center tick pointing up
+    const bracePath = `M${x40},${braceY + braceH} L${x40},${braceY} L${midX},${braceY} L${midX},${braceY - braceH} M${midX},${braceY} L${x70},${braceY} L${x70},${braceY + braceH}`;
+    bg.append('path')
+      .attr('d', bracePath)
+      .attr('fill', 'none')
+      .attr('stroke', BRACE_COLOR)
+      .attr('stroke-width', 1.5)
+      .attr('pointer-events', 'none');
+
+    // Label above brace
+    bg.append('text')
+      .attr('x', midX)
+      .attr('y', braceY - braceH - 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '10')
+      .attr('font-weight', '700')
+      .attr('fill', BRACE_COLOR)
+      .attr('pointer-events', 'none')
+      .text('Filières à prioriser pour les prospections - fidélisations');
+
+    // Tick labels at 40% and 70%
+    [{ v: 0.40, x: x40 }, { v: 0.70, x: x70 }].forEach(({ v, x }) => {
+      bg.append('text')
+        .attr('x', x)
+        .attr('y', braceY + braceH + 12)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '9')
+        .attr('fill', BRACE_COLOR)
+        .attr('pointer-events', 'none')
+        .text(`${Math.round(v * 100)}%`);
+    });
+  }
   const ZONE_DEFS = [
     { x: gxPx / 2,       y: gyPx / 2,       color:'#16a34a',
       lines:['A consolider,','maintenir un partenariat efficace'] },
