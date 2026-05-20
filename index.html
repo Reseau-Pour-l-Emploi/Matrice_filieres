@@ -3286,7 +3286,9 @@ async function fetchVeilleNews() {
   document.getElementById('veille-empty').style.display    = 'none';
   document.getElementById('veille-error').style.display    = 'none';
   document.getElementById('veille-result-header').style.display = 'none';
-  document.getElementById('veille-grid').innerHTML         = '';
+  document.getElementById('veille-grid').innerHTML = '';
+  document.getElementById('veille-chapo').style.display = 'none';
+  document.getElementById('veille-chapo-text').textContent = '';
 
   const spinnerEl = document.getElementById('veille-spinner');
   const msgEl     = document.getElementById('veille-spinner-msg');
@@ -3406,9 +3408,12 @@ async function fetchVeilleNews() {
         errEl.textContent = '⚠️ Aucune actualité trouvée pour cette filière — essayez dans quelques minutes ou relancez la recherche.';
       }
     } else {
-      // Final render with all results
+      // Final render with all results — all requests done
       spinnerEl.style.display = 'none';
-      renderVeilleNews(collected.slice(0, 20), filiereLabel);
+      const finalArticles = collected.slice(0, 20);
+      renderVeilleNews(finalArticles, filiereLabel);
+      // Generate chapô only now, once all fetches are complete
+      generateChapo(finalArticles, filiereLabel);
     }
 
   } catch (err) {
@@ -3431,10 +3436,6 @@ function renderVeilleNews(articles, filiereLabel) {
   document.getElementById('veille-result-subtitle').textContent =
     `${articles.length} actualités récentes · Source : Google News`;
   header.style.display = 'block';
-
-  // Reset chapô
-  document.getElementById('veille-chapo').style.display = 'none';
-  document.getElementById('veille-chapo-text').textContent = '';
 
   const grid = document.getElementById('veille-grid');
 
@@ -3490,9 +3491,6 @@ function renderVeilleNews(articles, filiereLabel) {
         <div class="user-news-card-domain">${escHtml(a.date)} · ${escHtml(domain)}</div>
       </div>`;
   });
-
-  // Generate AI summary chapô (async, non-blocking)
-  generateChapo(articles, filiereLabel);
 }
 
 function escHtml(str) {
