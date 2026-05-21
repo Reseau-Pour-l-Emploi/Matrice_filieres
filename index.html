@@ -863,8 +863,53 @@
     /* ══════════════════════════════════════════
        RESPONSIVE MOBILE  (≤ 768px)
     ══════════════════════════════════════════ */
-    /* ── Mobile-only elements hidden on desktop ── */
-    .sidebar-mobile-header { display: none; }
+    /* ── READING NOTES DRAWER (right side) ── */
+    .notes-fab {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--ft-teal); color: #fff; border: none;
+      box-shadow: 0 3px 14px rgba(0,128,100,.3);
+      z-index: 250; cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      font-size: 20px; transition: background .15s;
+    }
+    .notes-fab:hover { background: #0d6b5a; }
+    .notes-drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 88vw; max-width: 340px;
+      z-index: 300;
+      transform: translateX(110%);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+      box-shadow: -4px 0 24px rgba(0,0,0,.18);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      background: var(--ft-bg);
+    }
+    .notes-drawer.open {
+      transform: translateX(0);
+    }
+    .notes-drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 14px; height: 52px; min-height: 52px; flex-shrink: 0;
+      border-bottom: 1px solid var(--ft-border);
+      background: var(--ft-bg);
+    }
+    .notes-drawer-title { font-size: 13px; font-weight: 700; color: var(--ft-teal); }
+    .notes-drawer-close {
+      background: none; border: none; cursor: pointer; color: var(--ft-muted);
+      padding: 8px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .notes-drawer-body {
+      flex: 1; overflow-y: auto; padding: 14px 16px 32px;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 768px) {
+      /* notes-fab shown only on matrix tab via JS */
+      .notes-drawer { display: flex !important; }
+    }
     .mobile-fab { display: none !important; }
 
     @media (max-width: 768px) {
@@ -963,8 +1008,11 @@
       .mobile-fab[style*="display: none"] { display: none !important; }
 
 
-      /* Chart area */
-      .chart-area { padding: 10px 12px 90px !important; }
+      /* Remove overflow:hidden that traps position:fixed sidebar */
+      #tab-matrix .chart-area,
+      #tab-matrix .chart-main-row,
+      #tab-matrix .chart-card,
+      #tab-carte .chart-area { overflow: visible !important; }
 
       /* Matrice chart */
       .chart-main-row {
@@ -1092,6 +1140,20 @@
 <button class="mobile-fab" id="mobile-fab-carte" onclick="toggleSidebar('carte')" title="Filtres" style="display:none">
   <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
+<button class="notes-fab" id="notes-fab" onclick="toggleNotesDrawer()" title="Notes de lecture" style="display:none">💡</button>
+
+<!-- ── NOTES DRAWER (right side, mobile only) ── -->
+<div id="notes-drawer" class="notes-drawer">
+  <div class="notes-drawer-header">
+    <span class="notes-drawer-title">💡 Notes de lecture</span>
+    <button class="notes-drawer-close" onclick="toggleNotesDrawer()" title="Fermer">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="notes-drawer-body" id="notes-drawer-body">
+    <!-- Content cloned from interp-block-side on mobile init -->
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════════
      TAB 1 : MATRICE
@@ -1596,9 +1658,9 @@
         <!-- Chapô IA -->
         <div id="veille-chapo" style="display:none;margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:12px">
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
-            <svg width="14" height="14" fill="none" stroke="#1d4ed8" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
-            <span style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.06em">Synthèse IA — Gemini</span>
-            <span id="veille-chapo-spinner" style="font-size:10px;color:var(--ft-muted);display:none">⏳ Génération…</span>
+            <svg width="14" height="14" fill="none" stroke="#1d4ed8" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+            <span style="font-size:11px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.06em">Éditorial</span>
+            <span id="veille-chapo-spinner" style="font-size:10px;color:var(--ft-muted);display:none">⏳ Rédaction…</span>
           </div>
           <p id="veille-chapo-text" style="font-size:13px;line-height:1.65;color:#1e3a8a;margin:0"></p>
         </div>
@@ -1794,12 +1856,22 @@ function switchTab(name) {
   if (window.innerWidth <= 768) {
     const fabMatrix = document.getElementById('mobile-fab-matrix');
     const fabCarte  = document.getElementById('mobile-fab-carte');
+    const notesFab  = document.getElementById('notes-fab');
     if (fabMatrix) fabMatrix.style.display = (name === 'matrix') ? 'flex' : 'none';
     if (fabCarte)  fabCarte.style.display  = (name === 'carte')  ? 'flex' : 'none';
+    if (notesFab)  notesFab.style.display  = (name === 'matrix') ? 'flex' : 'none';
+
+    // Also close notes drawer when leaving matrix tab
+    if (name !== 'matrix') {
+      const nd = document.getElementById('notes-drawer');
+      if (nd) nd.classList.remove('open');
+    }
   }
 
-  // Close any open mobile sidebar/backdrop
+  // Close any open mobile sidebar/backdrop/notes drawer
   document.querySelectorAll('.sidebar.mobile-open').forEach(s => s.classList.remove('mobile-open'));
+  const notesDrawer = document.getElementById('notes-drawer');
+  if (notesDrawer) notesDrawer.classList.remove('open');
   const bd = document.getElementById('mobile-sidebar-backdrop');
   if (bd) bd.classList.remove('active');
   if (name === 'matrix') {
@@ -1810,8 +1882,10 @@ function switchTab(name) {
 // ── SIDEBAR TOGGLE ────────────────────────────────────────────────────────────
 function toggleSidebar(which) {
   const isMobile = window.innerWidth <= 768;
-  const page = document.getElementById('page-' + (which || 'matrix'));
-  const sidebar = page ? page.querySelector('.sidebar') : null;
+
+  // Get sidebar directly by ID — more reliable than querySelector
+  const sidebarId = which === 'carte' ? 'sidebar-carte' : 'sidebar-matrix';
+  const sidebar = document.getElementById(sidebarId);
   if (!sidebar) return;
 
   if (isMobile) {
@@ -1825,25 +1899,59 @@ function toggleSidebar(which) {
       backdrop.className = 'mobile-sidebar-backdrop';
       document.body.appendChild(backdrop);
     }
-    // Always update the onclick to close the currently open sidebar
     backdrop.onclick = () => {
       sidebar.classList.remove('mobile-open');
       backdrop.classList.remove('active');
     };
     backdrop.classList.toggle('active', isOpen);
 
-    // Close other sidebars if open
+    // Close other sidebars
     if (isOpen) {
       document.querySelectorAll('.sidebar.mobile-open').forEach(s => {
         if (s !== sidebar) s.classList.remove('mobile-open');
       });
     }
   } else {
-    page.classList.toggle('sidebar-collapsed');
+    const page = document.getElementById('page-' + (which || 'matrix'));
+    if (page) page.classList.toggle('sidebar-collapsed');
     setTimeout(() => {
       if (which === 'carte') renderMap();
       else initChart3();
     }, 320);
+  }
+}
+
+// ── NOTES DRAWER ─────────────────────────────────────────────────────────────
+function toggleNotesDrawer() {
+  const drawer = document.getElementById('notes-drawer');
+  if (!drawer) return;
+
+  // Lazily populate on first open
+  const body = document.getElementById('notes-drawer-body');
+  if (body && !body.dataset.populated) {
+    const source = document.querySelector('.interp-block-side');
+    if (source) {
+      body.innerHTML = source.innerHTML;
+      body.dataset.populated = '1';
+    }
+  }
+
+  const isOpen = drawer.classList.toggle('open');
+
+  // Reuse shared backdrop
+  let bd = document.getElementById('mobile-sidebar-backdrop');
+  if (!bd) {
+    bd = document.createElement('div');
+    bd.id = 'mobile-sidebar-backdrop';
+    bd.className = 'mobile-sidebar-backdrop';
+    document.body.appendChild(bd);
+  }
+  bd.onclick = () => { drawer.classList.remove('open'); bd.classList.remove('active'); };
+  bd.classList.toggle('active', isOpen);
+
+  // Close any open sidebar
+  if (isOpen) {
+    document.querySelectorAll('.sidebar.mobile-open').forEach(s => s.classList.remove('mobile-open'));
   }
 }
 
@@ -2866,15 +2974,17 @@ async function generateChapo(articles, filiereLabel) {
     `${i+1}. ${a.titre}${a.resume ? ' — ' + a.resume.slice(0, 120) : ''}`
   ).join('\n');
 
-  const prompt = `Tu es un expert en marché du travail et emploi en France.
+  const prompt = `Tu es rédacteur en chef spécialisé dans le marché du travail et l'emploi en France.
 Voici ${articles.length} actualités récentes sur la filière "${filiereLabel}".
-Rédige un chapô de synthèse en 3-4 phrases en français, factuel et professionnel, qui résume les grandes tendances (emploi, recrutement, innovations, réglementation, formation).
-Ne cite pas les sources. Ne commence pas par "Dans cet article" ou "Voici".
+Rédige un éditorial court (3-4 phrases) en français qui annonce et introduit le contenu de ces actualités.
+Le ton doit être journalistique, direct et engageant — comme un chapeau d'article de presse.
+Tu dois mentionner les sujets clés abordés (sans citer les sources) et donner envie de lire les articles.
+Ne commence pas par "Dans cet article", "Voici" ou "Ces actualités".
 
 Actualités :
 ${context}
 
-Chapô :`;
+Éditorial :`;
 
   const body = JSON.stringify({
     contents: [{ parts: [{ text: prompt }] }],
@@ -3693,6 +3803,18 @@ function updateRanking() {
   if (window.innerWidth <= 768) {
     const fabMatrix = document.getElementById('mobile-fab-matrix');
     if (fabMatrix) fabMatrix.style.display = 'flex';
+    const notesFab = document.getElementById('notes-fab');
+    if (notesFab) notesFab.style.display = 'flex';
+
+    // ── Critical mobile fix ──────────────────────────────────────────────────
+    // overflow:hidden on chart ancestors traps position:fixed children.
+    // Move sidebars to <body> so they escape all containing blocks.
+    ['sidebar-matrix', 'sidebar-carte'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentElement !== document.body) {
+        document.body.appendChild(el);
+      }
+    });
   }
 
   // Load shared user news once at startup
