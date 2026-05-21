@@ -665,7 +665,35 @@
       font-size: 11.5px; color: #1e3a6e; line-height: 1.6;
       overflow-y: auto; align-self: stretch;
     }
-    .interp-block-side strong { font-weight: 700; }
+    @media (max-width: 768px) { .interp-block-side { display: none !important; } }
+    .indic-tooltip-icon {
+      font-size: 11px; color: var(--ft-blue-lt); margin-left: 4px;
+      cursor: help; vertical-align: middle; flex-shrink: 0;
+      position: relative;
+    }
+    .indicator-list label {
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      padding: 5px 0; font-size: 12px; line-height: 1.4;
+      position: relative;
+    }
+    .indicator-list label:hover { color: var(--ft-blue); }
+    /* CSS tooltip on ⓘ hover */
+    .indicator-list label:hover .indic-tooltip-icon::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 20px; top: -4px;
+      width: 220px;
+      background: #1e3a8a;
+      color: #fff;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 7px 10px;
+      border-radius: 8px;
+      z-index: 100;
+      pointer-events: none;
+      white-space: normal;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
     .interp-label {
       display: inline-block; font-size: 10px; font-weight: 700;
       letter-spacing: .06em; text-transform: uppercase;
@@ -865,7 +893,7 @@
     ══════════════════════════════════════════ */
     /* ── READING NOTES DRAWER (right side) ── */
     .notes-fab {
-      position: fixed; bottom: 20px; right: 20px;
+      position: fixed; bottom: 20px; left: 84px;
       width: 48px; height: 48px; border-radius: 50%;
       background: var(--ft-teal); color: #fff; border: none;
       box-shadow: 0 3px 14px rgba(0,128,100,.3);
@@ -908,6 +936,8 @@
     }
     @media (max-width: 768px) {
       /* notes-fab shown only on matrix tab via JS */
+      .notes-fab { display: flex !important; align-items: center; justify-content: center; }
+      .notes-fab.fab-hidden { display: none !important; }
       .notes-drawer { display: flex !important; }
     }
     .mobile-fab { display: none !important; }
@@ -996,6 +1026,7 @@
 
       /* Desktop burger hidden, mobile FAB visible */
       .desktop-burger { display: none !important; }
+      .mobile-fab.fab-hidden { display: none !important; }
       .mobile-fab {
         display: flex !important;
         position: fixed; bottom: 20px; left: 20px;
@@ -1005,7 +1036,6 @@
         z-index: 250; cursor: pointer;
         align-items: center; justify-content: center;
       }
-      .mobile-fab[style*="display: none"] { display: none !important; }
 
 
       /* Remove overflow:hidden that traps position:fixed sidebar */
@@ -1134,13 +1164,35 @@
 </nav>
 
 <!-- Mobile FAB buttons (outside sidebar, always visible) -->
-<button class="mobile-fab" id="mobile-fab-matrix" onclick="toggleSidebar('matrix')" title="Filtres" style="display:none">
+<button class="mobile-fab" id="mobile-fab-matrix" onclick="toggleSidebar('matrix')" title="Filtres Matrice">
   <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
-<button class="mobile-fab" id="mobile-fab-carte" onclick="toggleSidebar('carte')" title="Filtres" style="display:none">
+<button class="mobile-fab fab-hidden" id="mobile-fab-carte" onclick="toggleSidebar('carte')" title="Filtres Carte">
   <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
-<button class="notes-fab" id="notes-fab" onclick="toggleNotesDrawer()" title="Notes de lecture" style="display:none">💡</button>
+<button class="notes-fab fab-hidden" id="notes-fab" onclick="toggleNotesDrawer()" title="Notes de lecture">💡</button>
+
+<script>
+// Init FABs synchronously — before any async loading
+(function() {
+  if (window.innerWidth > 768) return;
+  // notes-fab: remove fab-hidden immediately
+  var notesFab = document.getElementById('notes-fab');
+  if (notesFab) notesFab.classList.remove('fab-hidden');
+  // Move fixed elements to body as soon as DOM is ready
+  function moveToBody() {
+    ['sidebar-matrix', 'sidebar-carte', 'notes-fab', 'notes-drawer'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && el.parentElement !== document.body) document.body.appendChild(el);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', moveToBody);
+  } else {
+    moveToBody();
+  }
+})();
+</script>
 
 <!-- ── NOTES DRAWER (right side, mobile only) ── -->
 <div id="notes-drawer" class="notes-drawer">
@@ -1494,21 +1546,25 @@
       <div class="filter-section">
         <h2>📊 Indicateur</h2>
         <div class="indicator-list" id="indicator-list">
-          <label>
+          <label title="Importance de la filière sur le territoire : Ratio du nombre de Déclarations Préalables À l'Embauche de plus d'un mois de la filière sur le nombre de DPAE > 1 mois total sur le territoire.">
             <input type="radio" name="map-ind" value="poids_rel" checked onchange="onMapChange()">
             Importance de la filière sur le territoire
+            <span class="indic-tooltip-icon" data-tip="Ratio du nombre de DPAE > 1 mois de la filière sur le nombre de DPAE > 1 mois total sur le territoire.">ⓘ</span>
           </label>
-          <label>
+          <label title="Difficultés de recrutement : Part des projets de recrutement jugés difficiles pour les établissements ayant exprimé des besoins en main d'œuvre pour l'année 2026.">
             <input type="radio" name="map-ind" value="diffRecruit" onchange="onMapChange()">
             Difficultés de recrutement
+            <span class="indic-tooltip-icon" data-tip="Part des projets de recrutement jugés difficiles pour les établissements ayant exprimé des besoins en main d'œuvre pour 2026.">ⓘ</span>
           </label>
-          <label>
+          <label title="Taux de recours : Taux de recours à France Travail sur la période de janvier à décembre 2025.">
             <input type="radio" name="map-ind" value="ent" onchange="onMapChange()">
             Taux de recours
+            <span class="indic-tooltip-icon" data-tip="Taux de recours à France Travail sur la période de janvier à décembre 2025.">ⓘ</span>
           </label>
-          <label>
+          <label title="Évolution DPAE > 1 mois : Évolution du nombre de Déclarations Préalables À l'Embauche de plus d'un mois entre 2025 et 2024.">
             <input type="radio" name="map-ind" value="evol" onchange="onMapChange()">
             Évolution DPAE &gt; 1 mois
+            <span class="indic-tooltip-icon" data-tip="Évolution du nombre de Déclarations Préalables À l'Embauche de plus d'un mois entre 2025 et 2024.">ⓘ</span>
           </label>
         </div>
       </div>
@@ -1857,9 +1913,9 @@ function switchTab(name) {
     const fabMatrix = document.getElementById('mobile-fab-matrix');
     const fabCarte  = document.getElementById('mobile-fab-carte');
     const notesFab  = document.getElementById('notes-fab');
-    if (fabMatrix) fabMatrix.style.display = (name === 'matrix') ? 'flex' : 'none';
-    if (fabCarte)  fabCarte.style.display  = (name === 'carte')  ? 'flex' : 'none';
-    if (notesFab)  notesFab.style.display  = (name === 'matrix') ? 'flex' : 'none';
+    if (fabMatrix) fabMatrix.classList.toggle('fab-hidden', name !== 'matrix');
+    if (fabCarte)  fabCarte.classList.toggle('fab-hidden', name !== 'carte');
+    if (notesFab)  notesFab.classList.toggle('fab-hidden', name !== 'matrix');
 
     // Also close notes drawer when leaving matrix tab
     if (name !== 'matrix') {
@@ -3799,22 +3855,10 @@ function updateRanking() {
     initChart3();
   }
 
-  // Init mobile FAB visibility
+  // Init mobile FAB visibility — handled by inline script above
   if (window.innerWidth <= 768) {
-    const fabMatrix = document.getElementById('mobile-fab-matrix');
-    if (fabMatrix) fabMatrix.style.display = 'flex';
-    const notesFab = document.getElementById('notes-fab');
-    if (notesFab) notesFab.style.display = 'flex';
-
     // ── Critical mobile fix ──────────────────────────────────────────────────
-    // overflow:hidden on chart ancestors traps position:fixed children.
-    // Move sidebars to <body> so they escape all containing blocks.
-    ['sidebar-matrix', 'sidebar-carte'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.parentElement !== document.body) {
-        document.body.appendChild(el);
-      }
-    });
+    // Sidebars already moved to body by inline script above
   }
 
   // Load shared user news once at startup
@@ -3830,7 +3874,7 @@ function updateRanking() {
         const bd = document.getElementById('mobile-sidebar-backdrop');
         if (bd) bd.classList.remove('active');
         // Hide mobile FABs
-        document.querySelectorAll('.mobile-fab').forEach(f => f.style.display = 'none');
+        document.querySelectorAll('.mobile-fab').forEach(f => f.classList.add('fab-hidden'));
       }
       // On mobile: clean up desktop sidebar-collapsed (drawer handles open/close)
       if (window.innerWidth <= 768) {
