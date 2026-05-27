@@ -4119,14 +4119,14 @@ async function adminSave() {
   const AG = [
     { t:'La semaine des métiers du tourisme',                         date:'Du 2 au 8 février 2026',           org:'Ministère / DG', dot:'#2563eb', badge_bg:'#eff6ff', badge_col:'#1d4ed8', icon:'🏖️' },
     { t:'La semaine des métiers du nucléaire',                        date:'Du 9 au 13 mars 2026',             org:'DR ARA',         dot:'#f59e0b', badge_bg:'#fffbeb', badge_col:'#b45309', icon:'⚛️' },
-    { t:'La semaine des métiers du soin et de l'accompagnement',     date:'Du 30 mars au 3 avril 2026',       org:'DR NAQ',         dot:'#10b981', badge_bg:'#f0fdf4', badge_col:'#047857', icon:'❤️‍🩹' },
-    { t:'Les jeudis de l'alternance',                                date:'D'avril jusqu'à juin 2026',      org:'DG / Ministère', dot:'#8b5cf6', badge_bg:'#f5f3ff', badge_col:'#6d28d9', icon:'🎓' },
+    { t:'La semaine des métiers du soin et de l\'accompagnement',     date:'Du 30 mars au 3 avril 2026',       org:'DR NAQ',         dot:'#10b981', badge_bg:'#f0fdf4', badge_col:'#047857', icon:'❤️‍🩹' },
+    { t:'Les jeudis de l\'alternance',                                date:'D\'avril jusqu\'à juin 2026',      org:'DG / Ministère', dot:'#8b5cf6', badge_bg:'#f5f3ff', badge_col:'#6d28d9', icon:'🎓' },
     { t:'La semaine des métiers du transport et de la logistique',    date:'Du 15 au 19 juin 2026',            org:'DR PACA',        dot:'#3b82f6', badge_bg:'#eff6ff', badge_col:'#1d4ed8', icon:'🚛' },
     { t:'La semaine des métiers du numérique',                        date:'Du 21 au 26 septembre 2026',       org:'DR IDF',         dot:'#06b6d4', badge_bg:'#ecfeff', badge_col:'#0e7490', icon:'💻' },
     { t:'La semaine des métiers du BTP',                              date:'Du 12 au 16 octobre 2026',         org:'DR BFC',         dot:'#f97316', badge_bg:'#fff7ed', badge_col:'#c2410c', icon:'🏗️' },
-    { t:'La semaine de l'emploi agroalimentaire',                    date:'Du 2 au 6 novembre 2026',          org:'DR BRET',        dot:'#22c55e', badge_bg:'#f0fdf4', badge_col:'#15803d', icon:'🌾' },
-    { t:'SEEPH – Semaine Européenne pour l'Emploi des Personnes en Situation de Handicap', date:'Du 16 au 22 novembre 2026', org:'Ministère / DG', dot:'#f43f5e', badge_bg:'#fff1f2', badge_col:'#be123c', icon:'♿' },
-    { t:'La semaine de l'industrie',                                 date:'Du 16 au 22 novembre 2026',        org:'Ministère / DG', dot:'#475569', badge_bg:'#f8fafc', badge_col:'#334155', icon:'🏭' },
+    { t:'La semaine de l\'emploi agroalimentaire',                    date:'Du 2 au 6 novembre 2026',          org:'DR BRET',        dot:'#22c55e', badge_bg:'#f0fdf4', badge_col:'#15803d', icon:'🌾' },
+    { t:'SEEPH – Semaine Européenne pour l\'Emploi des Personnes en Situation de Handicap', date:'Du 16 au 22 novembre 2026', org:'Ministère / DG', dot:'#f43f5e', badge_bg:'#fff1f2', badge_col:'#be123c', icon:'♿' },
+    { t:'La semaine de l\'industrie',                                 date:'Du 16 au 22 novembre 2026',        org:'Ministère / DG', dot:'#475569', badge_bg:'#f8fafc', badge_col:'#334155', icon:'🏭' },
     { t:'ReStart 2026',                                               date:'Du 30 nov au 4 décembre 2026',     org:'DG',             dot:'#7c3aed', badge_bg:'#f5f3ff', badge_col:'#6d28d9', icon:'🚀' },
   ];
 
@@ -4139,7 +4139,7 @@ async function adminSave() {
     wrap.innerHTML = AG.map(e => `
       <div class="ag-tl-item">
         <div class="ag-tl-dot" style="background:${e.dot}"></div>
-        <span class="ag-tl-date" style="color:${e.dot}">${e.date.replace('Du ','').replace(' 2026','').replace('D'avril jusqu'à ','Avr–')}</span>
+        <span class="ag-tl-date" style="color:${e.dot}">${e.date.replace('Du ','').replace(' 2026','').replace("D'avril jusqu'à ","Avr–")}</span>
         <div class="ag-tl-title">${e.t}</div>
         <div class="ag-tl-org">${e.org}</div>
       </div>
