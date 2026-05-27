@@ -1161,6 +1161,10 @@
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Veille filières
   </button>
+  <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Semaines thématiques
+  </button>
 </nav>
 
 <!-- Mobile FAB buttons (outside sidebar, always visible) -->
@@ -3967,6 +3971,230 @@ async function adminSave() {
     status.style.color = '#991b1b';
   }
 }
+</script>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4 : SEMAINES THÉMATIQUES
+══════════════════════════════════════════════ -->
+<div id="tab-agenda" class="tab-content">
+
+  <!-- ── CSS ── -->
+  <style>
+    #tab-agenda { background:#f8fafc; min-height:calc(100vh - 106px); }
+    .ag-wrap { max-width:1100px; margin:0 auto; padding:24px 24px 80px; }
+
+    /* Timeline scroll */
+    .ag-timeline-scroll { overflow-x:auto; padding-bottom:12px; }
+    .ag-timeline-scroll::-webkit-scrollbar { height:6px; }
+    .ag-timeline-scroll::-webkit-scrollbar-track { background:#f1f5f9; border-radius:3px; }
+    .ag-timeline-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+
+    /* Timeline item */
+    .ag-tl-item {
+      position:relative; flex:1; min-width:150px;
+      background:#f8fafc; padding:14px 12px 12px;
+      border-radius:12px; border:1px solid #e2e8f0;
+      transition:border-color .2s,box-shadow .2s; z-index:1;
+    }
+    .ag-tl-item:hover { border-color:#93c5fd; box-shadow:0 2px 12px rgba(0,49,137,.1); }
+    .ag-tl-dot {
+      position:absolute; top:-23px; left:50%; transform:translateX(-50%);
+      width:16px; height:16px; border-radius:50%; border:4px solid #fff;
+      box-shadow:0 0 0 1px #e2e8f0;
+    }
+    .ag-tl-date { display:block; font-size:10px; font-weight:700; text-transform:uppercase; margin-bottom:4px; }
+    .ag-tl-title { font-size:11.5px; font-weight:700; color:#0f172a; line-height:1.4; }
+    .ag-tl-org { font-size:10px; color:#94a3b8; margin-top:4px; }
+
+    /* Filter buttons */
+    .ag-filter-btn {
+      padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600;
+      border:none; cursor:pointer; transition:background .15s, color .15s;
+      background:#f1f5f9; color:#475569;
+    }
+    .ag-filter-btn:hover { background:#e2e8f0; }
+    .ag-filter-btn.active { background:#002244; color:#fff; }
+
+    /* Event cards */
+    .ag-card {
+      background:#fff; border-radius:12px; border:1px solid #f1f5f9;
+      overflow:hidden; transition:box-shadow .2s, transform .2s;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .ag-card:hover { box-shadow:0 4px 20px rgba(0,0,0,.1); transform:translateY(-2px); }
+    .ag-card-body { padding:18px 18px 14px; }
+    .ag-card-footer { background:#f8fafc; padding:10px 18px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
+    .ag-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 9px; border-radius:8px; border:1px solid; }
+    .ag-icon-wrap { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px; transition:background .2s; }
+    .ag-card:hover .ag-icon-wrap { background:#e60067 !important; }
+    .ag-card-title { font-size:14px; font-weight:700; color:#0f172a; line-height:1.4; margin-top:10px; }
+
+    /* Vacances section */
+    .ag-vacances { background:#0f172a; color:#fff; padding:28px 24px; }
+    .ag-vac-card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:12px 14px; }
+
+    /* Grid */
+    .ag-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    @media (max-width:900px) { .ag-grid { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:600px) { .ag-grid { grid-template-columns:1fr; } .ag-wrap { padding:14px 12px 80px; } }
+  </style>
+
+  <div class="ag-wrap">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div>
+        <h1 style="font-size:17px;font-weight:800;color:#002244;margin:0 0 3px;display:flex;align-items:center;gap:8px">
+          <svg width="18" height="18" fill="none" stroke="#e60067" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Semaines thématiques nationales 2026
+        </h1>
+        <p style="font-size:11px;color:#94a3b8;margin:0">MAJ : 26/05/2026 — Confirmation dates T4 2026</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🏛️ Ministère / DG</span>
+        <span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🌍 DR</span>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:24px;font-size:12px;color:#1e3a8a;line-height:1.6">
+      <strong>ℹ️</strong> Ce calendrier organise la mobilisation coordonnée du réseau FT pour les filières socles ou prioritaires. La participation est organisée en fonction du bassin d'emploi, des opportunités et de la capacité locale — pas d'obligation de participation systématique.
+    </div>
+
+    <!-- Timeline -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:24px 20px 20px;margin-bottom:24px">
+      <h2 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0 0 20px;display:flex;align-items:center;gap:7px">
+        <svg width="13" height="13" fill="#e60067" viewBox="0 0 24 24"><path d="M3 12h18M12 3l9 9-9 9"/></svg>
+        Vue chronologique de l'année 2026
+      </h2>
+      <div class="ag-timeline-scroll">
+        <div style="position:relative;display:flex;gap:14px;min-width:1600px;padding-top:32px;padding-bottom:4px;padding-left:4px;padding-right:4px">
+          <!-- Ligne horizontale -->
+          <div style="position:absolute;top:15px;left:0;right:0;height:3px;background:#e2e8f0;z-index:0"></div>
+          <!-- Items injectés par JS -->
+          <div id="ag-tl-items" style="display:contents"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+      <span style="font-size:13px;font-weight:600;color:#475569;display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Filtrer :
+      </span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px" id="ag-filters">
+        <button class="ag-filter-btn active" onclick="agFilter('all',this)">Tous les événements</button>
+        <button class="ag-filter-btn" onclick="agFilter('dg',this)">Ministère / DG</button>
+        <button class="ag-filter-btn" onclick="agFilter('dr',this)">Directions Régionales (DR)</button>
+      </div>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="ag-grid" id="ag-grid"></div>
+
+  </div><!-- /.ag-wrap -->
+
+  <!-- Vacances scolaires -->
+  <div class="ag-vacances">
+    <div style="max-width:1100px;margin:0 auto;padding:0 24px">
+      <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin:0 0 14px;display:flex;align-items:center;gap:7px">
+        <svg width="13" height="13" fill="#e60067" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        Repères : Vacances scolaires 2026
+      </h3>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+        <div class="ag-vac-card"><p style="font-size:11px;font-weight:600;color:#e2e8f0">Hiver</p><p style="font-size:10px;color:#94a3b8;margin-top:3px">7 fév – 9 mars</p></div>
+        <div class="ag-vac-card"><p style="font-size:11px;font-weight:600;color:#e2e8f0">Printemps</p><p style="font-size:10px;color:#94a3b8;margin-top:3px">4 avr – 4 mai</p></div>
+        <div class="ag-vac-card"><p style="font-size:11px;font-weight:600;color:#e2e8f0">Été</p><p style="font-size:10px;color:#94a3b8;margin-top:3px">4 juil – 1er sept</p></div>
+        <div class="ag-vac-card"><p style="font-size:11px;font-weight:600;color:#e2e8f0">Toussaint</p><p style="font-size:10px;color:#94a3b8;margin-top:3px">17 oct – 2 nov</p></div>
+        <div class="ag-vac-card"><p style="font-size:11px;font-weight:600;color:#e2e8f0">Noël</p><p style="font-size:10px;color:#94a3b8;margin-top:3px">19 déc – 4 janv 2027</p></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#tab-agenda -->
+
+<script>
+(function() {
+  const AG = [
+    { t:'La semaine des métiers du tourisme',                         date:'Du 2 au 8 février 2026',           org:'Ministère / DG', dot:'#2563eb', badge_bg:'#eff6ff', badge_col:'#1d4ed8', icon:'🏖️' },
+    { t:'La semaine des métiers du nucléaire',                        date:'Du 9 au 13 mars 2026',             org:'DR ARA',         dot:'#f59e0b', badge_bg:'#fffbeb', badge_col:'#b45309', icon:'⚛️' },
+    { t:'La semaine des métiers du soin et de l'accompagnement',     date:'Du 30 mars au 3 avril 2026',       org:'DR NAQ',         dot:'#10b981', badge_bg:'#f0fdf4', badge_col:'#047857', icon:'❤️‍🩹' },
+    { t:'Les jeudis de l'alternance',                                date:'D'avril jusqu'à juin 2026',      org:'DG / Ministère', dot:'#8b5cf6', badge_bg:'#f5f3ff', badge_col:'#6d28d9', icon:'🎓' },
+    { t:'La semaine des métiers du transport et de la logistique',    date:'Du 15 au 19 juin 2026',            org:'DR PACA',        dot:'#3b82f6', badge_bg:'#eff6ff', badge_col:'#1d4ed8', icon:'🚛' },
+    { t:'La semaine des métiers du numérique',                        date:'Du 21 au 26 septembre 2026',       org:'DR IDF',         dot:'#06b6d4', badge_bg:'#ecfeff', badge_col:'#0e7490', icon:'💻' },
+    { t:'La semaine des métiers du BTP',                              date:'Du 12 au 16 octobre 2026',         org:'DR BFC',         dot:'#f97316', badge_bg:'#fff7ed', badge_col:'#c2410c', icon:'🏗️' },
+    { t:'La semaine de l'emploi agroalimentaire',                    date:'Du 2 au 6 novembre 2026',          org:'DR BRET',        dot:'#22c55e', badge_bg:'#f0fdf4', badge_col:'#15803d', icon:'🌾' },
+    { t:'SEEPH – Semaine Européenne pour l'Emploi des Personnes en Situation de Handicap', date:'Du 16 au 22 novembre 2026', org:'Ministère / DG', dot:'#f43f5e', badge_bg:'#fff1f2', badge_col:'#be123c', icon:'♿' },
+    { t:'La semaine de l'industrie',                                 date:'Du 16 au 22 novembre 2026',        org:'Ministère / DG', dot:'#475569', badge_bg:'#f8fafc', badge_col:'#334155', icon:'🏭' },
+    { t:'ReStart 2026',                                               date:'Du 30 nov au 4 décembre 2026',     org:'DG',             dot:'#7c3aed', badge_bg:'#f5f3ff', badge_col:'#6d28d9', icon:'🚀' },
+  ];
+
+  const isDR = o => o.startsWith('DR');
+  const isNat = o => !isDR(o);
+
+  function buildTimeline() {
+    const wrap = document.getElementById('ag-tl-items');
+    if (!wrap) return;
+    wrap.innerHTML = AG.map(e => `
+      <div class="ag-tl-item">
+        <div class="ag-tl-dot" style="background:${e.dot}"></div>
+        <span class="ag-tl-date" style="color:${e.dot}">${e.date.replace('Du ','').replace(' 2026','').replace('D'avril jusqu'à ','Avr–')}</span>
+        <div class="ag-tl-title">${e.t}</div>
+        <div class="ag-tl-org">${e.org}</div>
+      </div>
+    `).join('');
+  }
+
+  function buildGrid(items) {
+    const grid = document.getElementById('ag-grid');
+    if (!grid) return;
+    if (!items.length) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:32px 0">Aucun événement.</p>'; return; }
+    grid.innerHTML = items.map(e => `
+      <div class="ag-card">
+        <div class="ag-card-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <span class="ag-badge" style="background:${e.badge_bg};color:${e.badge_col};border-color:${e.badge_col}30">${e.org}</span>
+            <div class="ag-icon-wrap" style="background:#f8fafc;font-size:18px">${e.icon}</div>
+          </div>
+          <div class="ag-card-title">${e.t}</div>
+        </div>
+        <div class="ag-card-footer">
+          <span style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${e.date}
+          </span>
+          <svg width="12" height="12" fill="none" stroke="#cbd5e1" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.agFilter = function(type, btn) {
+    document.querySelectorAll('.ag-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (type === 'all') buildGrid(AG);
+    else if (type === 'dg') buildGrid(AG.filter(e => isNat(e.org)));
+    else if (type === 'dr') buildGrid(AG.filter(e => isDR(e.org)));
+  };
+
+  function initAgenda() {
+    if (document.getElementById('ag-tl-items')?.innerHTML.trim()) return;
+    buildTimeline();
+    buildGrid(AG);
+  }
+
+  // Hook into switchTab
+  const _orig = window.switchTab;
+  window.switchTab = function(name) {
+    _orig(name);
+    if (name === 'agenda') setTimeout(initAgenda, 50);
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('tab-agenda')?.classList.contains('active')) initAgenda();
+  });
+})();
 </script>
 
 </body>
