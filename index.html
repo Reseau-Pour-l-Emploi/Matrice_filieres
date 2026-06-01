@@ -1166,6 +1166,10 @@
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Semaines thématiques
   </button>
+  <button class="tab-btn" id="tab-btn-ge" onclick="switchTab('ge')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    Grandes entreprises
+  </button>
 </nav>
 
 <!-- Mobile FAB buttons (outside sidebar, always visible) -->
@@ -4194,6 +4198,472 @@ async function adminSave() {
 
   document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('tab-agenda')?.classList.contains('active')) initAgenda();
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     TAB 5 : GRANDES ENTREPRISES
+══════════════════════════════════════════════ -->
+<div id="tab-ge" class="tab-content">
+<style>
+  #tab-ge { background:#f8fafc; min-height:calc(100vh - 106px); }
+  .ge-wrap { max-width:1200px; margin:0 auto; padding:24px 24px 80px; }
+
+  /* Search bar */
+  .ge-searchbar {
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:18px 20px; margin-bottom:16px;
+    display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:end;
+  }
+  @media(max-width:700px){ .ge-searchbar { grid-template-columns:1fr; } }
+
+  .ge-field label { font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block; }
+  .ge-input, .ge-select {
+    width:100%; padding:9px 12px; border:1px solid #e2e8f0; border-radius:9px;
+    font-size:13px; color:#0f172a; background:#f8fafc; box-sizing:border-box;
+    transition:border-color .15s;
+  }
+  .ge-input:focus, .ge-select:focus { border-color:#2563eb; outline:none; background:#fff; }
+
+  /* Filières checkboxes */
+  .ge-filiere-wrap {
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:14px 20px; margin-bottom:20px;
+  }
+  .ge-filiere-grid {
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; max-height:120px;
+    overflow-y:auto; padding-right:4px;
+  }
+  .ge-chip {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 11px; border-radius:20px; border:1px solid #e2e8f0;
+    font-size:11.5px; font-weight:500; cursor:pointer; transition:all .15s;
+    background:#f8fafc; color:#475569; white-space:nowrap;
+  }
+  .ge-chip input { width:12px; height:12px; accent-color:#2563eb; }
+  .ge-chip:has(input:checked) { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; font-weight:700; }
+
+  /* Results table */
+  .ge-table-wrap { background:#fff; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; margin-bottom:20px; }
+  .ge-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .ge-table thead th {
+    background:#f8fafc; padding:10px 14px; text-align:left;
+    font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;
+    letter-spacing:.05em; border-bottom:1px solid #f1f5f9; white-space:nowrap;
+  }
+  .ge-table thead th.sort-asc::after { content:' ↑'; }
+  .ge-table thead th.sort-desc::after { content:' ↓'; }
+  .ge-table thead th[data-sort] { cursor:pointer; user-select:none; }
+  .ge-table thead th[data-sort]:hover { color:#2563eb; }
+  .ge-table tbody tr { cursor:pointer; transition:background .1s; }
+  .ge-table tbody tr:hover { background:#f0f9ff; }
+  .ge-table tbody tr.selected { background:#eff6ff; }
+  .ge-table tbody td { padding:10px 14px; border-bottom:1px solid #f8fafc; vertical-align:middle; }
+  .ge-table tbody tr:last-child td { border-bottom:none; }
+
+  /* Fiche */
+  .ge-fiche {
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:24px; display:none;
+  }
+  .ge-fiche.visible { display:block; }
+  .ge-fiche-header {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    flex-wrap:wrap; gap:12px; padding-bottom:18px; margin-bottom:18px;
+    border-bottom:1px solid #f1f5f9;
+  }
+  .ge-fiche-title { font-size:20px; font-weight:800; color:#0f172a; }
+  .ge-fiche-siren { font-size:12px; color:#64748b; margin-top:3px; }
+  .ge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media(max-width:800px){ .ge-grid { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:500px){ .ge-grid { grid-template-columns:1fr; } }
+  .ge-kv { background:#f8fafc; border-radius:10px; padding:12px 14px; }
+  .ge-kv-label { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.07em; margin-bottom:4px; }
+  .ge-kv-value { font-size:13px; font-weight:600; color:#0f172a; word-break:break-word; }
+  .ge-kv-value a { color:#2563eb; text-decoration:none; }
+  .ge-kv-value a:hover { text-decoration:underline; }
+  .ge-tag { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; margin:2px; }
+  .ge-tag-g { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+
+  /* Pagination */
+  .ge-pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-top:1px solid #f1f5f9; flex-wrap:wrap; gap:8px; }
+  .ge-page-btn { padding:5px 12px; border-radius:7px; border:1px solid #e2e8f0; background:#fff; cursor:pointer; font-size:12px; }
+  .ge-page-btn:disabled { opacity:.4; cursor:default; }
+  .ge-page-btn.active { background:#2563eb; color:#fff; border-color:#2563eb; }
+</style>
+
+<div class="ge-wrap">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <div>
+      <h1 style="font-size:17px;font-weight:800;color:#002244;margin:0 0 3px;display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Grandes entreprises &amp; grands comptes
+      </h1>
+      <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="ge-status" style="font-size:11px;color:#94a3b8"></span>
+    </div>
+  </div>
+
+  <!-- Filters bar -->
+  <div class="ge-searchbar">
+    <div class="ge-field" style="min-width:0">
+      <label>Rechercher une entreprise</label>
+      <input id="ge-search" class="ge-input" type="text" placeholder="Saisir le nom ou SIREN…" oninput="geFilter()">
+    </div>
+    <div class="ge-field">
+      <label>Région du siège</label>
+      <select id="ge-region" class="ge-select" onchange="geFilter()">
+        <option value="">Toutes les régions</option>
+      </select>
+    </div>
+    <div class="ge-field" style="display:flex;flex-direction:column;justify-content:flex-end">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:0;padding:9px 0">
+        <input type="checkbox" id="ge-gc" onchange="geFilter()" style="width:15px;height:15px;accent-color:#2563eb">
+        <span style="font-size:12px;font-weight:600;color:#0f172a">Grands comptes uniquement</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Filières filter -->
+  <div class="ge-filiere-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span style="font-size:12px;font-weight:700;color:#475569">Filtrer par filière</span>
+      <button onclick="geClearFilieres()" style="font-size:11px;color:#64748b;background:none;border:none;cursor:pointer;text-decoration:underline">Tout décocher</button>
+    </div>
+    <div class="ge-filiere-grid" id="ge-filieres"></div>
+  </div>
+
+  <!-- Results table -->
+  <div class="ge-table-wrap">
+    <table class="ge-table">
+      <thead>
+        <tr>
+          <th data-sort="DC_RAISONSOCIALEENTREPRISE" onclick="geSort(this)">Raison sociale</th>
+          <th data-sort="SIREN" onclick="geSort(this)">SIREN</th>
+          <th data-sort="DC_NAFREV2_ENTREPRISE_ID" onclick="geSort(this)">NAF</th>
+          <th>Filières</th>
+          <th data-sort="Région" onclick="geSort(this)">Région</th>
+          <th data-sort="NBDPAEP1M" onclick="geSort(this)">DPAE &gt;1M</th>
+          <th data-sort="NB_SIRET" onclick="geSort(this)">Étab. recruteurs</th>
+          <th>Groupe</th>
+        </tr>
+      </thead>
+      <tbody id="ge-tbody"></tbody>
+    </table>
+    <div class="ge-pagination" id="ge-pagination"></div>
+  </div>
+
+  <!-- Fiche entreprise -->
+  <div class="ge-fiche" id="ge-fiche">
+    <div class="ge-fiche-header">
+      <div>
+        <div class="ge-fiche-title" id="ge-fiche-name"></div>
+        <div class="ge-fiche-siren" id="ge-fiche-siren-line"></div>
+      </div>
+      <a id="ge-fiche-annuaire" href="#" target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #bfdbfe">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Annuaire entreprises
+      </a>
+    </div>
+    <div class="ge-grid" id="ge-fiche-grid"></div>
+  </div>
+
+</div><!-- /.ge-wrap -->
+</div><!-- /#tab-ge -->
+
+<script>
+(function() {
+  const GE_CSV_URL = 'GDES_ENTREPRISES_GDS_CPT.csv';
+  let GE_DATA = [];
+  let GE_FILTERED = [];
+  let GE_SORT = { col: 'NBDPAEP1M', dir: -1 };
+  let GE_PAGE = 1;
+  const GE_PAGE_SIZE = 20;
+  let GE_FILIERES_SEL = new Set(); // empty = all
+  let GE_COMMUNE_CACHE = {};
+  let GE_NAF_TO_FILIERES = {}; // built from NAF_BY_FILIERE
+
+  // Build NAF→filières reverse map once data is ready
+  function buildNafMap() {
+    GE_NAF_TO_FILIERES = {};
+    if (typeof NAF_BY_FILIERE === 'undefined') return;
+    Object.entries(NAF_BY_FILIERE).forEach(([fil, nafs]) => {
+      nafs.forEach(n => {
+        const code = (n.code || '').trim();
+        if (!code) return;
+        if (!GE_NAF_TO_FILIERES[code]) GE_NAF_TO_FILIERES[code] = [];
+        if (!GE_NAF_TO_FILIERES[code].includes(fil)) GE_NAF_TO_FILIERES[code].push(fil);
+      });
+    });
+  }
+
+  // Determine region from commune code (first 2 chars = dept code)
+  const DEPT_REGION = {
+    '01':'Auvergne-Rhône-Alpes','03':'Auvergne-Rhône-Alpes','07':'Auvergne-Rhône-Alpes','15':'Auvergne-Rhône-Alpes','26':'Auvergne-Rhône-Alpes','38':'Auvergne-Rhône-Alpes','42':'Auvergne-Rhône-Alpes','43':'Auvergne-Rhône-Alpes','63':'Auvergne-Rhône-Alpes','69':'Auvergne-Rhône-Alpes','73':'Auvergne-Rhône-Alpes','74':'Auvergne-Rhône-Alpes',
+    '21':'Bourgogne-Franche-Comté','25':'Bourgogne-Franche-Comté','39':'Bourgogne-Franche-Comté','58':'Bourgogne-Franche-Comté','70':'Bourgogne-Franche-Comté','71':'Bourgogne-Franche-Comté','89':'Bourgogne-Franche-Comté','90':'Bourgogne-Franche-Comté',
+    '22':'Bretagne','29':'Bretagne','35':'Bretagne','56':'Bretagne',
+    '18':'Centre-Val de Loire','28':'Centre-Val de Loire','36':'Centre-Val de Loire','37':'Centre-Val de Loire','41':'Centre-Val de Loire','45':'Centre-Val de Loire',
+    '2A':'Corse','2B':'Corse',
+    '08':'Grand Est','10':'Grand Est','51':'Grand Est','52':'Grand Est','54':'Grand Est','55':'Grand Est','57':'Grand Est','67':'Grand Est','68':'Grand Est','88':'Grand Est',
+    '02':'Hauts-de-France','59':'Hauts-de-France','60':'Hauts-de-France','62':'Hauts-de-France','80':'Hauts-de-France',
+    '75':'Île-de-France','77':'Île-de-France','78':'Île-de-France','91':'Île-de-France','92':'Île-de-France','93':'Île-de-France','94':'Île-de-France','95':'Île-de-France',
+    '14':'Normandie','27':'Normandie','50':'Normandie','61':'Normandie','76':'Normandie',
+    '44':'Pays de la Loire','49':'Pays de la Loire','53':'Pays de la Loire','72':'Pays de la Loire','85':'Pays de la Loire',
+    '09':'Occitanie','11':'Occitanie','12':'Occitanie','30':'Occitanie','31':'Occitanie','32':'Occitanie','34':'Occitanie','46':'Occitanie','48':'Occitanie','65':'Occitanie','66':'Occitanie','81':'Occitanie','82':'Occitanie',
+    '16':'Nouvelle-Aquitaine','17':'Nouvelle-Aquitaine','19':'Nouvelle-Aquitaine','23':'Nouvelle-Aquitaine','24':'Nouvelle-Aquitaine','33':'Nouvelle-Aquitaine','40':'Nouvelle-Aquitaine','47':'Nouvelle-Aquitaine','64':'Nouvelle-Aquitaine','79':'Nouvelle-Aquitaine','86':'Nouvelle-Aquitaine','87':'Nouvelle-Aquitaine',
+    '04':'Provence-Alpes-Côte d\'Azur','05':'Provence-Alpes-Côte d\'Azur','06':'Provence-Alpes-Côte d\'Azur','13':'Provence-Alpes-Côte d\'Azur','83':'Provence-Alpes-Côte d\'Azur','84':'Provence-Alpes-Côte d\'Azur',
+    '971':'Guadeloupe','972':'Martinique','973':'Guyane','974':'La Réunion','976':'Mayotte',
+  };
+
+  function regionFromCommune(code) {
+    if (!code) return '';
+    const dept = code.length >= 3 ? code.substring(0, 3) : code.substring(0, 2);
+    return DEPT_REGION[dept] || DEPT_REGION[code.substring(0, 2)] || '';
+  }
+
+  function getFilieresForRow(row) {
+    if (row['Code filière'] && row['Code filière'].trim()) {
+      return row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+    }
+    const naf = (row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim();
+    return GE_NAF_TO_FILIERES[naf] || [];
+  }
+
+  function fmtNum(v) {
+    if (!v) return '—';
+    const n = parseInt(v, 10);
+    return isNaN(n) ? '—' : n.toLocaleString('fr-FR');
+  }
+
+  // ── Load CSV ────────────────────────────────────────────────────────────────
+  async function loadGE() {
+    const status = document.getElementById('ge-status');
+    status.textContent = '⏳ Chargement…';
+    try {
+      const res = await fetch(GE_CSV_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      // Detect separator
+      const sep = lines[0].includes(';') ? ';' : ',';
+      const headers = lines[0].split(sep).map(h => h.replace(/^\uFEFF/, '').trim().replace(/^"|"$/g, ''));
+      GE_DATA = lines.slice(1).map(line => {
+        const vals = line.split(sep).map(v => v.replace(/^"|"$/g, '').trim());
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = vals[i] || '');
+        // Precompute region and filières
+        obj._region = obj['Région']?.trim() || regionFromCommune(obj['C_COMMUNE_ID']);
+        return obj;
+      }).filter(r => r['DC_RAISONSOCIALEENTREPRISE']?.trim());
+
+      buildNafMap();
+
+      // Precompute filières for each row
+      GE_DATA.forEach(r => { r._filieres = getFilieresForRow(r); });
+
+      // Populate region dropdown
+      const regions = [...new Set(GE_DATA.map(r => r._region).filter(Boolean))].sort();
+      const sel = document.getElementById('ge-region');
+      regions.forEach(rg => { const o = document.createElement('option'); o.value = o.textContent = rg; sel.appendChild(o); });
+
+      // Build filières chips
+      buildFiliereChips();
+
+      status.textContent = '';
+      document.getElementById('ge-count-label').textContent = `${GE_DATA.length.toLocaleString('fr-FR')} entreprises`;
+      geFilter();
+    } catch (e) {
+      status.textContent = '⚠️ ' + e.message;
+      console.error('GE load error', e);
+    }
+  }
+
+  function buildFiliereChips() {
+    const all = new Set(GE_DATA.flatMap(r => r._filieres));
+    const wrap = document.getElementById('ge-filieres');
+    if (!wrap) return;
+    const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
+    const sorted = [...all].sort((a, b) => (names[a] || a).localeCompare(names[b] || b, 'fr'));
+    wrap.innerHTML = sorted.map(f => `
+      <label class="ge-chip" onclick="geFiliereToggle('${f}',this)">
+        <input type="checkbox" value="${f}" onchange="geFilter()">
+        ${names[f] || f}
+      </label>
+    `).join('');
+  }
+
+  window.geFiliereToggle = function(code, lbl) {
+    // handled by checkbox onchange → geFilter
+  };
+
+  window.geClearFilieres = function() {
+    document.querySelectorAll('#ge-filieres input[type=checkbox]').forEach(c => c.checked = false);
+    geFilter();
+  };
+
+  // ── Filter & sort ───────────────────────────────────────────────────────────
+  window.geFilter = function() {
+    const q      = (document.getElementById('ge-search')?.value || '').toLowerCase();
+    const region = document.getElementById('ge-region')?.value || '';
+    const gcOnly = document.getElementById('ge-gc')?.checked;
+    const selFil = [...document.querySelectorAll('#ge-filieres input:checked')].map(c => c.value);
+
+    GE_FILTERED = GE_DATA.filter(r => {
+      if (q && !(r['DC_RAISONSOCIALEENTREPRISE'].toLowerCase().includes(q) || r['SIREN']?.includes(q))) return false;
+      if (region && r._region !== region) return false;
+      if (gcOnly && !r['GROUPE']?.trim()) return false;
+      if (selFil.length && !selFil.some(f => r._filieres.includes(f))) return false;
+      return true;
+    });
+
+    // Sort
+    GE_FILTERED.sort((a, b) => {
+      const av = a[GE_SORT.col] || '', bv = b[GE_SORT.col] || '';
+      const an = parseFloat(av), bn = parseFloat(bv);
+      if (!isNaN(an) && !isNaN(bn)) return (an - bn) * GE_SORT.dir;
+      return av.localeCompare(bv, 'fr') * GE_SORT.dir;
+    });
+
+    GE_PAGE = 1;
+    renderTable();
+    document.getElementById('ge-fiche').classList.remove('visible');
+  };
+
+  window.geSort = function(th) {
+    const col = th.dataset.sort;
+    document.querySelectorAll('.ge-table thead th').forEach(t => { t.classList.remove('sort-asc','sort-desc'); });
+    if (GE_SORT.col === col) {
+      GE_SORT.dir *= -1;
+    } else {
+      GE_SORT.col = col;
+      GE_SORT.dir = -1;
+    }
+    th.classList.add(GE_SORT.dir === 1 ? 'sort-asc' : 'sort-desc');
+    geFilter();
+  };
+
+  // ── Render table ────────────────────────────────────────────────────────────
+  function renderTable() {
+    const tbody = document.getElementById('ge-tbody');
+    const pag   = document.getElementById('ge-pagination');
+    if (!tbody) return;
+
+    const total  = GE_FILTERED.length;
+    const pages  = Math.max(1, Math.ceil(total / GE_PAGE_SIZE));
+    GE_PAGE = Math.min(GE_PAGE, pages);
+    const slice  = GE_FILTERED.slice((GE_PAGE-1)*GE_PAGE_SIZE, GE_PAGE*GE_PAGE_SIZE);
+
+    const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
+    tbody.innerHTML = slice.map((r, i) => {
+      const fils = r._filieres.slice(0,3).map(f => `<span class="ge-tag">${names[f] || f}</span>`).join('');
+      const more = r._filieres.length > 3 ? `<span style="font-size:10px;color:#94a3b8">+${r._filieres.length-3}</span>` : '';
+      return `<tr onclick="geShowFiche(${(GE_PAGE-1)*GE_PAGE_SIZE + i})">
+        <td style="font-weight:600;color:#0f172a">${r['DC_RAISONSOCIALEENTREPRISE']}</td>
+        <td style="font-family:monospace;font-size:11.5px;color:#64748b">${r['SIREN'] || '—'}</td>
+        <td><span style="background:#f1f5f9;padding:2px 7px;border-radius:6px;font-size:11px;font-family:monospace">${r['DC_NAFREV2_ENTREPRISE_ID']||'—'}</span></td>
+        <td>${fils}${more}</td>
+        <td style="color:#475569;font-size:12px">${r._region||'—'}</td>
+        <td style="text-align:right;font-weight:600">${fmtNum(r['NBDPAEP1M'])}</td>
+        <td style="text-align:right">${fmtNum(r['NB_SIRET'])}</td>
+        <td>${r['GROUPE'] ? `<span class="ge-tag ge-tag-g">${r['GROUPE']}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="8" style="text-align:center;padding:32px;color:#94a3b8">Aucune entreprise trouvée.</td></tr>`;
+
+    // Pagination
+    const start = (GE_PAGE-1)*GE_PAGE_SIZE + 1;
+    const end   = Math.min(GE_PAGE*GE_PAGE_SIZE, total);
+    let pagHtml = `<span style="font-size:12px;color:#64748b">${start}–${end} sur ${total.toLocaleString('fr-FR')}</span>`;
+    pagHtml += `<div style="display:flex;gap:6px;align-items:center">`;
+    pagHtml += `<button class="ge-page-btn" onclick="gePage(${GE_PAGE-1})" ${GE_PAGE<=1?'disabled':''}>‹ Précédent</button>`;
+    const pStart = Math.max(1, GE_PAGE-2), pEnd = Math.min(pages, GE_PAGE+2);
+    for (let p=pStart; p<=pEnd; p++) {
+      pagHtml += `<button class="ge-page-btn ${p===GE_PAGE?'active':''}" onclick="gePage(${p})">${p}</button>`;
+    }
+    pagHtml += `<button class="ge-page-btn" onclick="gePage(${GE_PAGE+1})" ${GE_PAGE>=pages?'disabled':''}>Suivant ›</button>`;
+    pagHtml += `</div>`;
+    pag.innerHTML = pagHtml;
+  }
+
+  window.gePage = function(p) { GE_PAGE = p; renderTable(); };
+
+  // ── Fiche entreprise ────────────────────────────────────────────────────────
+  window.geShowFiche = function(idx) {
+    const r = GE_FILTERED[idx];
+    if (!r) return;
+    document.querySelectorAll('#ge-tbody tr').forEach((tr,i) => tr.classList.toggle('selected', i===idx%GE_PAGE_SIZE));
+
+    const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
+    const fils = r._filieres.map(f => `<span class="ge-tag">${names[f]||f}</span>`).join(' ');
+    const siren = r['SIREN'] || '';
+
+    document.getElementById('ge-fiche-name').textContent = r['DC_RAISONSOCIALEENTREPRISE'];
+    document.getElementById('ge-fiche-siren-line').textContent = siren ? `SIREN : ${siren}` : '';
+    document.getElementById('ge-fiche-annuaire').href = siren ? `https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siren}` : '#';
+
+    const kv = [
+      { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
+      { label:'NAF',             val: r['DC_NAFREV2_ENTREPRISE_ID'] || '—' },
+      { label:'Filière(s)',      val: fils || '—' },
+      { label:'Commune siège',   val: r['C_COMMUNE_ID'] || '—', id:'ge-kv-commune' },
+      { label:'Région',          val: r._region || r['Région'] || '—' },
+      { label:'Groupe',          val: r['GROUPE'] ? `<span class="ge-tag ge-tag-g">${r['GROUPE']}</span>` : '—' },
+      { label:'Parcours fidélisation', val: r['Parcours fidélisation'] || '—' },
+      { label:'Affectation DG/DR',     val: r['Affectation groupe DG/DR'] || '—' },
+      { label:'Région d\'affectation', val: [r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—' },
+      { label:'Étab. ayant recruté',   val: fmtNum(r['NB_SIRET']) },
+      { label:'DPAE &gt; 1 mois',      val: fmtNum(r['NBDPAEP1M']) },
+    ];
+
+    document.getElementById('ge-fiche-grid').innerHTML = kv.map(k =>
+      `<div class="ge-kv"${k.id?` id="${k.id}"`:''}><div class="ge-kv-label">${k.label}</div><div class="ge-kv-value">${k.val}</div></div>`
+    ).join('');
+
+    // Fetch commune name async
+    if (r['C_COMMUNE_ID']) {
+      const communeEl = document.getElementById('ge-kv-commune')?.querySelector('.ge-kv-value');
+      if (communeEl) {
+        const code = r['C_COMMUNE_ID'];
+        if (GE_COMMUNE_CACHE[code]) {
+          communeEl.textContent = GE_COMMUNE_CACHE[code];
+        } else {
+          fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => {
+              if (d?.nom) {
+                GE_COMMUNE_CACHE[code] = `${d.nom} (${code})`;
+                communeEl.textContent = GE_COMMUNE_CACHE[code];
+              }
+            }).catch(() => {});
+        }
+      }
+    }
+
+    const fiche = document.getElementById('ge-fiche');
+    fiche.classList.add('visible');
+    fiche.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+  function initGE() {
+    if (GE_DATA.length) return;
+    loadGE();
+  }
+
+  // Hook switchTab
+  const _orig = window.switchTab;
+  window.switchTab = function(name) {
+    _orig(name);
+    if (name === 'ge') setTimeout(initGE, 50);
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('tab-ge')?.classList.contains('active')) initGE();
   });
 })();
 </script>
