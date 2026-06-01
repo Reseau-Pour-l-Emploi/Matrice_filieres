@@ -4639,13 +4639,27 @@ async function adminSave() {
       { label:'Parcours fidélisation', val: r['Parcours fidélisation'] || '—' },
       { label:'Affectation DG/DR',     val: r['Affectation groupe DG/DR'] || '—' },
       { label:'Région d\'affectation', val: [r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—' },
-      { label:'Étab. ayant recruté',   val: fmtNum(r['NB_SIRET']) },
-      { label:'DPAE &gt; 1 mois',      val: fmtNum(r['NBDPAEP1M']) },
+      { label:'Étab. ayant recruté',   val: fmtNum(r['NB_SIRET']),   kpi: true, icon:'🏢', color:'#2563eb' },
+      { label:'DPAE &gt; 1 mois',      val: fmtNum(r['NBDPAEP1M']),  kpi: true, icon:'📋', color:'#059669' },
     ];
 
-    document.getElementById('ge-fiche-grid').innerHTML = kv.map(k =>
-      `<div class="ge-kv"${k.id?` id="${k.id}"`:''}><div class="ge-kv-label">${k.label}</div><div class="ge-kv-value">${k.val}</div></div>`
-    ).join('');
+    const kpiItems = kv.filter(k => k.kpi);
+    const stdItems = kv.filter(k => !k.kpi);
+
+    // KPI row
+    const kpiHtml = `<div style="display:grid;grid-template-columns:repeat(${kpiItems.length},1fr);gap:14px;margin-bottom:14px">` +
+      kpiItems.map(k => `
+        <div style="background:linear-gradient(135deg,${k.color}15,${k.color}08);border:2px solid ${k.color}30;border-radius:12px;padding:18px 20px;text-align:center">
+          <div style="font-size:24px;margin-bottom:4px">${k.icon}</div>
+          <div style="font-size:28px;font-weight:800;color:${k.color};line-height:1">${k.val}</div>
+          <div style="font-size:11px;font-weight:600;color:#64748b;margin-top:6px;text-transform:uppercase;letter-spacing:.06em">${k.label}</div>
+        </div>`).join('') + `</div>`;
+
+    document.getElementById('ge-fiche-grid').innerHTML = kpiHtml +
+      `<div class="ge-grid">` +
+      stdItems.map(k =>
+        `<div class="ge-kv"${k.id?` id="${k.id}"`:''}><div class="ge-kv-label">${k.label}</div><div class="ge-kv-value">${k.val}</div></div>`
+      ).join('') + `</div>`;
 
     // Fetch commune name async
     if (r['C_COMMUNE_ID']) {
