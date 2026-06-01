@@ -4404,7 +4404,7 @@ async function adminSave() {
     if (typeof NAF_BY_FILIERE === 'undefined') return;
     Object.entries(NAF_BY_FILIERE).forEach(([fil, nafs]) => {
       nafs.forEach(n => {
-        const code = (n.code || '').trim().toUpperCase();
+        const code = (n.code || '').trim().toUpperCase().replace('.', '');
         if (!code) return;
         if (!GE_NAF_TO_FILIERES[code]) GE_NAF_TO_FILIERES[code] = [];
         if (!GE_NAF_TO_FILIERES[code].includes(fil)) GE_NAF_TO_FILIERES[code].push(fil);
@@ -4444,7 +4444,7 @@ async function adminSave() {
       const explicit = row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean);
       return explicit.map(c => ({ code: c, fromNaf: false }));
     }
-    const naf = (row._nafNorm || row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase();
+    const naf = (row._nafNorm || row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase().replace('.', '');
     return (GE_NAF_TO_FILIERES[naf] || []).map(c => ({ code: c, fromNaf: true }));
   }
 
@@ -4479,7 +4479,7 @@ async function adminSave() {
 
       // Precompute filières for each row (normalize NAF code case)
       GE_DATA.forEach(r => {
-        r._nafNorm = (r['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase();
+        r._nafNorm = (r['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase().replace('.', '');
         r._filieres = getFilieresForRow(r);
         r._filieresCodes = r._filieres.map(f => f.code);
       });
@@ -4638,7 +4638,7 @@ async function adminSave() {
 
     const kv = [
       { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
-      { label:'NAF',             val: (() => { const naf = r['DC_NAFREV2_ENTREPRISE_ID'] || ''; const lbl = GE_NAF_TO_LABEL[naf.toUpperCase()] || ''; return naf ? `<span style="font-family:monospace;font-weight:700">${naf}</span>${lbl ? ` <span style="color:#64748b;font-weight:400">— ${lbl}</span>` : ''}` : '—'; })() },
+      { label:'NAF',             val: (() => { const naf = r['DC_NAFREV2_ENTREPRISE_ID'] || ''; const lbl = GE_NAF_TO_LABEL[naf.toUpperCase().replace('.', '')] || ''; return naf ? `<span style="font-family:monospace;font-weight:700">${naf}</span>${lbl ? ` <span style="color:#64748b;font-weight:400">— ${lbl}</span>` : ''}` : '—'; })() },
       { label:'Filière d\'affectation', val: filsExplicitHtml },
       { label:'Filières calculées (NAF)', val: filsNafHtml },
       { label:'Commune siège',   val: r['C_COMMUNE_ID'] || '—', id:'ge-kv-commune' },
