@@ -4284,7 +4284,9 @@ async function adminSave() {
   .ge-kv-value a { color:#2563eb; text-decoration:none; }
   .ge-kv-value a:hover { text-decoration:underline; }
   .ge-tag { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; margin:2px; }
+  .ge-tag-naf { background:#fef3c7; color:#b45309; border-color:#fde68a; }
   .ge-tag-g { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+  .ge-tag-naf:hover { background:#fde68a; }
 
   /* Pagination */
   .ge-pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-top:1px solid #f1f5f9; flex-wrap:wrap; gap:8px; }
@@ -4389,18 +4391,25 @@ async function adminSave() {
   let GE_COMMUNE_CACHE = {};
   let GE_NAF_TO_FILIERES = {}; // built from NAF_BY_FILIERE
 
-  // Build NAF→filières reverse map once data is ready
-  function buildNafMap() {
+  // Build NAF→filières reverse map — wait for NAF_BY_FILIERE to be populated
+  async function buildNafMap() {
     GE_NAF_TO_FILIERES = {};
+    // Poll until NAF_BY_FILIERE is populated (loaded by main app startup)
+    let attempts = 0;
+    while (typeof NAF_BY_FILIERE === 'undefined' || Object.keys(NAF_BY_FILIERE).length === 0) {
+      if (attempts++ > 50) break; // 5s timeout
+      await new Promise(r => setTimeout(r, 100));
+    }
     if (typeof NAF_BY_FILIERE === 'undefined') return;
     Object.entries(NAF_BY_FILIERE).forEach(([fil, nafs]) => {
       nafs.forEach(n => {
-        const code = (n.code || '').trim();
+        const code = (n.code || '').trim().toUpperCase();
         if (!code) return;
         if (!GE_NAF_TO_FILIERES[code]) GE_NAF_TO_FILIERES[code] = [];
         if (!GE_NAF_TO_FILIERES[code].includes(fil)) GE_NAF_TO_FILIERES[code].push(fil);
       });
     });
+    console.log(`[GE] NAF map built: ${Object.keys(GE_NAF_TO_FILIERES).length} codes NAF`);
   }
 
   // Determine region from commune code (first 2 chars = dept code)
@@ -4428,11 +4437,13 @@ async function adminSave() {
   }
 
   function getFilieresForRow(row) {
+    // Returns {code, fromNaf: bool}[]
     if (row['Code filière'] && row['Code filière'].trim()) {
-      return row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+      const explicit = row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+      return explicit.map(c => ({ code: c, fromNaf: false }));
     }
-    const naf = (row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim();
-    return GE_NAF_TO_FILIERES[naf] || [];
+    const naf = (row._nafNorm || row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase();
+    return (GE_NAF_TO_FILIERES[naf] || []).map(c => ({ code: c, fromNaf: true }));
   }
 
   function fmtNum(v) {
@@ -4462,10 +4473,14 @@ async function adminSave() {
         return obj;
       }).filter(r => r['DC_RAISONSOCIALEENTREPRISE']?.trim());
 
-      buildNafMap();
+      await buildNafMap();
 
-      // Precompute filières for each row
-      GE_DATA.forEach(r => { r._filieres = getFilieresForRow(r); });
+      // Precompute filières for each row (normalize NAF code case)
+      GE_DATA.forEach(r => {
+        r._nafNorm = (r['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase();
+        r._filieres = getFilieresForRow(r);
+        r._filieresCodes = r._filieres.map(f => f.code);
+      });
 
       // Populate region dropdown
       const regions = [...new Set(GE_DATA.map(r => r._region).filter(Boolean))].sort();
@@ -4485,7 +4500,7 @@ async function adminSave() {
   }
 
   function buildFiliereChips() {
-    const all = new Set(GE_DATA.flatMap(r => r._filieres));
+    const all = new Set(GE_DATA.flatMap(r => r._filieresCodes));
     const wrap = document.getElementById('ge-filieres');
     if (!wrap) return;
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
@@ -4518,7 +4533,7 @@ async function adminSave() {
       if (q && !(r['DC_RAISONSOCIALEENTREPRISE'].toLowerCase().includes(q) || r['SIREN']?.includes(q))) return false;
       if (region && r._region !== region) return false;
       if (gcOnly && !r['GROUPE']?.trim()) return false;
-      if (selFil.length && !selFil.some(f => r._filieres.includes(f))) return false;
+      if (selFil.length && !selFil.some(f => r._filieresCodes.includes(f))) return false;
       return true;
     });
 
@@ -4561,7 +4576,11 @@ async function adminSave() {
 
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
     tbody.innerHTML = slice.map((r, i) => {
-      const fils = r._filieres.slice(0,3).map(f => `<span class="ge-tag">${names[f] || f}</span>`).join('');
+      const fils = r._filieres.slice(0,3).map(f =>
+        f.fromNaf
+          ? `<span class="ge-tag ge-tag-naf" title="Filière déduite du code NAF">${names[f.code]||f.code}</span>`
+          : `<span class="ge-tag">${names[f.code]||f.code}</span>`
+      ).join('');
       const more = r._filieres.length > 3 ? `<span style="font-size:10px;color:#94a3b8">+${r._filieres.length-3}</span>` : '';
       return `<tr onclick="geShowFiche(${(GE_PAGE-1)*GE_PAGE_SIZE + i})">
         <td style="font-weight:600;color:#0f172a">${r['DC_RAISONSOCIALEENTREPRISE']}</td>
@@ -4599,15 +4618,19 @@ async function adminSave() {
     document.querySelectorAll('#ge-tbody tr').forEach((tr,i) => tr.classList.toggle('selected', i===idx%GE_PAGE_SIZE));
 
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
-    const fils = r._filieres.map(f => `<span class="ge-tag">${names[f]||f}</span>`).join(' ');
+    const fils = r._filieres.map(f =>
+      f.fromNaf
+        ? `<span class="ge-tag ge-tag-naf" title="Filière déduite du code NAF ${r['DC_NAFREV2_ENTREPRISE_ID']}">${names[f.code]||f.code} <span style="font-size:9px;opacity:.7">NAF</span></span>`
+        : `<span class="ge-tag">${names[f.code]||f.code}</span>`
+    ).join(' ');
     const siren = r['SIREN'] || '';
 
     document.getElementById('ge-fiche-name').textContent = r['DC_RAISONSOCIALEENTREPRISE'];
     document.getElementById('ge-fiche-siren-line').textContent = siren ? `SIREN : ${siren}` : '';
-    document.getElementById('ge-fiche-annuaire').href = siren ? `https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siren}` : '#';
+    document.getElementById('ge-fiche-annuaire').href = siren ? `https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}` : '#';
 
     const kv = [
-      { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
+      { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
       { label:'NAF',             val: r['DC_NAFREV2_ENTREPRISE_ID'] || '—' },
       { label:'Filière(s)',      val: fils || '—' },
       { label:'Commune siège',   val: r['C_COMMUNE_ID'] || '—', id:'ge-kv-commune' },
