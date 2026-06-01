@@ -3131,7 +3131,8 @@ async function addUserNews() {
   // Insert skeleton immediately
   const id = Date.now();
   if (!userNewsDB[filiereCode]) userNewsDB[filiereCode] = [];
-  userNewsDB[filiereCode].unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, loading: true });
+  const addedAt = new Date().toISOString();
+  userNewsDB[filiereCode].unshift({ url, titre: '', source: '', favicon: '', image: null, desc: '', id, addedAt, loading: true });
   renderUserNews();
 
   const domain  = extractDomain(url);
@@ -3160,18 +3161,29 @@ async function addUserNews() {
   if (!titre) titre = url;
 
   const idx = userNewsDB[filiereCode].findIndex(n => n.id === id);
-  if (idx !== -1) userNewsDB[filiereCode][idx] = { url, titre, source, favicon, image, desc, id, loading: false };
+  if (idx !== -1) userNewsDB[filiereCode][idx] = { url, titre, source, favicon, image, desc, id, addedAt, loading: false };
   btn.disabled = false;
   await saveUserNews();
   renderUserNews();
 }
 
 async function deleteUserNews(id) {
-  const filiereCode = getCurrentVeilleFiliere();
-  if (!filiereCode || !userNewsDB[filiereCode]) return;
-  userNewsDB[filiereCode] = userNewsDB[filiereCode].filter(n => n.id !== id);
+  // Search across all filières — any user can delete
+  let found = false;
+  Object.keys(userNewsDB).forEach(code => {
+    const before = userNewsDB[code].length;
+    userNewsDB[code] = userNewsDB[code].filter(n => n.id !== id);
+    if (userNewsDB[code].length < before) found = true;
+  });
+  if (!found) return;
   await saveUserNews();
   renderUserNews();
+  // Also refresh showAllUserNews if visible
+  const section = document.getElementById('user-news-section');
+  if (section && section.style.display !== 'none') {
+    const sel = document.getElementById('veille-filiere-select');
+    if (!sel?.value) showAllUserNews();
+  }
 }
 
 function showUserNewsStatus(msg, type) {
@@ -3182,6 +3194,13 @@ function showUserNewsStatus(msg, type) {
   el.innerHTML = `<div style="font-size:11px;color:${color};margin-bottom:8px">${msg}</div>`;
 }
 
+
+function fmtAddedAt(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' });
+  } catch(_) { return ''; }
+}
 function renderUserNews() {
   const filiereCode = getCurrentVeilleFiliere();
   const section = document.getElementById('user-news-section');
@@ -3233,7 +3252,7 @@ function renderUserNews() {
             </div>
             <div class="user-news-card-title">${safeText(n.titre)}</div>
             ${n.desc ? `<div class="user-news-card-desc">${safeText(n.desc)}</div>` : ''}
-            <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
+            <div class="user-news-card-domain">${n.addedAt ? `Ajouté le ${fmtAddedAt(n.addedAt)} · ` : ""}${escHtml(extractDomain(n.url))}</div>
           </div>
         </div>`;
     }).join('');
@@ -3296,7 +3315,7 @@ function showAllUserNews() {
             </div>
             <div class="user-news-card-title">${escHtml(n.titre)}</div>
             ${n.desc ? `<div class="user-news-card-desc">${escHtml(n.desc)}</div>` : ''}
-            <div class="user-news-card-domain">${escHtml(extractDomain(n.url))}</div>
+            <div class="user-news-card-domain">${n.addedAt ? `Ajouté le ${fmtAddedAt(n.addedAt)} · ` : ""}${escHtml(extractDomain(n.url))}</div>
           </div>
         </div>`;
     }).join('');
@@ -4364,7 +4383,7 @@ async function adminSave() {
     <div class="ge-fiche-header">
       <div>
         <div class="ge-fiche-title" id="ge-fiche-name"></div>
-        <div class="ge-fiche-siren" id="ge-fiche-siren-line"></div>
+        <div class="ge-fiche-siren-line" id="ge-fiche-siren-line"></div>
       </div>
       <a id="ge-fiche-annuaire" href="#" target="_blank" rel="noopener"
          style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #bfdbfe">
@@ -4372,7 +4391,45 @@ async function adminSave() {
         Annuaire entreprises
       </a>
     </div>
-    <div class="ge-grid" id="ge-fiche-grid"></div>
+    <div id="ge-fiche-grid"></div>
+
+    <!-- Enrichissement annuaire -->
+    <div id="ge-enrichissement" style="display:none;margin-top:20px">
+      <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 12px;display:flex;align-items:center;gap:6px">
+        <svg width="13" height="13" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Données annuaire entreprises
+        <span id="ge-enrich-spinner" style="font-size:10px;color:#94a3b8">⏳</span>
+      </h3>
+
+      <!-- Résumé -->
+      <div id="ge-enrich-resume" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px 16px;font-size:13px;color:#0c4a6e;line-height:1.6;margin-bottom:12px"></div>
+
+      <!-- Grille infos -->
+      <div id="ge-enrich-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px"></div>
+
+      <!-- Labels -->
+      <div id="ge-enrich-labels" style="display:none;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Labels &amp; certifications</div>
+        <div id="ge-enrich-labels-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+
+      <!-- Bilans -->
+      <div id="ge-enrich-bilans" style="display:none;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Bilans financiers</div>
+        <div id="ge-enrich-bilans-chart" style="display:flex;align-items:flex-end;gap:6px;height:80px;padding-bottom:20px;position:relative"></div>
+      </div>
+    </div>
+
+    <!-- Google News -->
+    <div id="ge-news" style="display:none;margin-top:20px">
+      <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 12px;display:flex;align-items:center;gap:6px">
+        <svg width="13" height="13" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Actualités — <span id="ge-news-title"></span>
+        <span id="ge-news-spinner" style="font-size:10px;color:#94a3b8">⏳</span>
+      </h3>
+      <div id="ge-news-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    </div>
+
   </div>
 
 </div><!-- /.ge-wrap -->
@@ -4779,7 +4836,149 @@ async function adminSave() {
     const fiche = document.getElementById('ge-fiche');
     fiche.classList.add('visible');
     fiche.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Async enrichment: annuaire entreprises + Google News
+    if (siren) {
+      enrichFicheAnnuaire(siren);
+    }
+    enrichFicheNews(r['DC_RAISONSOCIALEENTREPRISE'], siren);
   };
+
+  // ── ANNUAIRE ENTREPRISES enrichment ────────────────────────────────────────
+  async function enrichFicheAnnuaire(siren) {
+    const enrich = document.getElementById('ge-enrichissement');
+    const spinner = document.getElementById('ge-enrich-spinner');
+    enrich.style.display = 'block';
+    spinner.style.display = 'inline';
+
+    try {
+      const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siren}&per_page=1`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const e = data.results?.[0];
+      if (!e) throw new Error('Non trouvé');
+
+      // Résumé
+      if (e.description || e.activite_principale_label) {
+        const resumeEl = document.getElementById('ge-enrich-resume');
+        resumeEl.textContent = e.description || `Activité principale : ${e.activite_principale_label}`;
+        resumeEl.style.display = 'block';
+      }
+
+      // Grille d'infos
+      const infos = [
+        { label:'Forme juridique',      val: e.nature_juridique_label || '—' },
+        { label:'Catégorie entreprise', val: e.categorie_entreprise || '—' },
+        { label:'Établissements actifs',val: e.nombre_etablissements_ouverts != null ? e.nombre_etablissements_ouverts.toLocaleString('fr-FR') : '—' },
+      ];
+      const grid = document.getElementById('ge-enrich-grid');
+      grid.innerHTML = infos.map(i => `
+        <div class="ge-kv">
+          <div class="ge-kv-label">${i.label}</div>
+          <div class="ge-kv-value" style="font-size:14px">${i.val}</div>
+        </div>`).join('');
+
+      // Labels
+      const labels = e.complements?.identifiant_association
+        ? ['Association']
+        : [];
+      if (e.complements?.est_entreprise_individuelle) labels.push('Entreprise individuelle');
+      if (e.complements?.est_ess) labels.push('ESS');
+      if (e.complements?.egapro_renseignee) labels.push('Index Égapro');
+      if (e.complements?.bilan_carbone_renseigne) labels.push('Bilan carbone');
+      if (labels.length) {
+        document.getElementById('ge-enrich-labels').style.display = 'block';
+        document.getElementById('ge-enrich-labels-list').innerHTML = labels.map(l =>
+          `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`
+        ).join('');
+      }
+
+      // Bilans financiers via open data
+      fetchBilans(siren);
+
+    } catch(e) {
+      console.warn('[GE enrich]', e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  async function fetchBilans(siren) {
+    try {
+      const res = await fetch(`https://data.opendatagouv.fr/api/3/action/datastore_search?resource_id=0b54bad0-5879-4088-b46d-97f79d3fc0f2&q=${siren}&limit=5`);
+      if (!res.ok) return;
+      // Fallback: try recherche-entreprises finances
+      const res2 = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siren}&per_page=1`);
+      if (!res2.ok) return;
+      const data = await res2.json();
+      const finances = data.results?.[0]?.finances;
+      if (!finances || !Object.keys(finances).length) return;
+
+      const bilansEl = document.getElementById('ge-enrich-bilans');
+      const chartEl  = document.getElementById('ge-enrich-bilans-chart');
+      bilansEl.style.display = 'block';
+
+      const years = Object.keys(finances).sort();
+      const vals  = years.map(y => finances[y]?.ca || 0);
+      const maxV  = Math.max(...vals, 1);
+
+      chartEl.innerHTML = years.map((y, i) => {
+        const h = Math.max(4, Math.round((vals[i] / maxV) * 60));
+        const ca = vals[i] >= 1e6
+          ? (vals[i]/1e6).toFixed(1) + 'M€'
+          : vals[i] >= 1e3
+            ? (vals[i]/1e3).toFixed(0) + 'k€'
+            : vals[i] + '€';
+        return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+          <div style="font-size:9px;color:#64748b">${ca}</div>
+          <div style="width:100%;background:#2563eb;border-radius:4px 4px 0 0;height:${h}px;min-height:4px"></div>
+          <div style="font-size:9px;color:#94a3b8">${y}</div>
+        </div>`;
+      }).join('');
+    } catch(_) {}
+  }
+
+  // ── GOOGLE NEWS pour l'entreprise ──────────────────────────────────────────
+  async function enrichFicheNews(raisonSociale, siren) {
+    const newsEl    = document.getElementById('ge-news');
+    const spinner   = document.getElementById('ge-news-spinner');
+    const titleEl   = document.getElementById('ge-news-title');
+    const gridEl    = document.getElementById('ge-news-grid');
+    if (!newsEl) return;
+
+    newsEl.style.display = 'block';
+    titleEl.textContent  = raisonSociale;
+    spinner.style.display = 'inline';
+    gridEl.innerHTML = '';
+
+    const q = encodeURIComponent(`"${raisonSociale}"`);
+    const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
+
+    try {
+      const items = await fetchRssViaRss2Json(rssUrl, 6);
+      spinner.style.display = 'none';
+      if (!items.length) {
+        gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité trouvée.</p>';
+        return;
+      }
+      gridEl.innerHTML = items.slice(0, 6).map(item => {
+        const titre  = decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, ''));
+        const date   = formatRssDate(item.pubDate);
+        const src    = item.author || extractDomain(item.link || '');
+        const url    = item.link || '#';
+        return `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s"
+                     onclick="window.open('${url}','_blank','noopener')"
+                     onmouseover="this.style.boxShadow='0 2px 10px rgba(0,0,0,.1)'"
+                     onmouseout="this.style.boxShadow='none'">
+          <div style="font-size:12px;font-weight:600;color:#0f172a;line-height:1.4;margin-bottom:6px">${titre}</div>
+          <div style="font-size:10px;color:#94a3b8">${src}${date ? ' · ' + date : ''}</div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      spinner.style.display = 'none';
+      gridEl.innerHTML = `<p style="grid-column:1/-1;font-size:12px;color:#94a3b8">⚠️ ${e.message}</p>`;
+    }
+  }
 
   // ── Init ────────────────────────────────────────────────────────────────────
   function initGE() {
