@@ -4642,43 +4642,81 @@ async function adminSave() {
       ? filNafCodes.map(c => `<span class="ge-tag ge-tag-naf" title="Déduite du code NAF ${r['DC_NAFREV2_ENTREPRISE_ID']}">${names[c]||c} <span style="font-size:9px;opacity:.7">NAF</span></span>`).join(' ')
       : '—';
 
-    const kv = [
-      { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
-      { label:'NAF',             val: (() => {
-          const naf = r['DC_NAFREV2_ENTREPRISE_ID'] || '';
-          // Label will be populated async below
-          const lbl = GE_NAF_TO_LABEL[naf.toUpperCase().replace('.', '')] || '';
-          return naf ? `<span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:15px">${naf}</span><span id="ge-naf-lbl" style="display:block;font-size:13px;font-weight:400;color:#475569;margin-top:3px">${lbl || '…'}</span>` : '—';
-        })() },
-      { label:'Filière d\'affectation', val: filsExplicitHtml },
-      { label:'Filières calculées (NAF)', val: filsNafHtml },
-      { label:'Commune siège',   val: r['C_COMMUNE_ID'] || '—', id:'ge-kv-commune' },
-      { label:'Région',          val: r._region || r['Région'] || '—' },
-      { label:'Groupe',          val: r['GROUPE'] ? `<span class="ge-tag ge-tag-g">${r['GROUPE']}</span>` : '—' },
-      { label:'Parcours fidélisation', val: r['Parcours fidélisation'] || '—' },
-      { label:'Affectation DG/DR',     val: r['Affectation groupe DG/DR'] || '—' },
-      { label:'Région d\'affectation', val: [r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—' },
-    ];
+    document.getElementById('ge-fiche-grid').innerHTML = `
 
-    document.getElementById('ge-fiche-grid').innerHTML =
-      `<div class="ge-grid">` +
-      kv.map(k =>
-        `<div class="ge-kv"${k.id?` id="${k.id}"`:''}><div class="ge-kv-label">${k.label}</div><div class="ge-kv-value">${k.val}</div></div>`
-      ).join('') +
-      `</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
-        <div style="background:linear-gradient(135deg,#2563eb15,#2563eb08);border:2px solid #2563eb30;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px">
-          <div style="font-size:32px">🏢</div>
-          <div>
-            <div style="font-size:32px;font-weight:800;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div>
-            <div style="font-size:11px;font-weight:600;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Établissements ayant recruté</div>
+      <!-- Infos principales -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+        <div class="ge-kv">
+          <div class="ge-kv-label">SIREN</div>
+          <div class="ge-kv-value"><a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener" style="color:#2563eb;font-size:16px">${siren || '—'}</a></div>
+        </div>
+        <div class="ge-kv" style="grid-column:span 2">
+          <div class="ge-kv-label">NAF</div>
+          <div class="ge-kv-value">
+            <span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:16px">${r['DC_NAFREV2_ENTREPRISE_ID'] || '—'}</span>
+            <span id="ge-naf-lbl" style="display:block;font-size:14px;font-weight:400;color:#475569;margin-top:4px">${GE_NAF_TO_LABEL[(r['DC_NAFREV2_ENTREPRISE_ID']||'').toUpperCase().replace('.','')]||'…'}</span>
           </div>
         </div>
-        <div style="background:linear-gradient(135deg,#05996015,#05996008);border:2px solid #05996030;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px">
-          <div style="font-size:32px">📋</div>
+      </div>
+
+      <!-- Filières -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="ge-kv">
+          <div class="ge-kv-label">Filière d'affectation</div>
+          <div class="ge-kv-value" style="font-size:14px">${filsExplicitHtml}</div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Filières calculées via NAF</div>
+          <div class="ge-kv-value" style="font-size:14px">${filsNafHtml}</div>
+        </div>
+      </div>
+
+      <!-- Localisation & organisation -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+        <div class="ge-kv" id="ge-kv-commune">
+          <div class="ge-kv-label">Commune du siège</div>
+          <div class="ge-kv-value">${r['C_COMMUNE_ID'] || '—'}</div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Région</div>
+          <div class="ge-kv-value">${r._region || r['Région'] || '—'}</div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Groupe</div>
+          <div class="ge-kv-value">${r['GROUPE'] ? `<span class="ge-tag ge-tag-g" style="font-size:13px">${r['GROUPE']}</span>` : '—'}</div>
+        </div>
+      </div>
+
+      <!-- Affectation & parcours -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+        <div class="ge-kv">
+          <div class="ge-kv-label">Parcours fidélisation</div>
+          <div class="ge-kv-value">${r['Parcours fidélisation'] || '—'}</div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Affectation DG/DR</div>
+          <div class="ge-kv-value">${r['Affectation groupe DG/DR'] || '—'}</div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Région d'affectation</div>
+          <div class="ge-kv-value">${[r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—'}</div>
+        </div>
+      </div>
+
+      <!-- KPIs pleine largeur en bas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb25;border-radius:14px;padding:22px 28px;display:flex;align-items:center;gap:20px">
+          <div style="font-size:36px">🏢</div>
           <div>
-            <div style="font-size:32px;font-weight:800;color:#059960;line-height:1">${fmtNum(r['NBDPAEP1M'])}</div>
-            <div style="font-size:11px;font-weight:600;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 1 mois</div>
+            <div style="font-size:38px;font-weight:900;color:#2563eb;line-height:1;letter-spacing:-1px">${fmtNum(r['NB_SIRET'])}</div>
+            <div style="font-size:12px;font-weight:700;color:#64748b;margin-top:6px;text-transform:uppercase;letter-spacing:.07em">Établissements ayant recruté</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966025;border-radius:14px;padding:22px 28px;display:flex;align-items:center;gap:20px">
+          <div style="font-size:36px">📋</div>
+          <div>
+            <div style="font-size:38px;font-weight:900;color:#059660;line-height:1;letter-spacing:-1px">${fmtNum(r['NBDPAEP1M'])}</div>
+            <div style="font-size:12px;font-weight:700;color:#64748b;margin-top:6px;text-transform:uppercase;letter-spacing:.07em">DPAE &gt; 1 mois</div>
           </div>
         </div>
       </div>`;
