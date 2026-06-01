@@ -1176,7 +1176,9 @@
 <button class="mobile-fab" id="mobile-fab-matrix" onclick="toggleSidebar('matrix')" title="Filtres Matrice">
   <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
-<button class="mobile-fab fab-hidden" id="mobile-fab-carte" onclick="toggleSidebar('carte')" title="Filtres Carte">
+<button class="mobile-fab fab-hidden" id="mobile-fab-ge" onclick="toggleSidebar('ge')" title="Filtres Grandes entreprises">
+  <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+</button>
   <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 <button class="notes-fab fab-hidden" id="notes-fab" onclick="toggleNotesDrawer()" title="Notes de lecture">💡</button>
@@ -1190,7 +1192,7 @@
   if (notesFab) notesFab.classList.remove('fab-hidden');
   // Move fixed elements to body as soon as DOM is ready
   function moveToBody() {
-    ['sidebar-matrix', 'sidebar-carte', 'notes-fab', 'notes-drawer'].forEach(function(id) {
+    ['sidebar-matrix', 'sidebar-carte', 'sidebar-ge', 'notes-fab', 'notes-drawer'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el && el.parentElement !== document.body) document.body.appendChild(el);
     });
@@ -1921,9 +1923,11 @@ function switchTab(name) {
   if (window.innerWidth <= 768) {
     const fabMatrix = document.getElementById('mobile-fab-matrix');
     const fabCarte  = document.getElementById('mobile-fab-carte');
+    const fabGe     = document.getElementById('mobile-fab-ge');
     const notesFab  = document.getElementById('notes-fab');
     if (fabMatrix) fabMatrix.classList.toggle('fab-hidden', name !== 'matrix');
     if (fabCarte)  fabCarte.classList.toggle('fab-hidden', name !== 'carte');
+    if (fabGe)     fabGe.classList.toggle('fab-hidden', name !== 'ge');
     if (notesFab)  notesFab.classList.toggle('fab-hidden', name !== 'matrix');
 
     // Also close notes drawer when leaving matrix tab
@@ -1949,7 +1953,7 @@ function toggleSidebar(which) {
   const isMobile = window.innerWidth <= 768;
 
   // Get sidebar directly by ID — more reliable than querySelector
-  const sidebarId = which === 'carte' ? 'sidebar-carte' : 'sidebar-matrix';
+  const sidebarId = which === 'carte' ? 'sidebar-carte' : which === 'ge' ? 'sidebar-ge' : 'sidebar-matrix';
   const sidebar = document.getElementById(sidebarId);
   if (!sidebar) return;
 
@@ -1979,10 +1983,12 @@ function toggleSidebar(which) {
   } else {
     const page = document.getElementById('page-' + (which || 'matrix'));
     if (page) page.classList.toggle('sidebar-collapsed');
-    setTimeout(() => {
-      if (which === 'carte') renderMap();
-      else initChart3();
-    }, 320);
+    if (which !== 'ge') {
+      setTimeout(() => {
+        if (which === 'carte') renderMap();
+        else initChart3();
+      }, 320);
+    }
   }
 }
 
@@ -3176,14 +3182,12 @@ async function deleteUserNews(id) {
     if (userNewsDB[code].length < before) found = true;
   });
   if (!found) return;
-  await saveUserNews();
-  renderUserNews();
+  renderUserNews(); // update UI immediately
   // Also refresh showAllUserNews if visible
-  const section = document.getElementById('user-news-section');
-  if (section && section.style.display !== 'none') {
-    const sel = document.getElementById('veille-filiere-select');
-    if (!sel?.value) showAllUserNews();
-  }
+  const sel = document.getElementById('veille-filiere-select');
+  if (!sel?.value) showAllUserNews();
+  // Save if token available
+  if (_token) await saveUserNews();
 }
 
 function showUserNewsStatus(msg, type) {
@@ -4225,214 +4229,145 @@ async function adminSave() {
      TAB 5 : GRANDES ENTREPRISES
 ══════════════════════════════════════════════ -->
 <div id="tab-ge" class="tab-content">
-<style>
-  #tab-ge { background:#f8fafc; min-height:calc(100vh - 106px); }
-  .ge-wrap { max-width:1200px; margin:0 auto; padding:24px 24px 80px; }
 
-  /* Search bar */
-  .ge-searchbar {
-    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
-    padding:18px 20px; margin-bottom:16px;
-    display:grid; grid-template-columns:1fr auto auto; gap:12px; align-items:end;
-  }
-  @media(max-width:700px){ .ge-searchbar { grid-template-columns:1fr; } }
+<div class="page" id="page-ge">
 
-  .ge-field label { font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block; }
-  .ge-input, .ge-select {
-    width:100%; padding:9px 12px; border:1px solid #e2e8f0; border-radius:9px;
-    font-size:13px; color:#0f172a; background:#f8fafc; box-sizing:border-box;
-    transition:border-color .15s;
-  }
-  .ge-input:focus, .ge-select:focus { border-color:#2563eb; outline:none; background:#fff; }
-
-  /* Filières checkboxes */
-  .ge-filiere-wrap {
-    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
-    padding:14px 20px; margin-bottom:20px;
-  }
-  .ge-filiere-grid {
-    display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
-  }
-  .ge-chip {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:5px 11px; border-radius:20px; border:1px solid #e2e8f0;
-    font-size:11.5px; font-weight:500; cursor:pointer; transition:all .15s;
-    background:#f8fafc; color:#475569; white-space:nowrap;
-  }
-  .ge-chip input { width:12px; height:12px; accent-color:#2563eb; }
-  .ge-chip:has(input:checked) { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; font-weight:700; }
-
-  /* Results table */
-  .ge-table-wrap { background:#fff; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; margin-bottom:20px; }
-  .ge-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-  .ge-table thead th {
-    background:#f8fafc; padding:10px 14px; text-align:center;
-    font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;
-    letter-spacing:.05em; border-bottom:1px solid #f1f5f9; white-space:nowrap;
-  }
-  .ge-table thead th.sort-asc::after { content:' ↑'; }
-  .ge-table thead th.sort-desc::after { content:' ↓'; }
-  .ge-table thead th[data-sort] { cursor:pointer; user-select:none; }
-  .ge-table thead th[data-sort]:hover { color:#2563eb; }
-  .ge-table tbody tr { cursor:pointer; transition:background .1s; }
-  .ge-table tbody tr:hover { background:#f0f9ff; }
-  .ge-table tbody tr.selected { background:#eff6ff; }
-  .ge-table tbody td { padding:10px 14px; border-bottom:1px solid #f8fafc; vertical-align:middle; text-align:center; }
-  .ge-table tbody tr:last-child td { border-bottom:none; }
-
-  /* Fiche */
-  .ge-fiche {
-    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
-    padding:24px; display:none;
-  }
-  .ge-fiche.visible { display:block; }
-  .ge-fiche-header {
-    display:flex; align-items:flex-start; justify-content:space-between;
-    flex-wrap:wrap; gap:12px; padding-bottom:18px; margin-bottom:18px;
-    border-bottom:1px solid #f1f5f9;
-  }
-  .ge-fiche-title { font-size:20px; font-weight:800; color:#0f172a; }
-  .ge-fiche-siren { font-size:12px; color:#64748b; margin-top:3px; }
-  .ge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  @media(max-width:800px){ .ge-grid { grid-template-columns:repeat(2,1fr); } }
-  @media(max-width:500px){ .ge-grid { grid-template-columns:1fr; } }
-  .ge-kv { background:#f8fafc; border-radius:10px; padding:12px 14px; }
-  .ge-kv-label { font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
-  .ge-kv-value { font-size:15px; font-weight:600; color:#0f172a; word-break:break-word; line-height:1.5; }
-  .ge-kv-value a { color:#2563eb; text-decoration:none; }
-  .ge-kv-value a:hover { text-decoration:underline; }
-  .ge-tag { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; margin:2px; }
-  .ge-tag-naf { background:#fef3c7; color:#b45309; border-color:#fde68a; }
-  .ge-tag-g { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
-  .ge-tag-naf:hover { background:#fde68a; }
-
-  /* Pagination */
-  .ge-pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-top:1px solid #f1f5f9; flex-wrap:wrap; gap:8px; }
-  .ge-page-btn { padding:5px 12px; border-radius:7px; border:1px solid #e2e8f0; background:#fff; cursor:pointer; font-size:12px; }
-  .ge-page-btn:disabled { opacity:.4; cursor:default; }
-  .ge-page-btn.active { background:#2563eb; color:#fff; border-color:#2563eb; }
-</style>
-
-<div class="ge-wrap">
-
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
-    <div>
-      <h1 style="font-size:17px;font-weight:800;color:#002244;margin:0 0 3px;display:flex;align-items:center;gap:8px">
-        <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-        Grandes entreprises &amp; grands comptes
-      </h1>
-      <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
+  <!-- ── SIDEBAR FILTRES ── -->
+  <aside class="sidebar" id="sidebar-ge">
+    <div class="sidebar-mobile-header">
+      <span class="sidebar-mobile-title">🏢 Filtres</span>
+      <button class="sidebar-mobile-close" onclick="toggleSidebar('ge')" title="Fermer">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
+    <div class="sidebar-inner">
+
+      <div class="ge-section-title" style="margin-bottom:14px;color:var(--ft-blue)">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Filtres
+        <button onclick="geResetAll()" style="margin-left:auto;font-size:10px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;font-weight:400">Réinitialiser</button>
+      </div>
+
+      <!-- Recherche -->
+      <div class="ge-field" style="margin-bottom:14px">
+        <label>Rechercher</label>
+        <input id="ge-search" class="ge-input" type="text" placeholder="Nom ou SIREN…" oninput="geFilter()">
+      </div>
+
+      <!-- Région -->
+      <div class="ge-field" style="margin-bottom:14px">
+        <label>Région du siège</label>
+        <select id="ge-region" class="ge-select" onchange="geFilter()">
+          <option value="">Toutes les régions</option>
+        </select>
+      </div>
+
+      <!-- Grand compte -->
+      <div style="margin-bottom:18px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;font-size:12px;font-weight:600;color:#0f172a">
+          <input type="checkbox" id="ge-gc" onchange="geFilter()" style="width:14px;height:14px;accent-color:#2563eb">
+          Grands comptes uniquement
+        </label>
+      </div>
+
+      <div style="height:1px;background:var(--ft-border);margin-bottom:14px"></div>
+
+      <!-- Filières -->
+      <div class="ge-section-title">
+        Filières
+        <span style="font-size:9px;font-weight:500;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:1px 6px">via NAF</span>
+        <button onclick="geClearFilieres()" style="margin-left:auto;font-size:10px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;font-weight:400">Tout décocher</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="ge-filieres"></div>
+
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="chart-area" id="ge-main">
+    <button class="burger-btn desktop-burger" onclick="toggleSidebar('ge')" title="Masquer / afficher les filtres">
+      <div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </button>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <div>
+        <h1 style="font-size:16px;font-weight:800;color:#002244;margin:0 0 2px;display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Grandes entreprises &amp; grands comptes
+        </h1>
+        <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
+      </div>
       <span id="ge-status" style="font-size:11px;color:#94a3b8"></span>
     </div>
-  </div>
 
-  <!-- Filters bar -->
-  <div class="ge-searchbar">
-    <div class="ge-field" style="min-width:0">
-      <label>Rechercher une entreprise</label>
-      <input id="ge-search" class="ge-input" type="text" placeholder="Saisir le nom ou SIREN…" oninput="geFilter()">
-    </div>
-    <div class="ge-field">
-      <label>Région du siège</label>
-      <select id="ge-region" class="ge-select" onchange="geFilter()">
-        <option value="">Toutes les régions</option>
-      </select>
-    </div>
-    <div class="ge-field" style="display:flex;flex-direction:column;justify-content:flex-end">
-      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:0;padding:9px 0">
-        <input type="checkbox" id="ge-gc" onchange="geFilter()" style="width:15px;height:15px;accent-color:#2563eb">
-        <span style="font-size:12px;font-weight:600;color:#0f172a">Grands comptes uniquement</span>
-      </label>
-    </div>
-  </div>
-
-  <!-- Filières filter -->
-  <div class="ge-filiere-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <span style="font-size:12px;font-weight:700;color:#475569">Filtrer par filière <span style="font-size:10px;font-weight:500;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:1px 7px">calculée via NAF</span></span>
-      <button onclick="geClearFilieres()" style="font-size:11px;color:#64748b;background:none;border:none;cursor:pointer;text-decoration:underline">Tout décocher</button>
-    </div>
-    <div class="ge-filiere-grid" id="ge-filieres"></div>
-  </div>
-
-  <!-- Results table -->
-  <div class="ge-table-wrap">
-    <table class="ge-table">
-      <thead>
-        <tr>
+    <!-- Tableau -->
+    <div class="ge-table-wrap">
+      <table class="ge-table">
+        <thead><tr>
           <th data-sort="DC_RAISONSOCIALEENTREPRISE" onclick="geSort(this)">Raison sociale</th>
           <th data-sort="SIREN" onclick="geSort(this)">SIREN</th>
           <th data-sort="DC_NAFREV2_ENTREPRISE_ID" onclick="geSort(this)">NAF</th>
           <th>Filières</th>
           <th data-sort="Région" onclick="geSort(this)">Région</th>
           <th data-sort="NBDPAEP1M" onclick="geSort(this)">DPAE &gt;1M</th>
-          <th data-sort="NB_SIRET" onclick="geSort(this)">Étab. recruteurs</th>
+          <th data-sort="NB_SIRET" onclick="geSort(this)">Étab.</th>
           <th>Groupe</th>
-        </tr>
-      </thead>
-      <tbody id="ge-tbody"></tbody>
-    </table>
-    <div class="ge-pagination" id="ge-pagination"></div>
-  </div>
-
-  <!-- Fiche entreprise -->
-  <div class="ge-fiche" id="ge-fiche">
-    <div class="ge-fiche-header">
-      <div>
-        <div class="ge-fiche-title" id="ge-fiche-name"></div>
-        <div class="ge-fiche-siren-line" id="ge-fiche-siren-line"></div>
-      </div>
-      <a id="ge-fiche-annuaire" href="#" target="_blank" rel="noopener"
-         style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #bfdbfe">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Annuaire entreprises
-      </a>
-    </div>
-    <div id="ge-fiche-grid"></div>
-
-    <!-- Enrichissement annuaire -->
-    <div id="ge-enrichissement" style="display:none;margin-top:20px">
-      <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 12px;display:flex;align-items:center;gap:6px">
-        <svg width="13" height="13" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Données annuaire entreprises
-        <span id="ge-enrich-spinner" style="font-size:10px;color:#94a3b8">⏳</span>
-      </h3>
-
-      <!-- Résumé -->
-      <div id="ge-enrich-resume" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px 16px;font-size:13px;color:#0c4a6e;line-height:1.6;margin-bottom:12px"></div>
-
-      <!-- Grille infos -->
-      <div id="ge-enrich-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px"></div>
-
-      <!-- Labels -->
-      <div id="ge-enrich-labels" style="display:none;margin-bottom:12px">
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Labels &amp; certifications</div>
-        <div id="ge-enrich-labels-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      </div>
-
-      <!-- Bilans -->
-      <div id="ge-enrich-bilans" style="display:none;margin-bottom:12px">
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Bilans financiers</div>
-        <div id="ge-enrich-bilans-chart" style="display:flex;align-items:flex-end;gap:6px;height:80px;padding-bottom:20px;position:relative"></div>
-      </div>
+        </tr></thead>
+        <tbody id="ge-tbody"></tbody>
+      </table>
+      <div class="ge-pagination" id="ge-pagination"></div>
     </div>
 
-    <!-- Google News -->
-    <div id="ge-news" style="display:none;margin-top:20px">
-      <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 12px;display:flex;align-items:center;gap:6px">
-        <svg width="13" height="13" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Actualités — <span id="ge-news-title"></span>
-        <span id="ge-news-spinner" style="font-size:10px;color:#94a3b8">⏳</span>
-      </h3>
-      <div id="ge-news-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
-    </div>
+    <!-- Fiche entreprise -->
+    <div class="ge-fiche" id="ge-fiche">
+      <div class="ge-fiche-header">
+        <div>
+          <div class="ge-fiche-title" id="ge-fiche-name"></div>
+          <div id="ge-fiche-siren-line" style="font-size:12px;color:#64748b;margin-top:2px"></div>
+        </div>
+        <a id="ge-fiche-annuaire" href="#" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;border:1px solid #bfdbfe">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Annuaire entreprises
+        </a>
+      </div>
+      <div id="ge-fiche-grid"></div>
 
-  </div>
+      <!-- Enrichissement annuaire -->
+      <div id="ge-enrichissement" style="display:none;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:20px">
+        <h3 class="ge-section-title" style="margin-bottom:12px">
+          <svg width="13" height="13" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Données annuaire entreprises
+          <span id="ge-enrich-spinner" style="font-size:10px;color:#94a3b8">⏳</span>
+        </h3>
+        <div id="ge-enrich-resume" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px 16px;font-size:13px;color:#0c4a6e;line-height:1.6;margin-bottom:12px"></div>
+        <div id="ge-enrich-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px"></div>
+        <div id="ge-enrich-labels" style="display:none;margin-bottom:12px">
+          <div class="ge-section-title" style="margin-bottom:8px">Labels &amp; certifications</div>
+          <div id="ge-enrich-labels-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+        <div id="ge-enrich-bilans" style="display:none;margin-bottom:12px">
+          <div class="ge-section-title" style="margin-bottom:10px">Bilans financiers (CA)</div>
+          <div id="ge-enrich-bilans-chart" style="display:flex;align-items:flex-end;gap:6px;height:90px;padding-bottom:20px;position:relative"></div>
+        </div>
+      </div>
 
-</div><!-- /.ge-wrap -->
+      <!-- Google News -->
+      <div id="ge-news" style="display:none;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:20px">
+        <h3 class="ge-section-title" style="margin-bottom:12px">
+          <svg width="13" height="13" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Actualités — <span id="ge-news-title"></span>
+          <span id="ge-news-spinner" style="font-size:10px;color:#94a3b8;margin-left:4px">⏳</span>
+        </h3>
+        <div id="ge-news-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+      </div>
+
+    </div><!-- /.ge-fiche -->
+
+  </div><!-- /.chart-area#ge-main -->
+
+</div><!-- /.page#page-ge -->
 </div><!-- /#tab-ge -->
 
 <script>
@@ -4867,8 +4802,14 @@ async function adminSave() {
 
       // Grille d'infos
       const infos = [
-        { label:'Forme juridique',      val: e.nature_juridique_label || '—' },
-        { label:'Catégorie entreprise', val: e.categorie_entreprise || '—' },
+        { label:'Forme juridique',      val: e.nature_juridique_label || e.forme_juridique || e.forme_juridique_label || '—' },
+        { label:'Date de création',     val: e.date_creation ? new Date(e.date_creation).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '—' },
+        { label:'Catégorie entreprise', val: ({
+          'GE':'Grande Entreprise',
+          'ETI':'Entreprise de Taille Intermédiaire',
+          'PME':'Petite et Moyenne Entreprise',
+          'TPE':'Très Petite Entreprise',
+        }[e.categorie_entreprise] || e.categorie_entreprise || '—') },
         { label:'Établissements actifs',val: e.nombre_etablissements_ouverts != null ? e.nombre_etablissements_ouverts.toLocaleString('fr-FR') : '—' },
       ];
       const grid = document.getElementById('ge-enrich-grid');
@@ -4955,7 +4896,18 @@ async function adminSave() {
     const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
 
     try {
-      const items = await fetchRssViaRss2Json(rssUrl, 6);
+      // Use proxy directly — rss2json fails on Google News URLs with special chars
+      let items = [];
+      try { items = await fetchRssViaRss2Json(rssUrl, 6); } catch(_) {}
+      if (!items.length) {
+        // Fallback: proxy + DOMParser
+        const xml = await fetchWithProxy(rssUrl, 8000);
+        const doc = new DOMParser().parseFromString(xml, 'text/xml');
+        items = [...doc.querySelectorAll('item')].slice(0,6).map(it => {
+          const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
+          return { title: gt('title'), link: gt('link') || it.querySelector('guid')?.textContent?.trim() || '', pubDate: gt('pubDate'), author: gt('source') };
+        });
+      }
       spinner.style.display = 'none';
       if (!items.length) {
         gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité trouvée.</p>';
@@ -4979,6 +4931,13 @@ async function adminSave() {
       gridEl.innerHTML = `<p style="grid-column:1/-1;font-size:12px;color:#94a3b8">⚠️ ${e.message}</p>`;
     }
   }
+
+  window.geResetAll = function() {
+    document.getElementById('ge-search').value = '';
+    document.getElementById('ge-region').value = '';
+    document.getElementById('ge-gc').checked = false;
+    geClearFilieres();
+  };
 
   // ── Init ────────────────────────────────────────────────────────────────────
   function initGE() {
