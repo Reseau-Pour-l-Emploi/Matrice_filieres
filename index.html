@@ -4278,8 +4278,8 @@ async function adminSave() {
   @media(max-width:800px){ .ge-grid { grid-template-columns:repeat(2,1fr); } }
   @media(max-width:500px){ .ge-grid { grid-template-columns:1fr; } }
   .ge-kv { background:#f8fafc; border-radius:10px; padding:12px 14px; }
-  .ge-kv-label { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.07em; margin-bottom:4px; }
-  .ge-kv-value { font-size:13px; font-weight:600; color:#0f172a; word-break:break-word; }
+  .ge-kv-label { font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+  .ge-kv-value { font-size:15px; font-weight:600; color:#0f172a; word-break:break-word; line-height:1.5; }
   .ge-kv-value a { color:#2563eb; text-decoration:none; }
   .ge-kv-value a:hover { text-decoration:underline; }
   .ge-tag { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; margin:2px; }
@@ -4440,12 +4440,18 @@ async function adminSave() {
 
   function getFilieresForRow(row) {
     // Returns {code, fromNaf: bool}[]
+    // Always compute both explicit and NAF-derived filières
+    const result = [];
     if (row['Code filière'] && row['Code filière'].trim()) {
-      const explicit = row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean);
-      return explicit.map(c => ({ code: c, fromNaf: false }));
+      row['Code filière'].split(/[,;|]/).map(s => s.trim()).filter(Boolean)
+        .forEach(c => result.push({ code: c, fromNaf: false }));
     }
     const naf = (row._nafNorm || row['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase().replace('.', '');
-    return (GE_NAF_TO_FILIERES[naf] || []).map(c => ({ code: c, fromNaf: true }));
+    (GE_NAF_TO_FILIERES[naf] || []).forEach(c => {
+      // Add NAF filière only if not already in explicit list
+      if (!result.some(r => r.code === c)) result.push({ code: c, fromNaf: true });
+    });
+    return result;
   }
 
   function fmtNum(v) {
@@ -4628,17 +4634,22 @@ async function adminSave() {
 
     // Filière d'affectation (explicit) vs filières NAF calculées
     const filExplicit = r._filieres.filter(f => !f.fromNaf);
-    const filNaf      = r._filieres.filter(f => f.fromNaf);
+    const filNafCodes = (GE_NAF_TO_FILIERES[r._nafNorm] || []);
     const filsExplicitHtml = filExplicit.length
       ? filExplicit.map(f => `<span class="ge-tag">${names[f.code]||f.code}</span>`).join(' ')
       : '—';
-    const filsNafHtml = filNaf.length
-      ? filNaf.map(f => `<span class="ge-tag ge-tag-naf" title="Déduite du code NAF">${names[f.code]||f.code} <span style="font-size:9px;opacity:.7">NAF</span></span>`).join(' ')
+    const filsNafHtml = filNafCodes.length
+      ? filNafCodes.map(c => `<span class="ge-tag ge-tag-naf" title="Déduite du code NAF ${r['DC_NAFREV2_ENTREPRISE_ID']}">${names[c]||c} <span style="font-size:9px;opacity:.7">NAF</span></span>`).join(' ')
       : '—';
 
     const kv = [
       { label:'SIREN',           val: siren ? `<a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener">${siren}</a>` : '—' },
-      { label:'NAF',             val: (() => { const naf = r['DC_NAFREV2_ENTREPRISE_ID'] || ''; const lbl = GE_NAF_TO_LABEL[naf.toUpperCase().replace('.', '')] || ''; return naf ? `<span style="font-family:monospace;font-weight:700">${naf}</span>${lbl ? ` <span style="color:#64748b;font-weight:400">— ${lbl}</span>` : ''}` : '—'; })() },
+      { label:'NAF',             val: (() => {
+          const naf = r['DC_NAFREV2_ENTREPRISE_ID'] || '';
+          // Label will be populated async below
+          const lbl = GE_NAF_TO_LABEL[naf.toUpperCase().replace('.', '')] || '';
+          return naf ? `<span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:15px">${naf}</span><span id="ge-naf-lbl" style="display:block;font-size:13px;font-weight:400;color:#475569;margin-top:3px">${lbl || '…'}</span>` : '—';
+        })() },
       { label:'Filière d\'affectation', val: filsExplicitHtml },
       { label:'Filières calculées (NAF)', val: filsNafHtml },
       { label:'Commune siège',   val: r['C_COMMUNE_ID'] || '—', id:'ge-kv-commune' },
@@ -4671,6 +4682,41 @@ async function adminSave() {
           </div>
         </div>
       </div>`;
+
+    // Fetch NAF label from public API (no auth required)
+    const nafCode = r['DC_NAFREV2_ENTREPRISE_ID'] || '';
+    if (nafCode) {
+      const nafEl  = document.getElementById('ge-naf-lbl');
+      const nafKey = nafCode.toUpperCase().replace('.', '');
+      if (GE_NAF_TO_LABEL[nafKey]) {
+        if (nafEl) nafEl.textContent = GE_NAF_TO_LABEL[nafKey];
+      } else {
+        // Try recherche-entreprises API which returns NAF label for any SIREN/NAF
+        // Use the open nomenclature endpoint from data.gouv
+        const nafDotted = nafCode.length === 5
+          ? nafCode.slice(0, 2) + '.' + nafCode.slice(2)
+          : nafCode;
+        fetch(`https://recherche-entreprises.api.gouv.fr/search?activite_principale=${encodeURIComponent(nafCode)}&per_page=1`)
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            const lbl = data?.results?.[0]?.activite_principale_label || '';
+            if (lbl) {
+              GE_NAF_TO_LABEL[nafKey] = lbl;
+              if (nafEl) nafEl.textContent = lbl;
+            } else {
+              // Fallback: static INSEEformat from nomenclature publique
+              return fetch(`https://api.insee.fr/metadonnees/V1/codes/nafr2/n5/${encodeURIComponent(nafDotted)}`)
+                .then(r2 => r2.ok ? r2.json() : null)
+                .then(d2 => {
+                  const lbl2 = d2?.intitule || '';
+                  if (lbl2) { GE_NAF_TO_LABEL[nafKey] = lbl2; if (nafEl) nafEl.textContent = lbl2; }
+                  else if (nafEl) nafEl.textContent = '';
+                });
+            }
+          })
+          .catch(() => { if (nafEl) nafEl.textContent = ''; });
+      }
+    }
 
     // Fetch commune name async
     if (r['C_COMMUNE_ID']) {
