@@ -4456,7 +4456,7 @@ async function adminSave() {
             </div>
           </div>
           <div style="position:relative">
-            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 420"></svg>
+            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 500"></svg>
             <div id="ge-map-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;pointer-events:none;min-width:140px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10;line-height:1.7"></div>
           </div>
           <div id="ge-map-legend" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
@@ -4782,34 +4782,38 @@ async function adminSave() {
     document.getElementById('ge-fiche-grid').innerHTML = `
 
       <!-- Infos principales -->
-      <div class="ge-fiche-grid-wrap" style="margin-bottom:12px">
+      <div class="ge-fiche-grid-wrap" style="margin-bottom:10px">
         <div class="ge-kv">
           <div class="ge-kv-label">SIREN</div>
-          <div class="ge-kv-value"><a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener" style="color:#2563eb;font-size:16px">${siren || '—'}</a></div>
+          <div class="ge-kv-value"><a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener" style="color:#2563eb">${siren || '—'}</a></div>
         </div>
         <div class="ge-kv">
           <div class="ge-kv-label">NAF</div>
           <div class="ge-kv-value">
-            <span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:16px">${r['DC_NAFREV2_ENTREPRISE_ID'] || '—'}</span>
-            <span id="ge-naf-lbl" style="display:block;font-size:14px;font-weight:400;color:#475569;margin-top:4px">${NAF_MAP[(r['DC_NAFREV2_ENTREPRISE_ID']||'').toUpperCase().replace('.','')] || NAF_MAP[r['DC_NAFREV2_ENTREPRISE_ID']||''] || ''}</span>
+            <span id="ge-naf-code" style="font-family:monospace;font-weight:700">${r['DC_NAFREV2_ENTREPRISE_ID'] || '—'}</span>
+            <span id="ge-naf-lbl" style="display:block;font-size:12px;font-weight:400;color:#475569;margin-top:2px">${NAF_MAP[(r['DC_NAFREV2_ENTREPRISE_ID']||'').toUpperCase().replace('.','')] || ''}</span>
           </div>
+        </div>
+        <div class="ge-kv">
+          <div class="ge-kv-label">Groupe</div>
+          <div class="ge-kv-value">${r['GROUPE'] ? `<span class="ge-tag ge-tag-g">${r['GROUPE']}</span>` : '—'}</div>
         </div>
       </div>
 
       <!-- Filières -->
-      <div class="ge-fiche-grid-wrap" style="margin-bottom:12px">
+      <div class="ge-fiche-grid-wrap" style="margin-bottom:10px">
         <div class="ge-kv">
           <div class="ge-kv-label">Filière d'affectation</div>
-          <div class="ge-kv-value" style="font-size:14px">${filsExplicitHtml}</div>
+          <div class="ge-kv-value" style="font-size:12px">${filsExplicitHtml}</div>
         </div>
         <div class="ge-kv">
           <div class="ge-kv-label">Filières calculées via NAF</div>
-          <div class="ge-kv-value" style="font-size:14px">${filsNafHtml}</div>
+          <div class="ge-kv-value" style="font-size:12px">${filsNafHtml}</div>
         </div>
       </div>
 
-      <!-- Localisation & organisation -->
-      <div class="ge-fiche-grid-wrap" style="margin-bottom:12px">
+      <!-- Localisation & affectation -->
+      <div class="ge-fiche-grid-wrap" style="margin-bottom:10px">
         <div class="ge-kv" id="ge-kv-commune">
           <div class="ge-kv-label">Commune du siège</div>
           <div class="ge-kv-value">${r['C_COMMUNE_ID'] || '—'}</div>
@@ -4819,13 +4823,9 @@ async function adminSave() {
           <div class="ge-kv-value">${r._region || r['Région'] || '—'}</div>
         </div>
         <div class="ge-kv">
-          <div class="ge-kv-label">Groupe</div>
-          <div class="ge-kv-value">${r['GROUPE'] ? `<span class="ge-tag ge-tag-g" style="font-size:13px">${r['GROUPE']}</span>` : '—'}</div>
+          <div class="ge-kv-label">Région d'affectation</div>
+          <div class="ge-kv-value">${[r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—'}</div>
         </div>
-      </div>
-
-      <!-- Affectation & parcours -->
-      <div class="ge-fiche-grid-wrap" style="margin-bottom:20px">
         <div class="ge-kv">
           <div class="ge-kv-label">Parcours fidélisation</div>
           <div class="ge-kv-value">${r['Parcours fidélisation'] || '—'}</div>
@@ -4834,62 +4834,95 @@ async function adminSave() {
           <div class="ge-kv-label">Affectation DG/DR</div>
           <div class="ge-kv-value">${r['Affectation groupe DG/DR'] || '—'}</div>
         </div>
-        <div class="ge-kv">
-          <div class="ge-kv-label">Région d'affectation</div>
-          <div class="ge-kv-value">${[r['Code Région'], r['Région']].filter(Boolean).join(' — ') || '—'}</div>
-        </div>
       </div>
 
-      <!-- KPIs pleine largeur en bas -->
-      <div class="ge-fiche-grid-wrap" style="margin-top:16px">
-        <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb25;border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:16px">
-          <div style="font-size:32px">🏢</div>
-          <div>
-            <div style="font-size:24px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div>
-            <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:5px;text-transform:uppercase;letter-spacing:.07em">Établissements ayant recruté</div>
-          </div>
-        </div>
-        <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966025;border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:16px">
-          <div style="font-size:32px">📋</div>
-          <div>
-            <div style="font-size:24px;font-weight:900;color:#059660;line-height:1">${fmtNum(r['NBDPAEP1M'])}</div>
-            <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:5px;text-transform:uppercase;letter-spacing:.07em">DPAE &gt; 1 mois</div>
-          </div>
-        </div>
-      </div>
+      <!-- Données annuaire entreprise (chargées async) -->
+      <div id="ge-annuaire-inline" style="display:none;margin-bottom:10px"></div>
 
-      <!-- KPIs supplémentaires -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px">
-        <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:14px 16px;text-align:center">
-          <div style="font-size:20px;margin-bottom:3px">📦</div>
-          <div style="font-size:18px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div>
-          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div>
+      <!-- ═══ INDICATEURS ═══ -->
+      <div style="margin-top:14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#2563eb;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <svg width="11" height="11" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Indicateurs 2025
         </div>
-        <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:14px 16px;text-align:center">
-          <div style="font-size:20px;margin-bottom:3px">🎯</div>
-          <div style="font-size:18px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div>
-          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">POEI</div>
+
+        <!-- Ligne 1 : 2 grands KPIs -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb30;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:26px">🏢</div>
+            <div>
+              <div style="font-size:22px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. recruteurs</div>
+            </div>
+          </div>
+          <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966030;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:26px">📋</div>
+            <div>
+              <div style="font-size:22px;font-weight:900;color:#059660;line-height:1">${fmtNum(r['NBDPAEP1M'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 1 mois</div>
+            </div>
+          </div>
         </div>
-        <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:14px 16px;text-align:center">
-          <div style="font-size:20px;margin-bottom:3px">⭐</div>
-          <div style="font-size:18px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div>
-          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div>
+
+        <!-- Ligne 2 : DPAE 6M + Étab. actifs annuaire -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📦</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div>
+            </div>
+          </div>
+          <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">🏗️</div>
+            <div>
+              <div id="ge-kpi-etb-val" style="font-size:18px;font-weight:900;color:#16a34a;line-height:1">…</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">
+                Étab. actifs
+                <span style="cursor:help;color:#94a3b8" title="Source : Annuaire entreprises (data.gouv.fr)">ⓘ</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:14px 16px;text-align:center">
-          <div style="font-size:20px;margin-bottom:3px">📢</div>
-          <div style="font-size:18px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div>
-          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div>
+
+        <!-- Ligne 3 : offres pleine largeur -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📢</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div>
+            </div>
+          </div>
+          <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📬</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div>
+            </div>
+          </div>
         </div>
-        <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:14px 16px;text-align:center">
-          <div style="font-size:20px;margin-bottom:3px">📬</div>
-          <div style="font-size:18px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div>
-          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div>
+
+        <!-- Ligne 4 : POEI + PDP pleine largeur -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">🎯</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">POEI</div>
+            </div>
+          </div>
+          <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">⭐</div>
+            <div>
+              <div style="font-size:18px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div>
+              <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div>
+            </div>
+          </div>
         </div>
       </div>`;
 
-    // Log available keys for debugging
-    console.log('[GE] fiche keys:', Object.keys(r).filter(k => k.startsWith('NB')));
-    // NAF label already rendered from NAF_MAP in the template above — nothing to do
+    // NAF label — already rendered from NAF_MAP above
 
     // Fetch commune name async
     if (r['C_COMMUNE_ID']) {
@@ -4958,14 +4991,24 @@ async function adminSave() {
         { label:'🏷️ Catégorie', val: ({'GE':'Grande Entreprise','ETI':'Entreprise de Taille Intermédiaire','PME':'Petite et Moyenne Entreprise','TPE':'Très Petite Entreprise'}[e.categorie_entreprise] || e.categorie_entreprise || '—') },
         { label:'🏗️ Étab. actifs', val: e.nombre_etablissements_ouverts != null ? e.nombre_etablissements_ouverts.toLocaleString('fr-FR') : '—' },
       ];
-      const grid = document.getElementById('ge-enrich-grid');
-      grid.className = 'ge-fiche-grid-wrap';
-      grid.style.marginBottom = '12px';
-      grid.innerHTML = infos.map(i => `
-        <div class="ge-kv">
-          <div class="ge-kv-label">${i.label}</div>
-          <div class="ge-kv-value" style="font-size:14px">${i.val}</div>
-        </div>`).join('');
+      const grid = document.getElementById('ge-enrich-grid') || { innerHTML:'', style:{}, className:'' };
+      // Populate inline annuaire block
+      const inlineEl = document.getElementById('ge-annuaire-inline');
+      if (inlineEl) {
+        inlineEl.style.display = 'block';
+        inlineEl.innerHTML = `<div class="ge-fiche-grid-wrap">` +
+          infos.map(i => `<div class="ge-kv"><div class="ge-kv-label">${i.label} <span style="cursor:help;color:#94a3b8;font-size:9px" title="Source : Annuaire entreprises (data.gouv.fr)">ⓘ</span></div><div class="ge-kv-value" style="font-size:13px">${i.val}</div></div>`).join('') +
+          `</div>`;
+      }
+      // Populate Étab. actifs KPI
+      const etbActifsVal = document.getElementById('ge-kpi-etb-val');
+      if (etbActifsVal && e.nombre_etablissements_ouverts != null) {
+        etbActifsVal.textContent = e.nombre_etablissements_ouverts.toLocaleString('fr-FR');
+      } else if (etbActifsVal) {
+        etbActifsVal.textContent = '—';
+      }
+      // Hide old grid
+      grid.style.display = 'none';
 
       // Labels
       const labels = e.complements?.identifiant_association
@@ -5135,12 +5178,12 @@ async function adminSave() {
 
     // D3 projection
     const W = svgEl.parentElement.clientWidth || 300;
-    const H = 420;
+    const H = 500;
     svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
     const proj = d3.geoConicConformal()
       .center([2.454071, 46.279229])
-      .scale(level === 'dep' ? W * 2.8 : W * 2.7)
-      .translate([W * 0.5, H * 0.46]);
+      .scale(level === 'dep' ? W * 2.5 : W * 2.4)
+      .translate([W * 0.5, H * 0.48]);
     const path = d3.geoPath().projection(proj);
     const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxVal]);
 
