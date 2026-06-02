@@ -4456,7 +4456,7 @@ async function adminSave() {
             </div>
           </div>
           <div style="position:relative">
-            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 360"></svg>
+            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 420"></svg>
             <div id="ge-map-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;pointer-events:none;min-width:140px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10;line-height:1.7"></div>
           </div>
           <div id="ge-map-legend" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
@@ -4594,11 +4594,12 @@ async function adminSave() {
     try {
       const res = await fetch(GE_CSV_URL);
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const text = await res.text();
+      const rawText = await res.text();
+      const text = rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText;
       const lines = text.split(/\r?\n/).filter(l => l.trim());
-      // Detect separator
       const sep = lines[0].includes(';') ? ';' : ',';
-      const headers = lines[0].split(sep).map(h => { let v = h.trim(); if (v.charCodeAt(0)===0xFEFF) v=v.slice(1); if(v[0]=='"')v=v.slice(1); if(v[v.length-1]=='"')v=v.slice(0,-1); return v; });
+      const cleanH = h => { let v=h.trim(); if(v[0]==='"')v=v.slice(1); if(v[v.length-1]==='"')v=v.slice(0,-1); return v.trim(); };
+      const headers = lines[0].split(sep).map(cleanH);
       GE_DATA = lines.slice(1).map(line => {
         const vals = line.split(sep).map(v => { let s=v.trim(); if(s[0]=='"')s=s.slice(1); if(s[s.length-1]=='"')s=s.slice(0,-1); return s; });
         const obj = {};
@@ -5133,13 +5134,13 @@ async function adminSave() {
     }
 
     // D3 projection
-    const W = svgEl.parentElement.clientWidth || 280;
-    const H = 310;
+    const W = svgEl.parentElement.clientWidth || 300;
+    const H = 420;
     svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
     const proj = d3.geoConicConformal()
       .center([2.454071, 46.279229])
-      .scale(level === 'dep' ? W * 3.2 : W * 3.0)
-      .translate([W / 2, H / 2]);
+      .scale(level === 'dep' ? W * 2.8 : W * 2.7)
+      .translate([W * 0.5, H * 0.46]);
     const path = d3.geoPath().projection(proj);
     const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxVal]);
 
@@ -5156,8 +5157,8 @@ async function adminSave() {
           const v = agg[code]?.[indic] || 0;
           return v > 0 ? colorScale(v) : '#f1f5f9';
         })
-        .attr('stroke', '#fff')
-        .attr('stroke-width', level === 'dep' ? 0.5 : 0.8)
+        .attr('stroke', level === 'dep' ? '#c8d3e8' : '#a0b0cc')
+        .attr('stroke-width', level === 'dep' ? 0.8 : 1.5)
         .on('mouseover', function(event, f) {
           const code = f.properties[codeKey] || '';
           const name = f.properties.nom_officiel || f.properties.nom || code;
@@ -5193,7 +5194,7 @@ async function adminSave() {
         })
         .on('mouseout', function() {
           tooltip.style.display = 'none';
-          d3.select(this).attr('stroke','#fff').attr('stroke-width', level==='dep'?0.5:0.8);
+          d3.select(this).attr('stroke', level==='dep'?'#c8d3e8':'#a0b0cc').attr('stroke-width', level==='dep'?0.8:1.5);
         });
 
     // Legend
