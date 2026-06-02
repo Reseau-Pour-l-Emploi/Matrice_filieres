@@ -4518,12 +4518,17 @@ async function adminSave() {
             Établissements
             <span id="ge-etb-count" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:12px;padding:1px 7px;font-size:9px">0</span>
           </span>
-          <input id="ge-etb-filter" type="text" placeholder="Filtrer (SIRET, département…)"
+          <select id="ge-etb-filter-col" style="font-size:11px;padding:4px 8px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;color:#475569">
+            <option value="C_SIRET">SIRET</option>
+            <option value="C_COMMUNE">Commune</option>
+            <option value="C_DEPT">Département</option>
+          </select>
+          <input id="ge-etb-filter" type="text" placeholder="Filtrer…"
             oninput="filterEtbTable(this.value)"
-            style="font-size:11px;padding:4px 9px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;flex:1;min-width:120px;max-width:220px">
+            style="font-size:11px;padding:4px 9px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;flex:1;min-width:100px;max-width:180px">
         </div>
         <div style="border-radius:10px;border:1px solid #e2e8f0;overflow:hidden">
-          <div id="ge-etb-scroll" style="overflow-y:auto;max-height:345px;scrollbar-width:thin;scrollbar-color:#94a3b8 #f1f5f9">
+          <div id="ge-etb-scroll" style="overflow-y:auto;scrollbar-width:thin;scrollbar-color:#94a3b8 #f1f5f9">
             <table style="width:100%;border-collapse:collapse;font-size:11.5px">
               <thead id="ge-etb-thead">
                 <tr style="background:#f1f5ff;position:sticky;top:0;z-index:2">
@@ -5088,7 +5093,7 @@ async function adminSave() {
       ];
       const grid = document.getElementById('ge-enrich-grid') || { innerHTML:'', style:{}, className:'' };
       // Populate inline annuaire block
-      const inlineEl = document.getElementById('ge-enrichissement-inline2') || document.getElementById('ge-annuaire-inline');
+      const inlineEl = document.getElementById('ge-annuaire-inline');
       if (inlineEl) {
         inlineEl.style.display = 'block';
         inlineEl.innerHTML = `<div class="ge-fiche-grid-wrap">` +
@@ -5113,11 +5118,19 @@ async function adminSave() {
       if (e.complements?.est_ess) labels.push('ESS');
       if (e.complements?.egapro_renseignee) labels.push('Index Égapro');
       if (e.complements?.bilan_carbone_renseigne) labels.push('Bilan carbone');
-      if (labels.length) {
-        document.getElementById('ge-enrich-labels').style.display = 'block';
-        document.getElementById('ge-enrich-labels-list').innerHTML = labels.map(l =>
-          `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`
-        ).join('');
+      // Labels go to right column below map
+      const labelsEl = document.getElementById('ge-enrichissement-inline2');
+      if (labels.length && labelsEl) {
+        labelsEl.style.display = 'block';
+        const existing = labelsEl.innerHTML;
+        labelsEl.innerHTML = (existing || '') +
+          `<div style="margin-top:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:6px">🏅 Labels &amp; certifications</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">${labels.map(l => `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`).join('')}</div>
+          </div>`;
+        // Also update old section if visible
+        const oldLabelsEl = document.getElementById('ge-enrich-labels');
+        if (oldLabelsEl) { oldLabelsEl.style.display = 'none'; }
       }
 
       // Bilans financiers via open data
@@ -5230,7 +5243,7 @@ async function adminSave() {
   let _etbSortDir = -1;
   let _etbFilter  = '';
 
-  function showEtbTable(siren) {
+  async function showEtbTable(siren) {
     _etbRows = ETB_DATA.filter(r => r['SIREN'].trim() === siren);
     const wrap = document.getElementById('ge-etb-table-wrap');
     const count = document.getElementById('ge-etb-count');
@@ -5240,25 +5253,34 @@ async function adminSave() {
     if (count) count.textContent = _etbRows.length;
     document.getElementById('ge-etb-filter').value = '';
     _etbFilter = '';
-    // Prefetch commune names for ETB rows
-    _etbRows.forEach(r => {
-      const code = r['C_COMMUNE'];
-      if (code && !GE_COMMUNE_CACHE[code]) {
+    _etbFilterCol = 'C_SIRET';
+    const colSel = document.getElementById('ge-etb-filter-col');
+    if (colSel) colSel.value = 'C_SIRET';
+    // Fetch all commune names then render
+    const codes = [...new Set(_etbRows.map(r => r['C_COMMUNE']).filter(Boolean))];
+    const missing = codes.filter(c => !GE_COMMUNE_CACHE[c]);
+    if (missing.length) {
+      await Promise.allSettled(missing.map(code =>
         fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom`)
           .then(res => res.ok ? res.json() : null)
-          .then(d => { if (d?.nom) { GE_COMMUNE_CACHE[code] = `${d.nom} (${code})`; } })
-          .catch(() => {});
-      }
-    });
-    // Sync table height with map panel
+          .then(d => { if (d?.nom) GE_COMMUNE_CACHE[code] = d.nom; })
+          .catch(() => {})
+      ));
+    }
+    // Set scroll height to exactly 15 rows
     setTimeout(() => {
-      const mapPanel = document.getElementById('ge-map-panel');
-      const scroll   = document.getElementById('ge-etb-scroll');
-      if (mapPanel && scroll) {
-        const mapH = mapPanel.offsetHeight;
-        scroll.style.maxHeight = Math.max(200, mapH - 60) + 'px';
+      const scroll = document.getElementById('ge-etb-scroll');
+      if (!scroll) return;
+      const tbody = scroll.querySelector('tbody');
+      const rows = tbody?.querySelectorAll('tr');
+      if (rows?.length) {
+        const rowH = rows[0].offsetHeight || 30;
+        const theadH = scroll.querySelector('thead')?.offsetHeight || 38;
+        scroll.style.maxHeight = (theadH + rowH * 15) + 'px';
+      } else {
+        scroll.style.maxHeight = '488px'; // fallback: 38 + 30×15
       }
-    }, 100);
+    }, 50);
     renderEtbTable();
   }
 
@@ -5267,9 +5289,7 @@ async function adminSave() {
     if (!tbody) return;
     const fmt = v => { const n = parseInt(v||'0',10); return isNaN(n)||n===0 ? '—' : n.toLocaleString('fr-FR'); };
 
-    let rows = _etbFilter
-      ? _etbRows.filter(r => (r['C_SIRET']||'').includes(_etbFilter) || (r['C_DEPT']||'').includes(_etbFilter))
-      : [..._etbRows];
+    let rows = getFilteredEtbRows();
 
     rows.sort((a, b) => {
       const av = a[_etbSortCol] || '', bv = b[_etbSortCol] || '';
@@ -5287,7 +5307,7 @@ async function adminSave() {
         <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;text-align:center">
           <a href="${url}" target="_blank" rel="noopener" style="font-family:monospace;font-size:10.5px;color:#2563eb;text-decoration:none;font-weight:600">${siret||'—'}</a>
         </td>
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center" id="etb-commune-${siret}">${communeNom}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center" title="${r['C_COMMUNE']||''}">${communeNom}</td>
         <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center">${r['C_DEPT']||'—'}</td>
         <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;font-weight:600;color:#059660">${fmt(r['N_NBDPAEP1M'])}</td>
         <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#7c3aed">${fmt(r['N_NBDPAEP6M'])}</td>
@@ -5314,16 +5334,27 @@ async function adminSave() {
     renderEtbTable();
   };
 
+  let _etbFilterCol = 'C_SIRET';
+
   window.filterEtbTable = function(q) {
-    _etbFilter = q.trim();
+    _etbFilter    = q.trim().toLowerCase();
+    _etbFilterCol = document.getElementById('ge-etb-filter-col')?.value || 'C_SIRET';
     renderEtbTable();
     // Update count
-    const filtered = _etbFilter
-      ? _etbRows.filter(r => (r['C_SIRET']||'').includes(_etbFilter) || (r['C_DEPT']||'').includes(_etbFilter) || (GE_COMMUNE_CACHE[r['C_COMMUNE']]||r['C_COMMUNE']||'').toLowerCase().includes(_etbFilter.toLowerCase()))
-      : _etbRows;
+    const filtered = getFilteredEtbRows();
     const c = document.getElementById('ge-etb-count');
     if (c) c.textContent = filtered.length;
   };
+
+  function getFilteredEtbRows() {
+    if (!_etbFilter) return _etbRows;
+    return _etbRows.filter(r => {
+      const val = _etbFilterCol === 'C_COMMUNE'
+        ? (GE_COMMUNE_CACHE[r['C_COMMUNE']] || r['C_COMMUNE'] || '').toLowerCase()
+        : (r[_etbFilterCol] || '').toLowerCase();
+      return val.includes(_etbFilter);
+    });
+  }
 
   // ── ETB MAP ──────────────────────────────────────────────────────────────────
   let _currentEtbSiren = null;
