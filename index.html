@@ -4937,12 +4937,42 @@ async function adminSave() {
     const sorted = [...all].sort((a, b) => (names[a] || a).localeCompare(names[b] || b, 'fr'));
     const badge = document.getElementById('ge-fil-count');
     if (badge) badge.textContent = sorted.length;
-    wrap.innerHTML = sorted.map(f => `
-      <label class="filiere-item ge-filiere-item" data-code="${f}" data-label="${(names[f]||'').toLowerCase()}" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer">
-        <input type="checkbox" value="${f}" onchange="geFilter()" style="width:13px;height:13px;accent-color:var(--ft-blue);flex-shrink:0">
-        <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>
-      </label>
-    `).join('');
+
+    wrap.innerHTML = '';
+    sorted.forEach(f => {
+      const item = document.createElement('label');
+      item.className = 'filiere-item ge-filiere-item';
+      item.dataset.code = f;
+      item.dataset.label = (names[f] || '').toLowerCase();
+      item.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer';
+
+      // Checkbox
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = f;
+      cb.style.cssText = 'width:13px;height:13px;accent-color:var(--ft-blue);flex-shrink:0';
+      cb.addEventListener('change', () => geFilter());
+      item.appendChild(cb);
+
+      // Bouton label (avec NAF preview si dispo)
+      const hasNAF = typeof NAF_BY_FILIERE !== 'undefined' && (NAF_BY_FILIERE[f] || []).length > 0;
+      const btn = document.createElement('button');
+      btn.className = 'filiere-label-btn';
+      btn.innerHTML = `<span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>` +
+        (hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/></svg>` : '');
+
+      if (hasNAF) {
+        btn.title = 'Voir les codes NAF';
+        btn.addEventListener('click', e => { e.preventDefault(); if (typeof openNAFModal === 'function') openNAFModal(f, names[f] || f); });
+        btn.addEventListener('mouseenter', e => { if (typeof showNAFPreview === 'function') showNAFPreview(e, f, names[f] || f); });
+        btn.addEventListener('mousemove',  e => { if (typeof positionNAFTip === 'function') positionNAFTip(e); });
+        btn.addEventListener('mouseleave', ()  => { if (typeof hideNAFPreview === 'function') hideNAFPreview(); });
+      } else {
+        btn.addEventListener('click', e => { e.preventDefault(); cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); });
+      }
+      item.appendChild(btn);
+      wrap.appendChild(item);
+    });
   }
 
   window.geFiliereToggle = function(code, lbl) {
