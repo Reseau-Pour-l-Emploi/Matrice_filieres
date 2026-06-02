@@ -5111,6 +5111,8 @@ async function adminSave() {
       const labelsListEl = document.getElementById('ge-labels-list');
       const labelsEmptyEl = document.getElementById('ge-labels-empty');
       if (bottomPanel) bottomPanel.style.display = 'block';
+      // Also show bottom panel regardless
+      if (labelsListEl) labelsListEl.innerHTML = '';
       if (labelsListEl) {
         if (labels.length) {
           labelsListEl.innerHTML = labels.map(l =>
@@ -5172,16 +5174,13 @@ async function adminSave() {
 
   // ── GOOGLE NEWS pour l'entreprise ──────────────────────────────────────────
   async function enrichFicheNews(raisonSociale, siren) {
-    // Show bottom panel for news
     const bottomPanel2 = document.getElementById('ge-bottom-panel');
     if (bottomPanel2) bottomPanel2.style.display = 'block';
-    const newsEl    = document.getElementById('ge-news2') || document.getElementById('ge-news');
-    const spinner   = document.getElementById('ge-news-spinner2') || document.getElementById('ge-news-spinner');
-    const titleEl   = document.getElementById('ge-news-title2') || document.getElementById('ge-news-title');
-    const gridEl    = document.getElementById('ge-news-grid2') || document.getElementById('ge-news-grid');
-    if (!newsEl) return;
+    const spinner   = document.getElementById('ge-news-spinner2');
+    const titleEl   = document.getElementById('ge-news-title2');
+    const gridEl    = document.getElementById('ge-news-grid2');
+    if (!gridEl) return;
 
-    newsEl.style.display = 'block';
     if (titleEl) titleEl.textContent = raisonSociale;
     if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
@@ -5219,7 +5218,7 @@ async function adminSave() {
 
     spinner.style.display = 'none';
     if (!items.length) {
-      gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
+      if (gridEl) gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
       return;
     }
     gridEl.innerHTML = items.slice(0, 6).map(item => {
