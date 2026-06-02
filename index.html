@@ -4723,41 +4723,14 @@ async function adminSave() {
     if (!wrap) return;
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
     const sorted = [...all].sort((a, b) => (names[a] || a).localeCompare(names[b] || b, 'fr'));
-    // Update count badge
     const badge = document.getElementById('ge-fil-count');
     if (badge) badge.textContent = sorted.length;
-    wrap.innerHTML = '';
-    sorted.forEach(f => {
-      const item = document.createElement('div');
-      item.className = 'filiere-item ge-filiere-item';
-      item.dataset.code = f;
-      item.dataset.label = (names[f] || '').toLowerCase();
-      const cbId = `ge-cb-${f}`;
-      const hasNAF = typeof NAF_BY_FILIERE !== 'undefined' && (NAF_BY_FILIERE[f] || []).length > 0;
-      item.innerHTML = `
-        <input type="checkbox" id="${cbId}" value="${f}" onchange="geFilter()">
-        <button class="filiere-label-btn" ${hasNAF ? `title="Voir les codes NAF" onclick="openNAFModal('${f}', '${(names[f]||'').replace(/'/g,'\\\'')}')"` : ''}>
-          <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>
-          ${hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/></svg>` : ''}
-        </button>
-      `;
-      // checkbox click via text
-      if (!hasNAF) {
-        item.querySelector('.filiere-label-btn').addEventListener('click', () => {
-          const cb = item.querySelector('input');
-          cb.checked = !cb.checked;
-          cb.dispatchEvent(new Event('change'));
-        });
-      }
-      if (hasNAF) {
-        const btn = item.querySelector('.filiere-label-btn');
-        btn.addEventListener('mouseenter', e => showNAFPreview(e, f, names[f]||f));
-        btn.addEventListener('mousemove',  e => positionNAFTip(e));
-        btn.addEventListener('mouseleave', () => hideNAFPreview());
-      }
-      wrap.appendChild(item);
-    });
-
+    wrap.innerHTML = sorted.map(f => `
+      <label class="filiere-item ge-filiere-item" data-code="${f}" data-label="${(names[f]||'').toLowerCase()}" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer">
+        <input type="checkbox" value="${f}" onchange="geFilter()" style="width:13px;height:13px;accent-color:var(--ft-blue);flex-shrink:0">
+        <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>
+      </label>
+    `).join('');
   }
 
   window.geFiliereToggle = function(code, lbl) {
@@ -4893,7 +4866,6 @@ async function adminSave() {
     document.querySelectorAll('#ge-tbody tr').forEach((tr,i) => tr.classList.toggle('selected', i===idx%GE_PAGE_SIZE));
 
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
-    const siren = r['SIREN'] || '';
 
     document.getElementById('ge-fiche-name').textContent = r['DC_RAISONSOCIALEENTREPRISE'];
     document.getElementById('ge-fiche-siren-line').textContent = siren ? `SIREN : ${siren}` : '';
