@@ -4414,23 +4414,27 @@ async function adminSave() {
       <span id="ge-status" style="font-size:11px;color:#94a3b8"></span>
     </div>
 
-    <!-- Tableau -->
+    <!-- Tableau entreprises -->
+    <div id="ge-table-section">
     <div class="ge-table-wrap">
       <table class="ge-table">
         <thead><tr>
           <th data-sort="DC_RAISONSOCIALEENTREPRISE" onclick="geSort(this)">🏢 Raison sociale</th>
           <th data-sort="SIREN" onclick="geSort(this)">SIREN</th>
           <th data-sort="DC_NAFREV2_ENTREPRISE_ID" onclick="geSort(this)">NAF</th>
-          <th>🏭 Filières</th>
+          <th data-sort="_filiere_sort" onclick="geSort(this)">🏭 Filières</th>
           <th data-sort="Région" onclick="geSort(this)">📍 Région</th>
           <th data-sort="NBDPAEP1M" onclick="geSort(this)">📋 DPAE&gt;1M</th>
+          <th data-sort="NBDPAEP6M" onclick="geSort(this)">📦 DPAE&gt;6M</th>
+          <th data-sort="NBOFFP1M" onclick="geSort(this)">📢 Offres&gt;1M</th>
           <th data-sort="NB_SIRET" onclick="geSort(this)">🏗️ Étab.</th>
           <th>⭐ Groupe</th>
         </tr></thead>
         <tbody id="ge-tbody"></tbody>
       </table>
       <div class="ge-pagination" id="ge-pagination"></div>
-    </div>
+    </div><!-- /.ge-table-wrap -->
+    </div><!-- /#ge-table-section -->
 
     <!-- Fiche entreprise -->
     <div class="ge-fiche" id="ge-fiche">
@@ -4491,7 +4495,19 @@ async function adminSave() {
           <div id="ge-map-legend" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
             <span>0</span><div id="ge-map-legend-bar" style="flex:1;height:6px;margin:0 8px;border-radius:3px;background:linear-gradient(to right,#dbeafe,#1d4ed8)"></div><span id="ge-map-legend-max">max</span>
           </div>
-        </div>
+
+          <!-- Labels annuaire + Actualités (dans colonne droite, sous carte) -->
+          <div id="ge-enrichissement-inline2" style="display:none;margin-top:12px"></div>
+          <div id="ge-news2" style="display:none;margin-top:12px;border-top:1px solid #f1f5f9;padding-top:12px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ea4335;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Actualités — <span id="ge-news-title2"></span>
+              <span id="ge-news-spinner2" style="color:#94a3b8">⏳</span>
+            </div>
+            <div id="ge-news-grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+          </div>
+
+        </div><!-- /map panel -->
       </div><!-- /fiche-top grid -->
 
       <!-- Tableau SIRET établissements -->
@@ -4507,12 +4523,13 @@ async function adminSave() {
             style="font-size:11px;padding:4px 9px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;flex:1;min-width:120px;max-width:220px">
         </div>
         <div style="border-radius:10px;border:1px solid #e2e8f0;overflow:hidden">
-          <div id="ge-etb-scroll" style="overflow-y:auto;max-height:320px;scrollbar-width:thin;scrollbar-color:#94a3b8 #f1f5f9">
+          <div id="ge-etb-scroll" style="overflow-y:auto;max-height:345px;scrollbar-width:thin;scrollbar-color:#94a3b8 #f1f5f9">
             <table style="width:100%;border-collapse:collapse;font-size:11.5px">
               <thead id="ge-etb-thead">
                 <tr style="background:#f1f5ff;position:sticky;top:0;z-index:2">
-                  <th data-col="C_SIRET"      data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">SIRET <span class="etb-sort-icon">↕</span></th>
-                  <th data-col="C_DEPT"       data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;cursor:pointer;user-select:none">Département <span class="etb-sort-icon">↕</span></th>
+                  <th data-col="C_SIRET"      data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">SIRET <span class="etb-sort-icon">↕</span></th>
+                  <th data-col="C_COMMUNE"    data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;cursor:pointer;user-select:none">Commune <span class="etb-sort-icon">↕</span></th>
+                  <th data-col="C_DEPT"       data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;cursor:pointer;user-select:none">Dept <span class="etb-sort-icon">↕</span></th>
                   <th data-col="N_NBDPAEP1M"  data-dir="-1" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#059660;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">DPAE&gt;1M <span class="etb-sort-icon">↓</span></th>
                   <th data-col="N_NBDPAEP6M"  data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">DPAE&gt;6M <span class="etb-sort-icon">↕</span></th>
                   <th data-col="N_NBPOEI"     data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;cursor:pointer;user-select:none">POEI <span class="etb-sort-icon">↕</span></th>
@@ -4570,7 +4587,7 @@ async function adminSave() {
   let GE_FILTERED = [];
   let GE_SORT = { col: 'NBDPAEP1M', dir: -1 };
   let GE_PAGE = 1;
-  const GE_PAGE_SIZE = 20;
+  const GE_PAGE_SIZE = 15;
   let GE_FILIERES_SEL = new Set(); // empty = all
   let GE_COMMUNE_CACHE = {};
   let GE_NAF_TO_FILIERES = {};
@@ -4680,6 +4697,7 @@ async function adminSave() {
         r._nafNorm = (r['DC_NAFREV2_ENTREPRISE_ID'] || '').trim().toUpperCase().replace('.', '');
         r._filieres = getFilieresForRow(r);
         r._filieresCodes = r._filieres.map(f => f.code);
+        r._filiere_sort = r._filieresCodes[0] || '';
       });
 
       // Populate region dropdown
@@ -4717,7 +4735,7 @@ async function adminSave() {
       const cbId = `ge-cb-${f}`;
       const hasNAF = typeof NAF_BY_FILIERE !== 'undefined' && (NAF_BY_FILIERE[f] || []).length > 0;
       item.innerHTML = `
-        <input type="checkbox" id="${cbId}" onchange="geFilter()">
+        <input type="checkbox" id="${cbId}" value="${f}" onchange="geFilter()">
         <button class="filiere-label-btn" ${hasNAF ? `title="Voir les codes NAF" onclick="openNAFModal('${f}', '${(names[f]||'').replace(/'/g,'\\\'')}')"` : ''}>
           <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>
           ${hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/></svg>` : ''}
@@ -4775,7 +4793,7 @@ async function adminSave() {
       if (region && r._region !== region) return false;
       if (gcOnly && !r['GROUPE']?.trim()) return false;
       if (!inclInterim && r._nafNorm === '7820Z') return false; // intérim exclu par défaut
-      if (selFil.length && !selFil.some(f => r._filieres.filter(x => x.fromNaf).map(x=>x.code).includes(f))) return false;
+      if (selFil.length && !selFil.some(f => r._filieresCodes.includes(f))) return false;
       return true;
     });
 
@@ -4830,14 +4848,16 @@ async function adminSave() {
       ).join('');
       const more = r._filieres.length > 3 ? `<span style="font-size:10px;color:#94a3b8">+${r._filieres.length-3}</span>` : '';
       return `<tr onclick="geShowFiche(${(GE_PAGE-1)*GE_PAGE_SIZE + i})">
-        <td style="font-weight:600;color:#0f172a">${r['DC_RAISONSOCIALEENTREPRISE']}</td>
-        <td style="font-family:monospace;font-size:11.5px;color:#64748b">${r['SIREN'] || '—'}</td>
-        <td><span style="background:#f1f5f9;padding:2px 7px;border-radius:6px;font-size:11px;font-family:monospace">${r['DC_NAFREV2_ENTREPRISE_ID']||'—'}</span></td>
-        <td>${fils}${more}</td>
-        <td style="color:#475569;font-size:12px">${r._region||'—'}</td>
-        <td style="text-align:right;font-weight:600">${fmtNum(r['NBDPAEP1M'])}</td>
-        <td style="text-align:right">${fmtNum(r['NB_SIRET'])}</td>
-        <td>${r['GROUPE'] ? `<span class="ge-tag ge-tag-g">${r['GROUPE']}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
+        <td style="font-weight:600;color:#0f172a;text-align:left">${r['DC_RAISONSOCIALEENTREPRISE']}</td>
+        <td style="font-family:monospace;font-size:11px;color:#64748b">${r['SIREN'] || '—'}</td>
+        <td><span style="background:#f1f5f9;padding:2px 6px;border-radius:6px;font-size:10.5px;font-family:monospace">${r['DC_NAFREV2_ENTREPRISE_ID']||'—'}</span></td>
+        <td style="text-align:left">${fils}${more}</td>
+        <td style="color:#475569;font-size:11px">${r._region||'—'}</td>
+        <td style="font-weight:600;color:#059660">${fmtNum(r['NBDPAEP1M'])}</td>
+        <td style="color:#7c3aed">${fmtNum(r['NBDPAEP6M'])}</td>
+        <td style="color:#dc2626">${fmtNum(r['NBOFFP1M'])}</td>
+        <td>${fmtNum(r['NB_SIRET'])}</td>
+        <td>${r['GROUPE'] ? `<span class="ge-tag ge-tag-g" style="font-size:10px">${r['GROUPE']}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
       </tr>`;
     }).join('') || `<tr><td colspan="8" style="text-align:center;padding:32px;color:#94a3b8">Aucune entreprise trouvée.</td></tr>`;
 
@@ -4854,6 +4874,8 @@ async function adminSave() {
     pagHtml += `<button class="ge-page-btn" onclick="gePage(${GE_PAGE+1})" ${GE_PAGE>=pages?'disabled':''}>Suivant ›</button>`;
     pagHtml += `</div>`;
     pag.innerHTML = pagHtml;
+    pag.style.flexWrap = "wrap";
+    pag.style.padding = "10px 14px";
   }
 
   window.gePage = function(p) { GE_PAGE = p; renderTable(); };
@@ -5016,7 +5038,9 @@ async function adminSave() {
 
     const fiche = document.getElementById('ge-fiche');
     fiche.classList.add('visible');
-    fiche.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Hide enterprise table when fiche opens
+    document.getElementById('ge-table-section').style.display = 'none';
+    fiche.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Async enrichment: annuaire entreprises + Google News
     if (siren) {
@@ -5064,7 +5088,7 @@ async function adminSave() {
       ];
       const grid = document.getElementById('ge-enrich-grid') || { innerHTML:'', style:{}, className:'' };
       // Populate inline annuaire block
-      const inlineEl = document.getElementById('ge-annuaire-inline');
+      const inlineEl = document.getElementById('ge-enrichissement-inline2') || document.getElementById('ge-annuaire-inline');
       if (inlineEl) {
         inlineEl.style.display = 'block';
         inlineEl.innerHTML = `<div class="ge-fiche-grid-wrap">` +
@@ -5143,15 +5167,15 @@ async function adminSave() {
 
   // ── GOOGLE NEWS pour l'entreprise ──────────────────────────────────────────
   async function enrichFicheNews(raisonSociale, siren) {
-    const newsEl    = document.getElementById('ge-news');
-    const spinner   = document.getElementById('ge-news-spinner');
-    const titleEl   = document.getElementById('ge-news-title');
-    const gridEl    = document.getElementById('ge-news-grid');
+    const newsEl    = document.getElementById('ge-news2') || document.getElementById('ge-news');
+    const spinner   = document.getElementById('ge-news-spinner2') || document.getElementById('ge-news-spinner');
+    const titleEl   = document.getElementById('ge-news-title2') || document.getElementById('ge-news-title');
+    const gridEl    = document.getElementById('ge-news-grid2') || document.getElementById('ge-news-grid');
     if (!newsEl) return;
 
     newsEl.style.display = 'block';
-    titleEl.textContent  = raisonSociale;
-    spinner.style.display = 'inline';
+    if (titleEl) titleEl.textContent = raisonSociale;
+    if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
 
     const q = encodeURIComponent(`"${raisonSociale}"`);
@@ -5216,6 +5240,16 @@ async function adminSave() {
     if (count) count.textContent = _etbRows.length;
     document.getElementById('ge-etb-filter').value = '';
     _etbFilter = '';
+    // Prefetch commune names for ETB rows
+    _etbRows.forEach(r => {
+      const code = r['C_COMMUNE'];
+      if (code && !GE_COMMUNE_CACHE[code]) {
+        fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom`)
+          .then(res => res.ok ? res.json() : null)
+          .then(d => { if (d?.nom) { GE_COMMUNE_CACHE[code] = `${d.nom} (${code})`; } })
+          .catch(() => {});
+      }
+    });
     // Sync table height with map panel
     setTimeout(() => {
       const mapPanel = document.getElementById('ge-map-panel');
@@ -5248,17 +5282,19 @@ async function adminSave() {
       const siret = r['C_SIRET'] || '';
       const url   = siret ? `https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}` : '#';
       const bg    = i % 2 === 0 ? '#fff' : '#fafbff';
+      const communeNom = GE_COMMUNE_CACHE[r['C_COMMUNE']] || r['C_COMMUNE'] || '—';
       return `<tr style="background:${bg}" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='${bg}'">
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff">
+        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;text-align:center">
           <a href="${url}" target="_blank" rel="noopener" style="font-family:monospace;font-size:10.5px;color:#2563eb;text-decoration:none;font-weight:600">${siret||'—'}</a>
         </td>
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px">${r['C_DEPT']||'—'}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;font-weight:600;color:#059660">${fmt(r['N_NBDPAEP1M'])}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;color:#7c3aed">${fmt(r['N_NBDPAEP6M'])}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;color:#0891b2">${fmt(r['N_NBPOEI'])}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;color:#d97706">${fmt(r['N_NBPDP'])}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;color:#dc2626">${fmt(r['N_NBOFFP1M'])}</td>
-        <td style="padding:6px 10px;text-align:right;border-bottom:1px solid #f5f7ff;color:#9f1239">${fmt(r['N_NBOFFP6M'])}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center" id="etb-commune-${siret}">${communeNom}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center">${r['C_DEPT']||'—'}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;font-weight:600;color:#059660">${fmt(r['N_NBDPAEP1M'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#7c3aed">${fmt(r['N_NBDPAEP6M'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#0891b2">${fmt(r['N_NBPOEI'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#d97706">${fmt(r['N_NBPDP'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#dc2626">${fmt(r['N_NBOFFP1M'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#9f1239">${fmt(r['N_NBOFFP6M'])}</td>
       </tr>`;
     }).join('');
   }
@@ -5281,6 +5317,12 @@ async function adminSave() {
   window.filterEtbTable = function(q) {
     _etbFilter = q.trim();
     renderEtbTable();
+    // Update count
+    const filtered = _etbFilter
+      ? _etbRows.filter(r => (r['C_SIRET']||'').includes(_etbFilter) || (r['C_DEPT']||'').includes(_etbFilter) || (GE_COMMUNE_CACHE[r['C_COMMUNE']]||r['C_COMMUNE']||'').toLowerCase().includes(_etbFilter.toLowerCase()))
+      : _etbRows;
+    const c = document.getElementById('ge-etb-count');
+    if (c) c.textContent = filtered.length;
   };
 
   // ── ETB MAP ──────────────────────────────────────────────────────────────────
@@ -5415,7 +5457,8 @@ async function adminSave() {
   window.geHideFiche = function() {
     document.getElementById('ge-fiche').classList.remove('visible');
     document.querySelectorAll('#ge-tbody tr').forEach(tr => tr.classList.remove('selected'));
-    document.getElementById('ge-fiche').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    document.getElementById('ge-table-section').style.display = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   window.geResetAll = function() {
