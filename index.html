@@ -3362,21 +3362,20 @@ const FILIERE_RSS_FEEDS = {
 function buildVeilleKeywords(filiereCode) {
   const filiereLabel = ALL_FILIERES[filiereCode] || filiereCode;
 
-  // Lowercase version for search queries (Google News handles this better)
-  const filiereLower = filiereLabel.toLowerCase()
-    .replace(/\(.*?\)/g, '').trim(); // remove parentheses
+  // Lowercase, sans parenthèses
+  const filiereLower = filiereLabel.toLowerCase().replace(/\(.*?\)/g, '').trim();
 
-  // Short version: first 3 meaningful words max
+  // Version courte : 3 mots significatifs max
   const stopShort = new Set(['et','de','du','des','le','la','les','par','en','au','aux','ou']);
   const shortWords = filiereLower.split(/[\s,\-\/]+/)
     .filter(w => w.length > 2 && !stopShort.has(w))
     .slice(0, 3);
   const filiereShort = shortWords.join(' ');
 
-  // Primary: curated keywords from Filieres-Keywords.json
+  // Mots-clés curés depuis Filieres-Keywords.json
   const curatedKws = (KEYWORDS_DATA[filiereCode] && KEYWORDS_DATA[filiereCode].keywords) || [];
 
-  // Fallback: extract from NAF libellés if JSON not loaded
+  // Fallback : extraire depuis les libellés NAF
   let topWords = curatedKws.length ? curatedKws : (() => {
     const nafs = NAF_BY_FILIERE[filiereCode] || [];
     const stop = new Set(['les','des','une','pour','dans','avec','sur','par','aux','de','du','la','le','et','en','au','autres','fabrication','activités','services','travaux','production','commerce','gestion','location','vente','achat','traitement','réparation','installation','construction','exploitation','mise','sous']);
@@ -3384,6 +3383,9 @@ function buildVeilleKeywords(filiereCode) {
     nafs.forEach(n => n.libelle.toLowerCase().split(/[\s,;()\-\/''«»]+/).filter(w => w.length > 4 && !stop.has(w) && !/^\d/.test(w)).forEach(w => { freq[w] = (freq[w]||0)+1; }));
     return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([w])=>w);
   })();
+
+  // ── CONSEIL GEMINI #3 : exclusion sites non pertinents ──────────────────
+  const EXCLUDED_SITES = '-site:pinterest.com -site:instagram.com -site:facebook.com -site:tiktok.com';
 
   const THEMES = [
     'emploi recrutement',
@@ -3398,25 +3400,34 @@ function buildVeilleKeywords(filiereCode) {
 
   const queries = [];
 
-  // 1. Filière × chaque thème — version courte en minuscules
-  THEMES.forEach(theme => queries.push(`${filiereShort} ${theme} France`));
+  // ── CONSEIL GEMINI #1 : opérateur OR pour élargir avec mots-clés ────────
+  // Requête principale avec nom filière + mots-clés en OR
+  if (topWords.length > 0) {
+    const kwGroup = topWords.slice(0, 5).map(w => `"${w}"`).join(' OR ');
+    queries.push(`"${filiereShort}" (${kwGroup}) France emploi ${EXCLUDED_SITES}`);
+    queries.push(`"${filiereShort}" (${kwGroup}) recrutement formation ${EXCLUDED_SITES}`);
+  }
 
-  // 2. Groupes de mots-clés sectoriels × thèmes prioritaires
+  // Filière × chaque thème (avec exclusion)
+  THEMES.forEach(theme => queries.push(`${filiereShort} ${theme} France ${EXCLUDED_SITES}`));
+
+  // Groupes de mots-clés sectoriels × thèmes prioritaires
   if (topWords.length >= 4) {
     const g1 = topWords.slice(0, 4).join(' ');
     const g2 = topWords.slice(4, 8).join(' ');
-    const g3 = topWords.slice(8, 12).join(' ');
-    queries.push(`${g1} emploi recrutement France`);
-    queries.push(`${g2} formation compétences`);
-    queries.push(`${g1} innovations réglementation`);
-    queries.push(`${g3} entreprises marché travail`);
+    queries.push(`${g1} emploi recrutement France ${EXCLUDED_SITES}`);
+    queries.push(`${g2} formation compétences ${EXCLUDED_SITES}`);
+    queries.push(`${g1} innovations réglementation ${EXCLUDED_SITES}`);
   }
 
-  // 3. Mots-clés individuels forts × thèmes
-  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France`));
+  // Mots-clés individuels forts
+  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France ${EXCLUDED_SITES}`));
+
+  // ── Requête de fallback simplifiée (conseil Gemini #4) ───────────────────
+  const fallbackQuery = `${filiereShort} France emploi actualités ${EXCLUDED_SITES}`;
 
   const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
-  return { filiereLabel, queries, topWords, rssFeeds };
+  return { filiereLabel, queries, topWords, rssFeeds, fallbackQuery, filiereShort };
 }
 
 
@@ -3638,11 +3649,15 @@ async function fetchVeilleNews() {
     msgEl.textContent = SPINNER_MESSAGES[msgIdx];
   }, 2500);
 
-  const { filiereLabel, queries, topWords, rssFeeds } = buildVeilleKeywords(filiereCode);
+  const { filiereLabel, queries, topWords, rssFeeds, fallbackQuery, filiereShort } = buildVeilleKeywords(filiereCode);
   const kwBox = document.getElementById('veille-keywords');
   document.getElementById('veille-keywords-list').textContent =
     [filiereLabel, ...topWords.slice(0, 6)].join(' · ');
   kwBox.style.display = 'block';
+
+  // ── CONSEIL GEMINI #4 : spinner avec filière en cours ──────────────────
+  msgEl.textContent = `Recherche des actualités pour « ${filiereLabel} »…`;
+  subEl.textContent = 'Connexion aux sources…';
 
   const FILTER_KEYWORDS = [
     'emploi','recrutement','métier','compétence','formation','apprentissage','alternance',
@@ -3728,6 +3743,18 @@ async function fetchVeilleNews() {
       if (i + BATCH_SIZE < queries.length && collected.length < 20) {
         await new Promise(res => setTimeout(res, BATCH_DELAY));
       }
+    }
+
+    clearInterval(msgTimer);
+
+    // ── CONSEIL GEMINI #4 : fallback requête simplifiée si 0 résultat ──────
+    if (!collected.length && fallbackQuery) {
+      subEl.textContent = 'Tentative avec requête simplifiée…';
+      spinnerEl.style.display = 'flex';
+      try {
+        const fallbackArts = await fetchRssFeed(fallbackQuery, 10000);
+        addArticles(fallbackArts);
+      } catch(_) {}
     }
 
     clearInterval(msgTimer);
