@@ -4841,11 +4841,17 @@ async function adminSave() {
           Indicateurs 2025
         </div>
 
-        <!-- Ligne 1 : 2 grands KPIs -->
+        <!-- Ligne 1 : Étab. recruteurs + Étab. actifs | DPAE 1M -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb30;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
-            <div style="font-size:22px">🏢</div>
-            <div><div style="font-size:20px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. recruteurs</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb30;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+              <div style="font-size:18px">🏢</div>
+              <div><div style="font-size:18px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. recruteurs</div></div>
+            </div>
+            <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+              <div style="font-size:18px">🏗️</div>
+              <div><div id="ge-kpi-etb-val" style="font-size:18px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises (data.gouv.fr)" style="cursor:help">ⓘ</span></div></div>
+            </div>
           </div>
           <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966030;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
             <div style="font-size:22px">📋</div>
@@ -4853,15 +4859,11 @@ async function adminSave() {
           </div>
         </div>
 
-        <!-- Ligne 2 : DPAE 6M + Étab. actifs annuaire + Offres 1M -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+        <!-- Ligne 2 : DPAE 6M -->
+        <div style="margin-bottom:8px">
+          <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;opacity:${r['NBDPAEP6M']?'1':'0.45'}">
             <div style="font-size:18px">📦</div>
             <div><div style="font-size:16px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div></div>
-          </div>
-          <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px">🏗️</div>
-            <div><div id="ge-kpi-etb-val" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises (data.gouv.fr)" style="cursor:help">ⓘ</span></div></div>
           </div>
         </div>
 
