@@ -4496,15 +4496,30 @@ async function adminSave() {
             <span>0</span><div id="ge-map-legend-bar" style="flex:1;height:6px;margin:0 8px;border-radius:3px;background:linear-gradient(to right,#dbeafe,#1d4ed8)"></div><span id="ge-map-legend-max">max</span>
           </div>
 
-          <!-- Labels annuaire + Actualités (dans colonne droite, sous carte) -->
-          <div id="ge-enrichissement-inline2" style="display:none;margin-top:12px"></div>
-          <div id="ge-news2" style="display:none;margin-top:12px;border-top:1px solid #f1f5f9;padding-top:12px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ea4335;margin-bottom:8px;display:flex;align-items:center;gap:5px">
-              <svg width="11" height="11" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              Actualités — <span id="ge-news-title2"></span>
-              <span id="ge-news-spinner2" style="color:#94a3b8">⏳</span>
+          <!-- Zone sous carte : Labels | Actualités (3 colonnes) -->
+          <div id="ge-bottom-panel" style="display:none;margin-top:14px;border-top:1px solid #f1f5f9;padding-top:12px">
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;align-items:start">
+
+              <!-- Col 1 : Labels -->
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+                  🏅 Labels &amp; certifications
+                </div>
+                <div id="ge-labels-list" style="display:flex;flex-direction:column;gap:5px"></div>
+                <div id="ge-labels-empty" style="font-size:11px;color:#94a3b8;display:none">Aucun label disponible</div>
+              </div>
+
+              <!-- Cols 2+3 : Actualités -->
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ea4335;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+                  <svg width="10" height="10" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  Actualités — <span id="ge-news-title2"></span>
+                  <span id="ge-news-spinner2" style="color:#94a3b8;display:none">⏳</span>
+                </div>
+                <div id="ge-news-grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+              </div>
+
             </div>
-            <div id="ge-news-grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
           </div>
 
         </div><!-- /map panel -->
@@ -5120,19 +5135,23 @@ async function adminSave() {
       if (e.complements?.egapro_renseignee) labels.push('Index Égapro');
       if (e.complements?.bilan_carbone_renseigne) labels.push('Bilan carbone');
       // Labels go to right column below map
-      const labelsEl = document.getElementById('ge-enrichissement-inline2');
-      if (labels.length && labelsEl) {
-        labelsEl.style.display = 'block';
-        const existing = labelsEl.innerHTML;
-        labelsEl.innerHTML = (existing || '') +
-          `<div style="margin-top:8px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:6px">🏅 Labels &amp; certifications</div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px">${labels.map(l => `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`).join('')}</div>
-          </div>`;
-        // Also update old section if visible
-        const oldLabelsEl = document.getElementById('ge-enrich-labels');
-        if (oldLabelsEl) { oldLabelsEl.style.display = 'none'; }
+      const bottomPanel = document.getElementById('ge-bottom-panel');
+      const labelsListEl = document.getElementById('ge-labels-list');
+      const labelsEmptyEl = document.getElementById('ge-labels-empty');
+      if (bottomPanel) bottomPanel.style.display = 'block';
+      if (labelsListEl) {
+        if (labels.length) {
+          labelsListEl.innerHTML = labels.map(l =>
+            `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`
+          ).join('');
+          if (labelsEmptyEl) labelsEmptyEl.style.display = 'none';
+        } else {
+          labelsListEl.innerHTML = '';
+          if (labelsEmptyEl) labelsEmptyEl.style.display = 'block';
+        }
       }
+      const oldLabelsEl = document.getElementById('ge-enrich-labels');
+      if (oldLabelsEl) oldLabelsEl.style.display = 'none';
 
       // Bilans financiers via open data
       fetchBilans(siren);
@@ -5181,6 +5200,9 @@ async function adminSave() {
 
   // ── GOOGLE NEWS pour l'entreprise ──────────────────────────────────────────
   async function enrichFicheNews(raisonSociale, siren) {
+    // Show bottom panel for news
+    const bottomPanel2 = document.getElementById('ge-bottom-panel');
+    if (bottomPanel2) bottomPanel2.style.display = 'block';
     const newsEl    = document.getElementById('ge-news2') || document.getElementById('ge-news');
     const spinner   = document.getElementById('ge-news-spinner2') || document.getElementById('ge-news-spinner');
     const titleEl   = document.getElementById('ge-news-title2') || document.getElementById('ge-news-title');
@@ -5192,7 +5214,9 @@ async function adminSave() {
     if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
 
-    const q = encodeURIComponent(`"${raisonSociale}"`);
+    // Build a smarter query: short name (first 3 words) for better results
+    const shortName = raisonSociale.split(/\s+/).slice(0,3).join(' ');
+    const q = encodeURIComponent(`"${shortName}"`);
     const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
 
     let items = [];
