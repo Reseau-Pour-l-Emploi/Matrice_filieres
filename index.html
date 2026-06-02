@@ -11,8 +11,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
     // Filières et leaders – construits dynamiquement depuis les fichiers du repo
-    let ALL_FILIERES = {};
-    let LEADERS_FILIERES = {};
+    var ALL_FILIERES = {};
+    var LEADERS_FILIERES = {};
   </script>
   <style>
     :root {
@@ -1784,15 +1784,15 @@ const KEYWORDS_URL  = 'Filieres-Keywords.json';
 const CJ_URL        = 'cj.json';
 const NAF_LOCAL_URL = 'naf.json';
 let KEYWORDS_DATA   = {}; // populated by loadKeywords()
-let CJ_MAP  = {}; // code CJ → libellé
-let NAF_MAP = {}; // code NAF → libellé (local)
+var CJ_MAP  = {}; // code CJ → libellé
+var NAF_MAP = {}; // code NAF → libellé (local)
 const ETB_URL = 'ETB_GDES_ENTREPRISES.csv';
-let ETB_DATA = []; // all establishment rows
+var ETB_DATA = []; // all establishment rows
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
-let SOURCE_DATA = [];
-let RAW = [];
-let NAF_BY_FILIERE = {};
+var SOURCE_DATA = [];
+var RAW = [];
+var NAF_BY_FILIERE = {};
 
 const COL_EVOL3 = { bas:"#dc2626", mid:"#f59e0b", haut:"#16a34a" };
 
@@ -4600,7 +4600,7 @@ async function adminSave() {
   let GE_PAGE = 1;
   const GE_PAGE_SIZE = 15;
   let GE_FILIERES_SEL = new Set(); // empty = all
-  let GE_COMMUNE_CACHE = {};
+  var GE_COMMUNE_CACHE = {};
   let GE_NAF_TO_FILIERES = {};
   let GE_NAF_TO_LABEL = {}; // NAF code → libellé
 
@@ -4719,11 +4719,12 @@ async function adminSave() {
       // Build filières chips
       buildFiliereChips();
 
-      status.textContent = '';
-      document.getElementById('ge-count-label').textContent = `${GE_DATA.length.toLocaleString('fr-FR')} entreprises`;
+      if (status) status.textContent = '';
+      const countLbl = document.getElementById('ge-count-label');
+      if (countLbl) countLbl.textContent = `${GE_DATA.length.toLocaleString('fr-FR')} entreprises`;
       geFilter();
     } catch (e) {
-      status.textContent = '⚠️ ' + e.message;
+      if (status) status.textContent = '⚠️ ' + e.message;
       console.error('GE load error', e);
     }
   }
