@@ -3913,17 +3913,25 @@ function updateRanking() {
     if (nafRes.ok) NAF_MAP = await nafRes.json();
     if (etbRes.ok) {
         const text = await etbRes.text();
-        const lines = text.split('\n').filter(l => l.trim());
+        // Remove BOM if present, split on \r\n or \n
+        const clean_text = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+        const lines = clean_text.split(/\r?\n/).filter(l => l.trim());
         const sep = lines[0].indexOf(';') !== -1 ? ';' : ',';
-        const clean = v => { let s = v.trim(); if (s[0] === '"') s = s.slice(1); if (s[s.length-1] === '"') s = s.slice(0,-1); return s; };
-        const hdrs = lines[0].split(sep).map(h => { let v = clean(h); if (v.charCodeAt(0) === 0xFEFF) v = v.slice(1); return v; });
+        const cleanCell = v => { let s = v.trim(); if (s[0] === '"') s = s.slice(1); if (s[s.length-1] === '"') s = s.slice(0,-1); return s.trim(); };
+        const hdrs = lines[0].split(sep).map(cleanCell);
+        console.log('[ETB] headers:', hdrs);
         ETB_DATA = lines.slice(1).map(line => {
-          const vals = line.split(sep).map(clean);
+          const vals = line.split(sep).map(cleanCell);
           const obj = {};
           hdrs.forEach((h,i) => { obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+          // Always ensure a clean SIREN key
+          const sirenKey = hdrs.find(h => h === 'SIREN' || h.includes('SIREN'));
+          if (sirenKey && sirenKey !== 'SIREN') obj['SIREN'] = obj[sirenKey];
           return obj;
-        }).filter(r => r['SIREN'] || r[hdrs[0]]);
-        ETB_DATA.forEach(r => { if (!r['SIREN'] && hdrs[0] !== 'SIREN') r['SIREN'] = r[hdrs[0]]; });
+        }).filter(r => r['SIREN'] && r['SIREN'].trim());
+        // Normalize all SIREN values (trim + remove non-digits)
+        ETB_DATA.forEach(r => { r['SIREN'] = r['SIREN'].trim(); });
+        console.log('[ETB] loaded', ETB_DATA.length, 'rows, sample SIREN:', ETB_DATA[0]?.['SIREN']);
       }
   } catch(e) { console.warn('Init load error:', e); }
 
@@ -4597,6 +4605,8 @@ async function adminSave() {
         headers.forEach((h, i) => obj[h] = vals[i] || '');
         // Precompute region and filières
         obj._region = obj['Région']?.trim() || regionFromCommune(obj['C_COMMUNE_ID']);
+        // Normalize SIREN
+        if (obj['SIREN']) obj['SIREN'] = obj['SIREN'].trim();
         return obj;
       }).filter(r => r['DC_RAISONSOCIALEENTREPRISE']?.trim());
 
@@ -4905,6 +4915,7 @@ async function adminSave() {
     // Async enrichment: annuaire entreprises + Google News
     if (siren) {
       enrichFicheAnnuaire(siren);
+      console.log('[GE] showFiche siren:', JSON.stringify(siren));
     }
     enrichFicheNews(r['DC_RAISONSOCIALEENTREPRISE'], siren);
     showEtbMap(siren);
@@ -5088,7 +5099,7 @@ async function adminSave() {
     if (!siren || !svgEl) return;
 
     // Filter ETB rows for this company
-    const rows = ETB_DATA.filter(r => r['SIREN'] === siren);
+    const rows = ETB_DATA.filter(r => r['SIREN'].trim() === siren);
     if (!rows.length) { panel.style.display = 'none'; return; }
 
     panel.style.display = 'block';
@@ -5184,8 +5195,9 @@ async function adminSave() {
   };
 
   function showEtbMap(siren) {
-    _currentEtbSiren = siren;
-    const rows = ETB_DATA.filter(r => r['SIREN'] === siren);
+    _currentEtbSiren = (siren || '').trim();
+    const rows = ETB_DATA.filter(r => r['SIREN'].trim() === _currentEtbSiren);
+    console.log('[ETB] showEtbMap siren:', _currentEtbSiren, '→', rows.length, 'rows');
     const panel = document.getElementById('ge-map-panel');
     if (!rows.length) { if(panel) panel.style.display='none'; return; }
     drawEtbMap();
