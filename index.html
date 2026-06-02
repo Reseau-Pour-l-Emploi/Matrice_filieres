@@ -2176,7 +2176,7 @@ function buildSidebar3() {
     item.innerHTML = `
       <input type="checkbox" id="${cbId}" checked>
       <button class="filiere-label-btn" data-code="${d.code}" data-label="${d.label.replace(/"/g,'&quot;')}" ${hasNAF ? 'title="Voir les codes NAF"' : ''}>
-        <span class="lbl-text">${d.label}</span>
+        <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${d.code}</span>${d.label}</span>
         ${hasNAF ? `<svg class="filiere-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/>
           <line x1="12" y1="12" x2="12" y2="16" stroke-linecap="round"/>
@@ -4276,9 +4276,10 @@ async function adminSave() {
 .ge-field label { font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;display:block; }
 .ge-input,.ge-select { width:100%;padding:9px 11px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;color:#0f172a;background:#fff;box-sizing:border-box;transition:border-color .15s; }
 .ge-input:focus,.ge-select:focus { border-color:#2563eb;outline:none; }
-.ge-chip { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1.5px solid #e2e8f0;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;background:#fff;color:#475569;white-space:nowrap; }
-.ge-chip input { width:11px;height:11px;accent-color:#2563eb; }
-.ge-chip:has(input:checked) { background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:700; }
+.ge-chip { display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;font-size:12px;font-weight:400;cursor:pointer;transition:background .1s;color:var(--ft-text);border:none;background:none; }
+.ge-chip input { width:13px;height:13px;accent-color:var(--ft-blue);flex-shrink:0;cursor:pointer; }
+.ge-chip:hover { background:#f8f9ff; }
+.ge-chip:has(input:checked) { background:#f0f4ff;color:var(--ft-blue);font-weight:600; }
 .ge-table-wrap { background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 8px rgba(0,0,0,.05); }
 .ge-table { width:100%;border-collapse:collapse;font-size:12.5px; }
 .ge-table thead th { background:linear-gradient(to bottom,#f8faff,#f1f5ff);padding:10px 13px;text-align:center;font-size:10px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;border-bottom:1.5px solid #e5eaf5;white-space:nowrap; }
@@ -4312,8 +4313,9 @@ async function adminSave() {
 .ge-news-card { background:#f8fafc;border:1px solid #e5eaf5;border-radius:10px;padding:13px 15px;cursor:pointer;transition:box-shadow .15s,transform .15s; }
 .ge-news-card:hover { box-shadow:0 3px 12px rgba(0,49,137,.1);transform:translateY(-1px);background:#fff; }
 .ge-enrich-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid; }
-#tab-ge .chart-area { overflow-y:auto; height:calc(100vh - 106px); min-height:0; }
-#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; display:grid; }
+#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; }
+#tab-ge .chart-area { overflow-y:auto; height:100%; box-sizing:border-box; }
+#tab-ge .sidebar { overflow-y:auto; height:100%; }
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
 @media(max-width:768px) { .ge-fiche-grid-wrap { grid-template-columns:1fr 1fr; } .ge-news-grid-wrap { grid-template-columns:1fr 1fr; } }
@@ -4374,7 +4376,7 @@ async function adminSave() {
         <span style="font-size:9px;font-weight:500;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:1px 6px">via NAF</span>
         <button onclick="geClearFilieres()" style="margin-left:auto;font-size:10px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;font-weight:400">Tout décocher</button>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px" id="ge-filieres"></div>
+      <div class="filiere-list" id="ge-filieres"></div>
 
     </div>
   </aside>
@@ -4644,9 +4646,9 @@ async function adminSave() {
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
     const sorted = [...all].sort((a, b) => (names[a] || a).localeCompare(names[b] || b, 'fr'));
     wrap.innerHTML = sorted.map(f => `
-      <label class="ge-chip" onclick="geFiliereToggle('${f}',this)">
+      <label class="ge-chip">
         <input type="checkbox" value="${f}" onchange="geFilter()">
-        ${f} – ${names[f] || f}
+        <span><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:3px">${f}</span>${names[f] || f}</span>
       </label>
     `).join('');
   }
@@ -4658,6 +4660,17 @@ async function adminSave() {
   window.geClearFilieres = function() {
     document.querySelectorAll('#ge-filieres input[type=checkbox]').forEach(c => c.checked = false);
     geFilter();
+  };
+  window.geSelectAllFilieres = function() {
+    document.querySelectorAll('#ge-filieres input[type=checkbox]').forEach(c => c.checked = true);
+    geFilter();
+  };
+  window.geFilterFiliereSearch = function(q) {
+    const lq = q.toLowerCase();
+    document.querySelectorAll('#ge-filieres .ge-chip').forEach(el => {
+      const txt = el.textContent.toLowerCase();
+      el.style.display = txt.includes(lq) ? '' : 'none';
+    });
   };
 
   // ── Filter & sort ───────────────────────────────────────────────────────────
@@ -5062,8 +5075,8 @@ async function adminSave() {
       if (!items.length) {
         try {
           const xml = await Promise.race([
-            fetchWithProxy(rssUrl, 12000),
-            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))
+            fetchWithProxy(rssUrl, 20000),
+            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 20000))
           ]);
           const doc = new DOMParser().parseFromString(xml, 'text/xml');
           items = [...doc.querySelectorAll('item')].slice(0, 6).map(it => {
