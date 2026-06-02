@@ -1781,7 +1781,11 @@ const DEP_URL     = 'dep.geojson';
 const REG_URL     = 'reg.geojson';
 const LEADERS_URL   = 'Leader_filieres.csv';
 const KEYWORDS_URL  = 'Filieres-Keywords.json';
+const CJ_URL        = 'cj.json';
+const NAF_LOCAL_URL = 'naf.json';
 let KEYWORDS_DATA   = {}; // populated by loadKeywords()
+let CJ_MAP  = {}; // code CJ → libellé
+let NAF_MAP = {}; // code NAF → libellé (local)
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];
@@ -3900,6 +3904,13 @@ function updateRanking() {
     // Sidebars already moved to body by inline script above
   }
 
+  // Load CJ + NAF nomenclatures
+  try {
+    const [cjRes, nafRes] = await Promise.all([fetch(CJ_URL), fetch(NAF_LOCAL_URL)]);
+    if (cjRes.ok)  CJ_MAP  = await cjRes.json();
+    if (nafRes.ok) NAF_MAP = await nafRes.json();
+  } catch(_) {}
+
   // Load shared user news once at startup
   loadUserNews();
 
@@ -4315,11 +4326,16 @@ async function adminSave() {
         </select>
       </div>
 
-      <!-- Grand compte -->
-      <div style="margin-bottom:18px">
+      <!-- Grand compte + Intérim -->
+      <div style="margin-bottom:18px;display:flex;flex-direction:column;gap:8px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;font-size:12px;font-weight:600;color:#0f172a">
           <input type="checkbox" id="ge-gc" onchange="geFilter()" style="width:14px;height:14px;accent-color:#2563eb">
-          Grands comptes uniquement
+          ⭐ Grands comptes uniquement
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;font-size:12px;font-weight:600;color:#0f172a" title="Activités des agences de travail temporaire (7820Z)">
+          <input type="checkbox" id="ge-interim" onchange="geFilter()" style="width:14px;height:14px;accent-color:#f59e0b">
+          🔄 Inclure l'intérim
+          <span style="font-size:10px;font-weight:400;color:#94a3b8">7820Z</span>
         </label>
       </div>
 
@@ -4455,6 +4471,10 @@ async function adminSave() {
         if (n.libelle && !GE_NAF_TO_LABEL[code]) GE_NAF_TO_LABEL[code] = n.libelle;
       });
     });
+    // Enrich GE_NAF_TO_LABEL with full NAF_MAP for codes not in Filieres-NAF.json
+    if (typeof NAF_MAP !== 'undefined') {
+      Object.assign(GE_NAF_TO_LABEL, NAF_MAP);
+    }
     console.log(`[GE] NAF map built: ${Object.keys(GE_NAF_TO_FILIERES).length} codes, ${Object.keys(GE_NAF_TO_LABEL).length} labels`);
   }
 
@@ -4578,13 +4598,15 @@ async function adminSave() {
   window.geFilter = function() {
     const q      = (document.getElementById('ge-search')?.value || '').toLowerCase();
     const region = document.getElementById('ge-region')?.value || '';
-    const gcOnly = document.getElementById('ge-gc')?.checked;
+    const gcOnly      = document.getElementById('ge-gc')?.checked;
+    const inclInterim = document.getElementById('ge-interim')?.checked;
     const selFil = [...document.querySelectorAll('#ge-filieres input:checked')].map(c => c.value);
 
     GE_FILTERED = GE_DATA.filter(r => {
       if (q && !(r['DC_RAISONSOCIALEENTREPRISE'].toLowerCase().includes(q) || r['SIREN']?.includes(q))) return false;
       if (region && r._region !== region) return false;
       if (gcOnly && !r['GROUPE']?.trim()) return false;
+      if (!inclInterim && r._nafNorm === '7820Z') return false; // intérim exclu par défaut
       if (selFil.length && !selFil.some(f => r._filieres.filter(x => x.fromNaf).map(x=>x.code).includes(f))) return false;
       return true;
     });
@@ -4698,7 +4720,7 @@ async function adminSave() {
           <div class="ge-kv-label">NAF</div>
           <div class="ge-kv-value">
             <span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:16px">${r['DC_NAFREV2_ENTREPRISE_ID'] || '—'}</span>
-            <span id="ge-naf-lbl" style="display:block;font-size:14px;font-weight:400;color:#475569;margin-top:4px">${GE_NAF_TO_LABEL[(r['DC_NAFREV2_ENTREPRISE_ID']||'').toUpperCase().replace('.','')]||'…'}</span>
+            <span id="ge-naf-lbl" style="display:block;font-size:14px;font-weight:400;color:#475569;margin-top:4px">${NAF_MAP[(r['DC_NAFREV2_ENTREPRISE_ID']||'').toUpperCase().replace('.','')] || NAF_MAP[r['DC_NAFREV2_ENTREPRISE_ID']||''] || ''}</span>
           </div>
         </div>
       </div>
@@ -4765,40 +4787,7 @@ async function adminSave() {
         </div>
       </div>`;
 
-    // Fetch NAF label from public API (no auth required)
-    const nafCode = r['DC_NAFREV2_ENTREPRISE_ID'] || '';
-    if (nafCode) {
-      const nafEl  = document.getElementById('ge-naf-lbl');
-      const nafKey = nafCode.toUpperCase().replace('.', '');
-      if (GE_NAF_TO_LABEL[nafKey]) {
-        if (nafEl) nafEl.textContent = GE_NAF_TO_LABEL[nafKey];
-      } else {
-        // Try recherche-entreprises API which returns NAF label for any SIREN/NAF
-        // Use the open nomenclature endpoint from data.gouv
-        const nafDotted = nafCode.length === 5
-          ? nafCode.slice(0, 2) + '.' + nafCode.slice(2)
-          : nafCode;
-        fetch(`https://recherche-entreprises.api.gouv.fr/search?activite_principale=${encodeURIComponent(nafCode)}&per_page=1`)
-          .then(res => res.ok ? res.json() : null)
-          .then(data => {
-            const lbl = data?.results?.[0]?.activite_principale_label || '';
-            if (lbl) {
-              GE_NAF_TO_LABEL[nafKey] = lbl;
-              if (nafEl) nafEl.textContent = lbl;
-            } else {
-              // Fallback: static INSEEformat from nomenclature publique
-              return fetch(`https://api.insee.fr/metadonnees/V1/codes/nafr2/n5/${encodeURIComponent(nafDotted)}`)
-                .then(r2 => r2.ok ? r2.json() : null)
-                .then(d2 => {
-                  const lbl2 = d2?.intitule || '';
-                  if (lbl2) { GE_NAF_TO_LABEL[nafKey] = lbl2; if (nafEl) nafEl.textContent = lbl2; }
-                  else if (nafEl) nafEl.textContent = '';
-                });
-            }
-          })
-          .catch(() => { if (nafEl) nafEl.textContent = ''; });
-      }
-    }
+    // NAF label already rendered from NAF_MAP in the template above — nothing to do
 
     // Fetch commune name async
     if (r['C_COMMUNE_ID']) {
@@ -4853,10 +4842,11 @@ async function adminSave() {
       }
 
       // Grille d'infos
-      const njCode  = e.nature_juridique || '';
-      const njLabel = e.nature_juridique_label || e.forme_juridique_label || '';
+      const njCode  = (e.nature_juridique || '').toString().trim();
+      // Use local cj.json — strip leading zeros for lookup (e.g. "5710" or "570")
+      const njLabel = CJ_MAP[njCode] || CJ_MAP[njCode.replace(/^0+/,'')] || e.nature_juridique_label || '';
       const njVal   = njLabel
-        ? `${njLabel}${njCode ? ` <span style="font-size:11px;color:#94a3b8;font-weight:400">(${njCode})</span>` : ''}`
+        ? `${njLabel}<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:6px">(${njCode})</span>`
         : njCode || '—';
       const infos = [
         { label:'⚖️ Catégorie juridique', val: njVal },
@@ -4990,6 +4980,7 @@ async function adminSave() {
     document.getElementById('ge-search').value = '';
     document.getElementById('ge-region').value = '';
     document.getElementById('ge-gc').checked = false;
+    document.getElementById('ge-interim').checked = false;
     geClearFilieres();
   };
 
