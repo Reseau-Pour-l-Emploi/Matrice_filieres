@@ -4841,53 +4841,51 @@ async function adminSave() {
           Indicateurs 2025
         </div>
 
-        <!-- Ligne 1 : Étab. recruteurs + Étab. actifs | DPAE 1M -->
+        <!-- L1 : Étab. recruteurs + Étab. actifs -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb30;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-              <div style="font-size:18px">🏢</div>
-              <div><div style="font-size:18px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. recruteurs</div></div>
-            </div>
-            <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-              <div style="font-size:18px">🏗️</div>
-              <div><div id="ge-kpi-etb-val" style="font-size:18px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises (data.gouv.fr)" style="cursor:help">ⓘ</span></div></div>
-            </div>
+          <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb30;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">🏢</div>
+            <div><div style="font-size:20px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. recruteurs</div></div>
           </div>
+          <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">🏗️</div>
+            <div><div id="ge-kpi-etb-val" style="font-size:20px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises" style="cursor:help">ⓘ</span></div></div>
+          </div>
+        </div>
+
+        <!-- L2 : DPAE > 1M + DPAE > 6M -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966030;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
             <div style="font-size:22px">📋</div>
             <div><div style="font-size:20px;font-weight:900;color:#059660;line-height:1">${fmtNum(r['NBDPAEP1M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 1 mois</div></div>
           </div>
-        </div>
-
-        <!-- Ligne 2 : DPAE 6M -->
-        <div style="margin-bottom:8px">
-          <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;opacity:${r['NBDPAEP6M']?'1':'0.45'}">
-            <div style="font-size:18px">📦</div>
-            <div><div style="font-size:16px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div></div>
+          <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📦</div>
+            <div><div style="font-size:20px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div></div>
           </div>
         </div>
 
-        <!-- Ligne 3 : Offres 1M + 6M -->
+        <!-- L3 : Offres > 1M + Offres > 6M -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px">📢</div>
-            <div><div style="font-size:16px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div></div>
+          <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📢</div>
+            <div><div style="font-size:20px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div></div>
           </div>
-          <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px">📬</div>
-            <div><div style="font-size:16px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div></div>
+          <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📬</div>
+            <div><div style="font-size:20px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div></div>
           </div>
         </div>
 
-        <!-- Ligne 4 : POEI + Promotions -->
+        <!-- L4 : POEI + Promotions de profil -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px">🎯</div>
-            <div><div style="font-size:16px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">POEI</div></div>
+          <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">🎯</div>
+            <div><div style="font-size:20px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">POEI</div></div>
           </div>
-          <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
-            <div style="font-size:18px">⭐</div>
-            <div><div style="font-size:16px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div></div>
+          <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">⭐</div>
+            <div><div style="font-size:20px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div></div>
           </div>
         </div>
       </div>`;
