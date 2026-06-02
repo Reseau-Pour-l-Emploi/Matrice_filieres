@@ -4297,11 +4297,11 @@ async function adminSave() {
 .ge-fiche { background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:24px;display:none;box-shadow:0 4px 20px rgba(0,49,137,.08); }
 .ge-fiche.visible { display:block; }
 .ge-fiche-header { display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:18px;margin-bottom:18px;border-bottom:1.5px solid #f0f4ff; }
-.ge-fiche-title { font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-.3px; }
-.ge-kv { background:linear-gradient(135deg,#f8fafc,#f0f4ff);border:1px solid #e5eaf5;border-radius:11px;padding:12px 14px;transition:box-shadow .15s; }
+.ge-fiche-title { font-size:17px;font-weight:900;color:#0f172a;letter-spacing:-.2px; }
+.ge-kv { background:linear-gradient(135deg,#f8fafc,#f0f4ff);border:1px solid #e5eaf5;border-radius:10px;padding:9px 11px;transition:box-shadow .15s; }
 .ge-kv:hover { box-shadow:0 2px 8px rgba(0,49,137,.08); }
 .ge-kv-label { font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px; }
-.ge-kv-value { font-size:14px;font-weight:600;color:#0f172a;word-break:break-word;line-height:1.5; }
+.ge-kv-value { font-size:13px;font-weight:600;color:#0f172a;word-break:break-word;line-height:1.4; }
 .ge-kv-value a { color:#2563eb;text-decoration:none; }
 .ge-kv-value a:hover { text-decoration:underline; }
 .ge-page-btn { padding:5px 12px;border-radius:7px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-size:12px;transition:all .12s; }
@@ -4421,7 +4421,7 @@ async function adminSave() {
     <!-- Fiche entreprise -->
     <div class="ge-fiche" id="ge-fiche">
       <!-- Layout: info left + map right -->
-      <div id="ge-fiche-top" style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;margin-bottom:0">
+      <div id="ge-fiche-top" style="display:grid;grid-template-columns:2fr 3fr;gap:16px;align-items:start;margin-bottom:0">
         <div>
           <div class="ge-fiche-header">
         <div>
@@ -4456,7 +4456,7 @@ async function adminSave() {
             </div>
           </div>
           <div style="position:relative">
-            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 320"></svg>
+            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 360"></svg>
             <div id="ge-map-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;pointer-events:none;min-width:140px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10;line-height:1.7"></div>
           </div>
           <div id="ge-map-legend" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
@@ -4786,7 +4786,7 @@ async function adminSave() {
           <div class="ge-kv-label">SIREN</div>
           <div class="ge-kv-value"><a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${siren}" target="_blank" rel="noopener" style="color:#2563eb;font-size:16px">${siren || '—'}</a></div>
         </div>
-        <div class="ge-kv" style="grid-column:span 2">
+        <div class="ge-kv">
           <div class="ge-kv-label">NAF</div>
           <div class="ge-kv-value">
             <span id="ge-naf-code" style="font-family:monospace;font-weight:700;font-size:16px">${r['DC_NAFREV2_ENTREPRISE_ID'] || '—'}</span>
@@ -4844,14 +4844,14 @@ async function adminSave() {
         <div style="background:linear-gradient(135deg,#2563eb12,#2563eb06);border:2px solid #2563eb25;border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:16px">
           <div style="font-size:32px">🏢</div>
           <div>
-            <div style="font-size:32px;font-weight:900;color:#2563eb;line-height:1;letter-spacing:-1px">${fmtNum(r['NB_SIRET'])}</div>
+            <div style="font-size:24px;font-weight:900;color:#2563eb;line-height:1">${fmtNum(r['NB_SIRET'])}</div>
             <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:5px;text-transform:uppercase;letter-spacing:.07em">Établissements ayant recruté</div>
           </div>
         </div>
         <div style="background:linear-gradient(135deg,#05966012,#05966006);border:2px solid #05966025;border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:16px">
           <div style="font-size:32px">📋</div>
           <div>
-            <div style="font-size:32px;font-weight:900;color:#059660;line-height:1;letter-spacing:-1px">${fmtNum(r['NBDPAEP1M'])}</div>
+            <div style="font-size:24px;font-weight:900;color:#059660;line-height:1">${fmtNum(r['NBDPAEP1M'])}</div>
             <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:5px;text-transform:uppercase;letter-spacing:.07em">DPAE &gt; 1 mois</div>
           </div>
         </div>
@@ -4861,31 +4861,33 @@ async function adminSave() {
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px">
         <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:14px 16px;text-align:center">
           <div style="font-size:20px;margin-bottom:3px">📦</div>
-          <div style="font-size:22px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div>
+          <div style="font-size:18px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div>
           <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div>
         </div>
         <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:14px 16px;text-align:center">
           <div style="font-size:20px;margin-bottom:3px">🎯</div>
-          <div style="font-size:22px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div>
+          <div style="font-size:18px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div>
           <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">POEI</div>
         </div>
         <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:14px 16px;text-align:center">
           <div style="font-size:20px;margin-bottom:3px">⭐</div>
-          <div style="font-size:22px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div>
+          <div style="font-size:18px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div>
           <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div>
         </div>
         <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:14px 16px;text-align:center">
           <div style="font-size:20px;margin-bottom:3px">📢</div>
-          <div style="font-size:22px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div>
+          <div style="font-size:18px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div>
           <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div>
         </div>
         <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:14px 16px;text-align:center">
           <div style="font-size:20px;margin-bottom:3px">📬</div>
-          <div style="font-size:22px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div>
+          <div style="font-size:18px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div>
           <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div>
         </div>
       </div>`;
 
+    // Log available keys for debugging
+    console.log('[GE] fiche keys:', Object.keys(r).filter(k => k.startsWith('NB')));
     // NAF label already rendered from NAF_MAP in the template above — nothing to do
 
     // Fetch commune name async
@@ -5144,24 +5146,32 @@ async function adminSave() {
     const svg = d3.select(svgEl);
     svg.selectAll('*').remove();
 
-    const codeKey = level === 'reg' ? 'code' : 'code';
+    const codeKey = 'code_insee'; // Both reg.geojson and dep.geojson use code_insee
     svg.selectAll('path')
       .data(geo.features)
       .enter().append('path')
         .attr('d', path)
         .attr('fill', f => {
-          const code = f.properties[codeKey] || f.properties.CODE || f.properties.NUM_DEP || '';
+          const code = f.properties[codeKey] || '';
           const v = agg[code]?.[indic] || 0;
           return v > 0 ? colorScale(v) : '#f1f5f9';
         })
         .attr('stroke', '#fff')
         .attr('stroke-width', level === 'dep' ? 0.5 : 0.8)
         .on('mouseover', function(event, f) {
-          const code = f.properties[codeKey] || f.properties.CODE || f.properties.NUM_DEP || '';
-          const name = f.properties.nom || f.properties.NOM || code;
+          const code = f.properties[codeKey] || '';
+          const name = f.properties.nom_officiel || f.properties.nom || code;
           const d = agg[code];
           if (!d) { tooltip.style.display = 'none'; return; }
-          const LABELS = { N_NBDPAEP1M:'DPAE>1M', N_NBDPAEP6M:'DPAE>6M', NUMERATEUR_N:'Étab.', N_NBPOEI:'POEI', N_NBPDP:'PDP', N_NBOFFP1M:'Offres>1M', N_NBOFFP6M:'Offres>6M' };
+          const LABELS = {
+      'N_NBDPAEP1M':'DPAE > 1 mois',
+      'N_NBDPAEP6M':'DPAE > 6 mois',
+      'NUMERATEUR_N':'Étab. recruteurs',
+      'N_NBPOEI':'POEI',
+      'N_NBPDP':'Promotions profil',
+      'N_NBOFFP1M':'Offres > 1 mois',
+      'N_NBOFFP6M':'Offres > 6 mois'
+    };
           let html = `<strong style="font-size:12px">${name}</strong><br>`;
           Object.entries(LABELS).forEach(([k,lbl]) => {
             const v = d[k] || 0;
@@ -5172,14 +5182,14 @@ async function adminSave() {
           // Position relative to svg container
           const box = svgEl.getBoundingClientRect();
           const ex = event.clientX - box.left, ey = event.clientY - box.top;
-          tooltip.style.left = (ex + 10) + 'px';
-          tooltip.style.top  = (ey - 10) + 'px';
+          tooltip.style.left = Math.min(ex + 10, 200) + 'px';
+          tooltip.style.top  = Math.max(ey - 80, 0) + 'px';
           d3.select(this).attr('stroke','#1d4ed8').attr('stroke-width', 1.5);
         })
         .on('mousemove', function(event) {
           const box = svgEl.getBoundingClientRect();
-          tooltip.style.left = (event.clientX - box.left + 10) + 'px';
-          tooltip.style.top  = (event.clientY - box.top - 10) + 'px';
+          tooltip.style.left = Math.min(event.clientX - box.left + 10, 200) + 'px';
+          tooltip.style.top  = Math.max(event.clientY - box.top - 80, 0) + 'px';
         })
         .on('mouseout', function() {
           tooltip.style.display = 'none';
