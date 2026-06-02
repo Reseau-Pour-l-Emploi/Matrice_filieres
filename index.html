@@ -5030,6 +5030,27 @@ async function adminSave() {
     }
 
     const fiche = document.getElementById('ge-fiche');
+
+    // Reset dynamic content before showing new fiche
+    const _bp  = document.getElementById('ge-bottom-panel');
+    if (_bp)  _bp.style.display  = 'none';
+    const _ll  = document.getElementById('ge-labels-list');
+    if (_ll)  _ll.innerHTML      = '';
+    const _le  = document.getElementById('ge-labels-empty');
+    if (_le)  _le.style.display  = 'none';
+    const _ng  = document.getElementById('ge-news-grid2');
+    if (_ng)  _ng.innerHTML      = '';
+    const _nt  = document.getElementById('ge-news-title2');
+    if (_nt)  _nt.textContent    = '';
+    const _ns  = document.getElementById('ge-news-spinner2');
+    if (_ns)  _ns.style.display  = 'none';
+    const _ai  = document.getElementById('ge-annuaire-inline');
+    if (_ai)  { _ai.style.display = 'none'; _ai.innerHTML = ''; }
+    const _ev  = document.getElementById('ge-kpi-etb-val');
+    if (_ev)  _ev.textContent    = '…';
+    const _mp  = document.getElementById('ge-map-panel');
+    if (_mp)  _mp.style.display  = 'none';
+
     fiche.classList.add('visible');
     // Hide enterprise table when fiche opens
     document.getElementById('ge-table-section').style.display = 'none';
