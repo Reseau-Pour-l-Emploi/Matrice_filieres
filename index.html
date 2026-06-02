@@ -4313,9 +4313,9 @@ async function adminSave() {
 .ge-news-card { background:#f8fafc;border:1px solid #e5eaf5;border-radius:10px;padding:13px 15px;cursor:pointer;transition:box-shadow .15s,transform .15s; }
 .ge-news-card:hover { box-shadow:0 3px 12px rgba(0,49,137,.1);transform:translateY(-1px);background:#fff; }
 .ge-enrich-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid; }
-#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; }
-#tab-ge .chart-area { overflow-y:auto; height:100%; box-sizing:border-box; }
-#tab-ge .sidebar { overflow-y:auto; height:100%; }
+#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; display:grid; grid-template-columns:var(--sidebar-w,300px) 1fr; }
+#tab-ge .sidebar { overflow-y:auto; height:100%; box-sizing:border-box; }
+#tab-ge .chart-area { overflow-y:scroll !important; height:100%; box-sizing:border-box; -webkit-overflow-scrolling:touch; }
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
 @media(max-width:768px) { .ge-fiche-grid-wrap { grid-template-columns:1fr 1fr; } .ge-news-grid-wrap { grid-template-columns:1fr 1fr; } }
@@ -4370,13 +4370,19 @@ async function adminSave() {
 
       <div style="height:1px;background:var(--ft-border);margin-bottom:14px"></div>
 
-      <!-- Filières -->
-      <div class="ge-section-title">
-        Filières
-        <span style="font-size:9px;font-weight:500;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:1px 6px">via NAF</span>
-        <button onclick="geClearFilieres()" style="margin-left:auto;font-size:10px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;font-weight:400">Tout décocher</button>
+      <!-- Filières — style identique à l'onglet 1 -->
+      <div class="filter-section" style="margin-top:0">
+        <h2>Filières <span class="count-badge" id="ge-fil-count">0</span> <span style="font-size:9px;font-weight:500;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:1px 6px;margin-left:4px">via NAF</span></h2>
+        <div class="search-box" style="margin-bottom:6px">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="ge-filiere-search" placeholder="Rechercher une filière…" oninput="geFilterFiliereSearch(this.value)">
+        </div>
+        <div class="filiere-actions">
+          <button class="btn-sm" onclick="geSelectAllFilieres()">Tout sélect.</button>
+          <button class="btn-sm" onclick="geClearFilieres()">Tout désélect.</button>
+        </div>
+        <div class="filiere-list" id="ge-filieres"></div>
       </div>
-      <div class="filiere-list" id="ge-filieres"></div>
 
     </div>
   </aside>
@@ -4645,12 +4651,25 @@ async function adminSave() {
     if (!wrap) return;
     const names = typeof ALL_FILIERES !== 'undefined' ? ALL_FILIERES : {};
     const sorted = [...all].sort((a, b) => (names[a] || a).localeCompare(names[b] || b, 'fr'));
-    wrap.innerHTML = sorted.map(f => `
-      <label class="ge-chip">
-        <input type="checkbox" value="${f}" onchange="geFilter()">
-        <span><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:3px">${f}</span>${names[f] || f}</span>
-      </label>
-    `).join('');
+    // Update count badge
+    const badge = document.getElementById('ge-fil-count');
+    if (badge) badge.textContent = sorted.length;
+    wrap.innerHTML = '';
+    sorted.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'filiere-item ge-filiere-item';
+      item.dataset.code = f;
+      item.dataset.label = (names[f] || '').toLowerCase();
+      const cbId = `ge-cb-${f}`;
+      item.innerHTML = `
+        <input type="checkbox" id="${cbId}" onchange="geFilter()">
+        <button class="filiere-label-btn" onclick="document.getElementById('${cbId}').click()">
+          <span class="lbl-text"><span style="font-weight:700;color:var(--ft-muted);font-size:10px;margin-right:4px">${f}</span>${names[f] || f}</span>
+        </button>
+      `;
+      wrap.appendChild(item);
+    });
+
   }
 
   window.geFiliereToggle = function(code, lbl) {
@@ -4667,8 +4686,8 @@ async function adminSave() {
   };
   window.geFilterFiliereSearch = function(q) {
     const lq = q.toLowerCase();
-    document.querySelectorAll('#ge-filieres .ge-chip').forEach(el => {
-      const txt = el.textContent.toLowerCase();
+    document.querySelectorAll('#ge-filieres .ge-filiere-item').forEach(el => {
+      const txt = (el.dataset.code + ' ' + el.dataset.label).toLowerCase();
       el.style.display = txt.includes(lq) ? '' : 'none';
     });
   };
