@@ -680,19 +680,19 @@
     /* CSS tooltip on ⓘ hover */
     .indicator-list label:hover .indic-tooltip-icon::after {
       content: attr(data-tip);
-      position: absolute;
-      left: 20px; top: -4px;
-      width: 220px;
+      position: fixed;
+      left: 310px; top: auto;
+      width: 260px;
       background: #1e3a8a;
       color: #fff;
       font-size: 11px;
       line-height: 1.5;
-      padding: 7px 10px;
+      padding: 8px 12px;
       border-radius: 8px;
-      z-index: 100;
+      z-index: 9999;
       pointer-events: none;
       white-space: normal;
-      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+      box-shadow: 0 4px 16px rgba(0,0,0,.3);
     }
     .interp-label {
       display: inline-block; font-size: 10px; font-weight: 700;
@@ -1164,6 +1164,10 @@
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
     Carte par filière
   </button>
+  <button class="tab-btn" id="tab-btn-ge" onclick="switchTab('ge')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    Grandes entreprises
+  </button>
   <button class="tab-btn" id="tab-btn-veille" onclick="switchTab('veille')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Veille filières
@@ -1171,10 +1175,6 @@
   <button class="tab-btn" id="tab-btn-agenda" onclick="switchTab('agenda')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     Semaines thématiques
-  </button>
-  <button class="tab-btn" id="tab-btn-ge" onclick="switchTab('ge')">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-    Grandes entreprises
   </button>
 </nav>
 
@@ -2618,11 +2618,11 @@ const CHORO_COLORS_BY_IND = {
 
 // Indicateur config: label, format function, invert (true = high value is bad = red)
 const IND_CONFIG = {
-  poids_rel:   { label: 'Importance de la filière sur le territoire', fmt: v => (v*100).toFixed(1)+'%', invert: false },
-  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: false },
-  ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false },
-  poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false },
-  evol:        { label: 'Évolution DPAE > 1 mois',     fmt: v => (v >= 0 ? '+' : '') + (v*100).toFixed(1)+'%', invert: false },
+  poids_rel:   { label: 'Importance de la filière sur le territoire', fmt: v => (v*100).toFixed(1)+'%', invert: false, isPct: true },
+  diffRecruit: { label: 'Difficultés de recrutement',  fmt: v => (v*100).toFixed(1)+'%', invert: false, isPct: true },
+  ent:         { label: 'Taux de recours',              fmt: v => (v*100).toFixed(1)+'%', invert: false, isPct: true },
+  poids:       { label: 'Nb DPAE > 1 mois',            fmt: v => Math.round(v).toLocaleString('fr-FR'), invert: false, isPct: false },
+  evol:        { label: 'Évolution DPAE > 1 mois',     fmt: v => (v >= 0 ? '+' : '') + (v*100).toFixed(1)+'%', invert: false, isPct: true },
 };
 
 // Map state
@@ -2921,9 +2921,9 @@ function updateLegend(values, cfg, palette, classBounds) {
   bar.innerHTML = palette.map((color, i) => {
     const [lo, hi] = classBounds[i];
     if (lo === null) return '';
-    const label = (lo === hi)
-      ? cfg.fmt(lo)
-      : `${cfg.fmt(lo)} – ${cfg.fmt(hi)}`;
+    // For % indicators: show actual data bounds not 0-100%
+    const fmtVal = v => cfg.fmt(v);
+    const label = (lo === hi) ? fmtVal(lo) : `${fmtVal(lo)} – ${fmtVal(hi)}`;
     return `<div class="choro-legend-row">
       <div class="choro-legend-swatch" style="background:${color}"></div>
       <span class="choro-legend-range">${label}</span>
@@ -2945,7 +2945,7 @@ function initVeilleTab() {
   sorted.forEach(([code, label]) => {
     const opt = document.createElement('option');
     opt.value = code;
-    opt.textContent = label;
+    opt.textContent = `${code} – ${label}`;
     sel.appendChild(opt);
   });
   sel.addEventListener('change', () => {
@@ -4312,8 +4312,8 @@ async function adminSave() {
 .ge-news-card { background:#f8fafc;border:1px solid #e5eaf5;border-radius:10px;padding:13px 15px;cursor:pointer;transition:box-shadow .15s,transform .15s; }
 .ge-news-card:hover { box-shadow:0 3px 12px rgba(0,49,137,.1);transform:translateY(-1px);background:#fff; }
 .ge-enrich-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid; }
-#tab-ge .chart-area { overflow-y:auto; height:calc(100vh - 106px); }
-#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; }
+#tab-ge .chart-area { overflow-y:auto; height:calc(100vh - 106px); min-height:0; }
+#tab-ge .page { height:calc(100vh - 106px); overflow:hidden; display:grid; }
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
 @media(max-width:768px) { .ge-fiche-grid-wrap { grid-template-columns:1fr 1fr; } .ge-news-grid-wrap { grid-template-columns:1fr 1fr; } }
@@ -4392,8 +4392,8 @@ async function adminSave() {
           🏢 Grandes entreprises &amp; grands comptes
           <span id="ge-count-badge" style="font-size:12px;font-weight:700;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:middle">0</span>
         </h1>
-        <p style="font-size:11px;color:#64748b;margin:0 0 4px;line-height:1.5;max-width:600px">
-          Les grandes entreprises référencées ont réalisé plus de 1 000 DPAE &gt; 1 mois en 2025 avec au moins 20 établissements. Les <strong>grands comptes</strong> sont les entreprises liées à France Travail par un accord.
+        <p style="font-size:11px;color:#64748b;margin:0 0 4px;line-height:1.6;max-width:700px">
+          Les grandes entreprises référencées ont réalisé plus de 1 000 DPAE &gt; 1 mois en 2025 et au moins 20 établissements recruteurs leur sont rattachés. Les <strong>grands comptes</strong> sont les entreprises liées à France Travail par un accord. La gestion des grands comptes est déléguée aux Directions Régionales ou à la Direction Générale selon les cas.
         </p>
         <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
       </div>
@@ -4646,7 +4646,7 @@ async function adminSave() {
     wrap.innerHTML = sorted.map(f => `
       <label class="ge-chip" onclick="geFiliereToggle('${f}',this)">
         <input type="checkbox" value="${f}" onchange="geFilter()">
-        ${names[f] || f}
+        ${f} – ${names[f] || f}
       </label>
     `).join('');
   }
@@ -4723,8 +4723,8 @@ async function adminSave() {
     tbody.innerHTML = slice.map((r, i) => {
       const fils = r._filieres.slice(0,3).map(f =>
         f.fromNaf
-          ? `<span class="ge-tag ge-tag-naf" title="Filière déduite du code NAF">${names[f.code]||f.code}</span>`
-          : `<span class="ge-tag">${names[f.code]||f.code}</span>`
+          ? `<span class="ge-tag ge-tag-naf" title="Filière déduite du code NAF">${f.code} – ${names[f.code]||f.code}</span>`
+          : `<span class="ge-tag">${f.code} – ${names[f.code]||f.code}</span>`
       ).join('');
       const more = r._filieres.length > 3 ? `<span style="font-size:10px;color:#94a3b8">+${r._filieres.length-3}</span>` : '';
       return `<tr onclick="geShowFiche(${(GE_PAGE-1)*GE_PAGE_SIZE + i})">
@@ -4776,10 +4776,10 @@ async function adminSave() {
     const filExplicit = r._filieres.filter(f => !f.fromNaf);
     const filNafCodes = (GE_NAF_TO_FILIERES[r._nafNorm] || []);
     const filsExplicitHtml = filExplicit.length
-      ? filExplicit.map(f => `<span class="ge-tag">${names[f.code]||f.code}</span>`).join(' ')
+      ? filExplicit.map(f => `<span class="ge-tag">${f.code} – ${names[f.code]||f.code}</span>`).join(' ')
       : '—';
     const filsNafHtml = filNafCodes.length
-      ? filNafCodes.map(c => `<span class="ge-tag ge-tag-naf" title="Déduite du code NAF ${r['DC_NAFREV2_ENTREPRISE_ID']}">${names[c]||c} <span style="font-size:9px;opacity:.7">NAF</span></span>`).join(' ')
+      ? filNafCodes.map(c => `<span class="ge-tag ge-tag-naf" title="Déduite du code NAF ${r['DC_NAFREV2_ENTREPRISE_ID']}">${c} – ${names[c]||c}</span>`).join(' ')
       : '—';
 
     document.getElementById('ge-fiche-grid').innerHTML = `
@@ -4849,7 +4849,7 @@ async function adminSave() {
           </div>
           <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
             <div style="font-size:22px">🏗️</div>
-            <div><div id="ge-kpi-etb-val" style="font-size:20px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises" style="cursor:help">ⓘ</span></div></div>
+            <div><div id="ge-kpi-etb-val" style="font-size:20px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Établissements actifs au sens de l'INSEE — Source : Annuaire entreprises (data.gouv.fr)" style="cursor:help">ⓘ</span></div></div>
           </div>
         </div>
 
@@ -5054,46 +5054,47 @@ async function adminSave() {
     const q = encodeURIComponent(`"${raisonSociale}"`);
     const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
 
+    let items = [];
     try {
-      // Use proxy directly — rss2json fails on Google News URLs with special chars
-      let items = [];
+      // Try rss2json first
       try { items = await fetchRssViaRss2Json(rssUrl, 6); } catch(_) {}
+      // Fallback: proxy with timeout
       if (!items.length) {
-        // Fallback: proxy + DOMParser
-        const xml = await fetchWithProxy(rssUrl, 8000);
-        const doc = new DOMParser().parseFromString(xml, 'text/xml');
-        items = [...doc.querySelectorAll('item')].slice(0,6).map(it => {
-          const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
-          return { title: gt('title'), link: gt('link') || it.querySelector('guid')?.textContent?.trim() || '', pubDate: gt('pubDate'), author: gt('source') };
-        });
+        try {
+          const xml = await Promise.race([
+            fetchWithProxy(rssUrl, 12000),
+            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000))
+          ]);
+          const doc = new DOMParser().parseFromString(xml, 'text/xml');
+          items = [...doc.querySelectorAll('item')].slice(0, 6).map(it => {
+            const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
+            return { title: gt('title'), link: gt('link') || it.querySelector('guid')?.textContent?.trim() || '', pubDate: gt('pubDate'), author: gt('source') };
+          });
+        } catch(_) {}
       }
-      spinner.style.display = 'none';
-      if (!items.length) {
-        gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité trouvée.</p>';
-        return;
-      }
-      const cutoff = Date.now() - 365*24*3600*1000;
-    items = items.filter(item => {
-      if (!item.pubDate) return true;
-      try { return new Date(item.pubDate).getTime() > cutoff; } catch(_) { return true; }
-    });
-    gridEl.innerHTML = items.slice(0, 6).map(item => {
-        const titre  = decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, ''));
-        const date   = formatRssDate(item.pubDate);
-        const src    = item.author || extractDomain(item.link || '');
-        const url    = item.link || '#';
-        return `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s"
-                     onclick="window.open('${url}','_blank','noopener')"
-                     onmouseover="this.style.boxShadow='0 2px 10px rgba(0,0,0,.1)'"
-                     onmouseout="this.style.boxShadow='none'">
-          <div style="font-size:12px;font-weight:600;color:#0f172a;line-height:1.4;margin-bottom:6px">${titre}</div>
-          <div style="font-size:10px;color:#94a3b8">${src}${date ? ' · ' + date : ''}</div>
-        </div>`;
-      }).join('');
-    } catch(e) {
-      spinner.style.display = 'none';
-      gridEl.innerHTML = `<p style="grid-column:1/-1;font-size:12px;color:#94a3b8">⚠️ ${e.message}</p>`;
+      // Filter to last 12 months
+      const cutoff = Date.now() - 365 * 24 * 3600 * 1000;
+      items = items.filter(item => {
+        if (!item.pubDate) return true;
+        try { return new Date(item.pubDate).getTime() > cutoff; } catch(_) { return true; }
+      });
+    } catch(_) {}
+
+    spinner.style.display = 'none';
+    if (!items.length) {
+      gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
+      return;
     }
+    gridEl.innerHTML = items.slice(0, 6).map(item => {
+      const titre = decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, ''));
+      const date  = item.pubDate ? (typeof formatRssDate === 'function' ? formatRssDate(item.pubDate) : '') : '';
+      const src   = item.author || extractDomain(item.link || '');
+      const url   = item.link || '#';
+      return `<div class="ge-news-card" onclick="window.open('${url}','_blank','noopener')">
+        <div style="font-size:12px;font-weight:600;color:#0f172a;line-height:1.45;margin-bottom:6px">${titre}</div>
+        <div style="font-size:10px;color:#94a3b8">${src}${date ? ' · ' + date : ''}</div>
+      </div>`;
+    }).join('');
   }
 
   // ── ETB MAP ──────────────────────────────────────────────────────────────────
