@@ -4313,15 +4313,19 @@ async function adminSave() {
 .ge-news-card { background:#f8fafc;border:1px solid #e5eaf5;border-radius:10px;padding:13px 15px;cursor:pointer;transition:box-shadow .15s,transform .15s; }
 .ge-news-card:hover { box-shadow:0 3px 12px rgba(0,49,137,.1);transform:translateY(-1px);background:#fff; }
 .ge-enrich-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid; }
-#tab-ge { height:calc(100vh - 106px); overflow:hidden; }
+#tab-ge { height:calc(100vh - var(--chrome-h, 106px)); overflow:hidden; }
 #tab-ge .page { height:100%; overflow:hidden; display:grid; grid-template-columns:300px 1fr; }
 #tab-ge .page.sidebar-collapsed { grid-template-columns:2vw 1fr; }
 #tab-ge .sidebar { overflow-y:auto; height:100%; }
-#tab-ge .chart-area { overflow-y:auto; height:100%; scrollbar-width:thin; scrollbar-color:#94a3b8 transparent; }
-#tab-ge .chart-area::-webkit-scrollbar { width:8px; }
+#tab-ge .chart-area { overflow-y:auto; height:100%; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:#94a3b8 transparent; }
+#tab-ge .chart-area::-webkit-scrollbar { width:6px; }
 #tab-ge .chart-area::-webkit-scrollbar-track { background:transparent; }
 #tab-ge .chart-area::-webkit-scrollbar-thumb { background:#94a3b8; border-radius:4px; }
-#tab-ge .chart-area::-webkit-scrollbar-thumb:hover { background:#64748b; }
+@media (max-width:768px) {
+  #tab-ge { height:calc(100vh - 100px); }
+  #tab-ge .page { grid-template-columns:1fr !important; height:auto; overflow:visible; }
+  #tab-ge .chart-area { height:auto; overflow-y:visible; }
+}
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
 @media(max-width:768px) { .ge-fiche-grid-wrap { grid-template-columns:1fr 1fr; } .ge-news-grid-wrap { grid-template-columns:1fr 1fr; } }
@@ -4676,7 +4680,7 @@ async function adminSave() {
   // ── Load CSV ────────────────────────────────────────────────────────────────
   async function loadGE() {
     const status = document.getElementById('ge-status');
-    status.textContent = '⏳ Chargement…';
+    if (status) status.textContent = '⏳ Chargement des entreprises…';
     try {
       const res = await fetch(GE_CSV_URL);
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -4893,11 +4897,6 @@ async function adminSave() {
     const r = GE_FILTERED[idx];
     if (!r) return;
     const siren = (r['SIREN'] || '').trim();
-    // Skip full reload if same siren (just scroll to fiche)
-    if (siren && siren === _currentFicheSiren) {
-      document.getElementById('ge-fiche').scrollIntoView({ behavior:'smooth', block:'start' });
-      return;
-    }
     _currentFicheSiren = siren;
     // DIAGNOSTIC: log r to console to confirm CSV columns loaded
     console.log('[GE] fiche r keys:', Object.keys(r));
@@ -5598,6 +5597,11 @@ async function adminSave() {
   // ── Init ────────────────────────────────────────────────────────────────────
   function initGE() {
     if (GE_DATA.length) return;
+    // On mobile the DOM might not be fully ready
+    if (!document.getElementById('ge-tbody')) {
+      setTimeout(initGE, 100);
+      return;
+    }
     loadGE();
   }
 
@@ -5611,6 +5615,8 @@ async function adminSave() {
   document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('tab-ge')?.classList.contains('active')) initGE();
   });
+  // Also init if user navigates directly to ge tab via URL hash
+  if (window.location.hash === '#ge') { setTimeout(() => { switchTab('ge'); }, 200); }
 })();
 </script>
 
