@@ -5107,22 +5107,45 @@ async function adminSave() {
           ? e.nombre_etablissements_ouverts.toLocaleString('fr-FR') : '—';
       }
 
-      // Labels & certifications → right column bottom panel
-      const labels = [];
-      if (e.complements?.identifiant_association) labels.push('Association');
-      if (e.complements?.est_entreprise_individuelle) labels.push('Entreprise individuelle');
-      if (e.complements?.est_ess) labels.push('ESS');
-      if (e.complements?.egapro_renseignee) labels.push('Index Égapro');
-      if (e.complements?.bilan_carbone_renseigne) labels.push('Bilan carbone');
+      // Labels & certifications — champs exacts de l'API recherche-entreprises (doc ReDoc)
+      const comp = e.complements || {};
+      const baseUrl = `https://annuaire-entreprises.data.gouv.fr/labels-certificats/${siren}`;
+      const LABEL_MAP = [
+        // champ API                          libellé affiché                        ancre URL
+        { f:'liste_finess_juridique',  truthy: v => v?.length,  label:'Finess – Étab. sanitaire et social',  anchor:'finess' },
+        { f:'egapro_renseignee',        truthy: v => v,          label:'Égalité professionnelle',             anchor:'egalite-professionnelle' },
+        { f:'est_alim_confiance',       truthy: v => v,          label:"Alim'Confiance",                      anchor:'alim-confiance' },
+        { f:'est_ess',                  truthy: v => v,          label:'ESS',                                 anchor:'ess' },
+        { f:'est_societe_mission',      truthy: v => v,          label:'Société à mission',                   anchor:'societe-mission' },
+        { f:'est_bio',                  truthy: v => v,          label:'Agriculture biologique',              anchor:'bio' },
+        { f:'est_rge',                  truthy: v => v,          label:'RGE',                                 anchor:'rge' },
+        { f:'est_qualiopi',             truthy: v => v,          label:'Qualiopi',                            anchor:'qualiopi' },
+        { f:'est_organisme_formation',  truthy: v => v,          label:'Organisme de formation',              anchor:'organisme-formation' },
+        { f:'est_patrimoine_vivant',    truthy: v => v,          label:'Entreprise du Patrimoine Vivant',     anchor:'patrimoine-vivant' },
+        { f:'est_achats_responsables',  truthy: v => v,          label:'Achats responsables',                 anchor:'achats-responsables' },
+        { f:'bilan_ges_renseigne',      truthy: v => v,          label:'Bilan GES',                          anchor:'bilan-ges' },
+        { f:'identifiant_association',  truthy: v => v,          label:'Association',                         anchor:'association' },
+        { f:'est_entrepreneur_spectacle', truthy: v => v,        label:'Entrepreneur du spectacle',           anchor:'entrepreneur-spectacle' },
+        { f:'est_uai',                  truthy: v => v,          label:'Établissement scolaire (UAI)',        anchor:'uai' },
+      ];
+
+      const labels = LABEL_MAP.filter(m => m.truthy(comp[m.f]));
 
       const labelsListEl  = document.getElementById('ge-labels-list');
       const labelsEmptyEl = document.getElementById('ge-labels-empty');
       if (labelsListEl) {
         labelsListEl.innerHTML = labels.length
-          ? labels.map(l => `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600;display:inline-block">${l}</span>`).join('')
+          ? labels.map(m => `<a href="${baseUrl}#${m.anchor}" target="_blank" rel="noopener"
+              style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;margin-bottom:3px"
+              onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
+              <svg width="10" height="10" fill="none" stroke="#15803d" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              ${m.label}
+            </a>`).join('')
           : '';
         if (labelsEmptyEl) labelsEmptyEl.style.display = labels.length ? 'none' : 'block';
       }
+      const bottomPanelForLabels = document.getElementById('ge-bottom-panel');
+      if (bottomPanelForLabels) bottomPanelForLabels.style.display = 'block';
 
       // Commune name
       if (e.siege?.code_commune) {
@@ -5163,33 +5186,68 @@ async function adminSave() {
     if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
 
-    // Query: first 3 words of name for better coverage
-    const shortName = raisonSociale.split(/\s+/).slice(0, 3).join(' ');
-    const q = encodeURIComponent(`"${shortName}"`);
-    const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
+    // Build query variants: try most specific first, then shorter
+    const words = raisonSociale.trim().split(/\s+/);
+    const queries = [
+      words.slice(0, 3).join(' '),   // 3 premiers mots
+      words.slice(0, 2).join(' '),   // 2 premiers mots
+    ].filter((v, i, a) => a.indexOf(v) === i); // déduplique
 
     let items = [];
-    try {
-      try { items = await fetchRssViaRss2Json(rssUrl, 6); } catch(_) {}
+    for (const q of queries) {
+      if (items.length) break;
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`;
+      // Strategy 1: rss2json
+      try { items = await fetchRssViaRss2Json(rssUrl, 8); } catch(_) {}
+      // Strategy 2: allorigins proxy
+      if (!items.length) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+          const res = await Promise.race([
+            fetch(proxyUrl).then(r => r.json()).then(d => d.contents || ''),
+            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 15000))
+          ]);
+          if (res) {
+            const doc = new DOMParser().parseFromString(res, 'text/xml');
+            items = [...doc.querySelectorAll('item')].slice(0, 8).map(it => {
+              const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
+              return {
+                title:   gt('title'),
+                link:    gt('link') || it.querySelector('guid')?.textContent?.trim() || '',
+                pubDate: gt('pubDate'),
+                author:  gt('source')
+              };
+            });
+          }
+        } catch(_) {}
+      }
+      // Strategy 3: fetchWithProxy fallback
       if (!items.length) {
         try {
           const xml = await Promise.race([
-            fetchWithProxy(rssUrl, 20000),
-            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 20000))
+            fetchWithProxy(rssUrl, 15000),
+            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 15000))
           ]);
           const doc = new DOMParser().parseFromString(xml, 'text/xml');
-          items = [...doc.querySelectorAll('item')].slice(0, 6).map(it => {
+          items = [...doc.querySelectorAll('item')].slice(0, 8).map(it => {
             const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
-            return { title: gt('title'), link: gt('link') || it.querySelector('guid')?.textContent?.trim() || '', pubDate: gt('pubDate'), author: gt('source') };
+            return {
+              title:   gt('title'),
+              link:    gt('link') || it.querySelector('guid')?.textContent?.trim() || '',
+              pubDate: gt('pubDate'),
+              author:  gt('source')
+            };
           });
         } catch(_) {}
       }
-      const cutoff = Date.now() - 365 * 24 * 3600 * 1000;
-      items = items.filter(item => {
-        if (!item.pubDate) return true;
-        try { return new Date(item.pubDate).getTime() > cutoff; } catch(_) { return true; }
-      });
-    } catch(_) {}
+    }
+
+    // Filter to last 12 months
+    const cutoff = Date.now() - 365 * 24 * 3600 * 1000;
+    items = items.filter(item => {
+      if (!item.pubDate) return true;
+      try { return new Date(item.pubDate).getTime() > cutoff; } catch(_) { return true; }
+    });
 
     if (spinner) spinner.style.display = 'none';
     if (!items.length) {
