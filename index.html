@@ -1786,6 +1786,8 @@ const NAF_LOCAL_URL = 'naf.json';
 let KEYWORDS_DATA   = {}; // populated by loadKeywords()
 let CJ_MAP  = {}; // code CJ → libellé
 let NAF_MAP = {}; // code NAF → libellé (local)
+const ETB_URL = 'ETB_GDES_ENTREPRISES.csv';
+let ETB_DATA = []; // all establishment rows
 
 // ── DONNÉES ───────────────────────────────────────────────────────────────────
 let SOURCE_DATA = [];
@@ -3904,12 +3906,28 @@ function updateRanking() {
     // Sidebars already moved to body by inline script above
   }
 
-  // Load CJ + NAF nomenclatures
+  // Load CJ + NAF nomenclatures + ETB data
   try {
-    const [cjRes, nafRes] = await Promise.all([fetch(CJ_URL), fetch(NAF_LOCAL_URL)]);
+    const [cjRes, nafRes, etbRes] = await Promise.all([fetch(CJ_URL), fetch(NAF_LOCAL_URL), fetch(ETB_URL)]);
     if (cjRes.ok)  CJ_MAP  = await cjRes.json();
     if (nafRes.ok) NAF_MAP = await nafRes.json();
-  } catch(_) {}
+    if (etbRes.ok) {
+      const text = await etbRes.text();
+      const lines = text.split(/
+?
+/).filter(l => l.trim());
+      const sep = lines[0].includes(';') ? ';' : ',';
+      const hdrs = lines[0].split(sep).map(h => h.replace(/^﻿/,'').trim().replace(/^"|"$/g,''));
+      ETB_DATA = lines.slice(1).map(line => {
+        const vals = line.split(sep).map(v => v.replace(/^"|"$/g,'').trim());
+        const obj = {};
+        hdrs.forEach((h,i) => obj[h] = vals[i] || '');
+        return obj;
+      }).filter(r => r['SIREN'] || r[Object.keys(r)[0]]);
+      // Normalize SIREN key (handle BOM)
+      ETB_DATA.forEach(r => { if (!r['SIREN']) { const k = Object.keys(r)[0]; r['SIREN'] = r[k]; } });
+    }
+  } catch(e) { console.warn('Init load error:', e); }
 
   // Load shared user news once at startup
   loadUserNews();
@@ -4288,10 +4306,13 @@ async function adminSave() {
 .ge-news-card { background:#f8fafc;border:1px solid #e5eaf5;border-radius:10px;padding:13px 15px;cursor:pointer;transition:box-shadow .15s,transform .15s; }
 .ge-news-card:hover { box-shadow:0 3px 12px rgba(0,49,137,.1);transform:translateY(-1px);background:#fff; }
 .ge-enrich-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid; }
+#tab-ge .chart-area { overflow-y:auto; }
+#tab-ge .page { height:calc(100vh - 106px); }
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
 @media(max-width:768px) { .ge-fiche-grid-wrap { grid-template-columns:1fr 1fr; } .ge-news-grid-wrap { grid-template-columns:1fr 1fr; } }
 @media(max-width:400px) { .ge-fiche-grid-wrap { grid-template-columns:1fr; } }
+@media(max-width:900px) { #ge-fiche-top { grid-template-columns:1fr !important; } }
 </style>
 
 <div class="page" id="page-ge">
@@ -4361,9 +4382,13 @@ async function adminSave() {
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
       <div>
-        <h1 style="font-size:16px;font-weight:900;color:#0f172a;margin:0 0 2px">
+        <h1 style="font-size:16px;font-weight:900;color:#0f172a;margin:0 0 6px">
           🏢 Grandes entreprises &amp; grands comptes
+          <span id="ge-count-badge" style="font-size:12px;font-weight:700;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:middle">0</span>
         </h1>
+        <p style="font-size:11px;color:#64748b;margin:0 0 4px;line-height:1.5;max-width:600px">
+          Les grandes entreprises référencées ont réalisé plus de 1 000 DPAE &gt; 1 mois en 2025 avec au moins 20 établissements. Les <strong>grands comptes</strong> sont les entreprises liées à France Travail par un accord.
+        </p>
         <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
       </div>
       <span id="ge-status" style="font-size:11px;color:#94a3b8"></span>
@@ -4389,7 +4414,10 @@ async function adminSave() {
 
     <!-- Fiche entreprise -->
     <div class="ge-fiche" id="ge-fiche">
-      <div class="ge-fiche-header">
+      <!-- Layout: info left + map right -->
+      <div id="ge-fiche-top" style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;margin-bottom:0">
+        <div>
+          <div class="ge-fiche-header">
         <div>
           <div class="ge-fiche-title" id="ge-fiche-name"></div>
           <div id="ge-fiche-siren-line" style="font-size:12px;color:#64748b;margin-top:2px"></div>
@@ -4399,8 +4427,37 @@ async function adminSave() {
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Annuaire entreprises
         </a>
-      </div>
+      </div><!-- /ge-fiche-header -->
       <div id="ge-fiche-grid"></div>
+        </div><!-- /left col -->
+
+        <!-- Carte établissements -->
+        <div id="ge-map-panel" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:16px;display:none;position:sticky;top:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+              Implantation
+            </span>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <select id="ge-map-level" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
+                <option value="reg">Régions</option>
+                <option value="dep">Depts</option>
+              </select>
+              <select id="ge-map-indicator" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
+                <option value="N_NBDPAEP1M">DPAE &gt; 1 mois</option>
+                <option value="NUMERATEUR_N">Étab. recruteurs</option>
+              </select>
+            </div>
+          </div>
+          <div style="position:relative">
+            <svg id="ge-map-svg" width="100%" viewBox="0 0 300 320"></svg>
+            <div id="ge-map-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;pointer-events:none;min-width:140px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10;line-height:1.7"></div>
+          </div>
+          <div id="ge-map-legend" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:#64748b">
+            <span>0</span><div id="ge-map-legend-bar" style="flex:1;height:6px;margin:0 8px;border-radius:3px;background:linear-gradient(to right,#dbeafe,#1d4ed8)"></div><span id="ge-map-legend-max">max</span>
+          </div>
+        </div>
+      </div><!-- /fiche-top grid -->
 
       <!-- Enrichissement annuaire -->
       <div id="ge-enrichissement" style="display:none;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:20px">
@@ -4645,6 +4702,11 @@ async function adminSave() {
 
     const total  = GE_FILTERED.length;
     const pages  = Math.max(1, Math.ceil(total / GE_PAGE_SIZE));
+    // Update counter badge and label
+    const badge = document.getElementById('ge-count-badge');
+    if (badge) badge.textContent = total.toLocaleString('fr-FR');
+    const lbl = document.getElementById('ge-count-label');
+    if (lbl) lbl.textContent = total ? `${total.toLocaleString('fr-FR')} entreprise${total>1?'s':''} affichée${total>1?'s':''}` : 'Aucun résultat';
     GE_PAGE = Math.min(GE_PAGE, pages);
     const slice  = GE_FILTERED.slice((GE_PAGE-1)*GE_PAGE_SIZE, GE_PAGE*GE_PAGE_SIZE);
 
@@ -4785,6 +4847,35 @@ async function adminSave() {
             <div style="font-size:11px;font-weight:700;color:#64748b;margin-top:5px;text-transform:uppercase;letter-spacing:.07em">DPAE &gt; 1 mois</div>
           </div>
         </div>
+      </div>
+
+      <!-- KPIs supplémentaires -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px">
+        <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:14px 16px;text-align:center">
+          <div style="font-size:20px;margin-bottom:3px">📦</div>
+          <div style="font-size:22px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div>
+        </div>
+        <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:14px 16px;text-align:center">
+          <div style="font-size:20px;margin-bottom:3px">🎯</div>
+          <div style="font-size:22px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">POEI</div>
+        </div>
+        <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:14px 16px;text-align:center">
+          <div style="font-size:20px;margin-bottom:3px">⭐</div>
+          <div style="font-size:22px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div>
+        </div>
+        <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:14px 16px;text-align:center">
+          <div style="font-size:20px;margin-bottom:3px">📢</div>
+          <div style="font-size:22px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div>
+        </div>
+        <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:14px 16px;text-align:center">
+          <div style="font-size:20px;margin-bottom:3px">📬</div>
+          <div style="font-size:22px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div>
+          <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div>
+        </div>
       </div>`;
 
     // NAF label already rendered from NAF_MAP in the template above — nothing to do
@@ -4818,6 +4909,7 @@ async function adminSave() {
       enrichFicheAnnuaire(siren);
     }
     enrichFicheNews(r['DC_RAISONSOCIALEENTREPRISE'], siren);
+    showEtbMap(siren);
   };
 
   // ── ANNUAIRE ENTREPRISES enrichment ────────────────────────────────────────
@@ -4957,7 +5049,12 @@ async function adminSave() {
         gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité trouvée.</p>';
         return;
       }
-      gridEl.innerHTML = items.slice(0, 6).map(item => {
+      const cutoff = Date.now() - 365*24*3600*1000;
+    items = items.filter(item => {
+      if (!item.pubDate) return true;
+      try { return new Date(item.pubDate).getTime() > cutoff; } catch(_) { return true; }
+    });
+    gridEl.innerHTML = items.slice(0, 6).map(item => {
         const titre  = decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, ''));
         const date   = formatRssDate(item.pubDate);
         const src    = item.author || extractDomain(item.link || '');
@@ -4974,6 +5071,126 @@ async function adminSave() {
       spinner.style.display = 'none';
       gridEl.innerHTML = `<p style="grid-column:1/-1;font-size:12px;color:#94a3b8">⚠️ ${e.message}</p>`;
     }
+  }
+
+  // ── ETB MAP ──────────────────────────────────────────────────────────────────
+  let _currentEtbSiren = null;
+  let _geoRegCache = null;
+  let _geoDepCache = null;
+
+  window.drawEtbMap = async function() {
+    const siren    = _currentEtbSiren;
+    const level    = document.getElementById('ge-map-level')?.value || 'reg';
+    const indic    = document.getElementById('ge-map-indicator')?.value || 'N_NBDPAEP1M';
+    const panel    = document.getElementById('ge-map-panel');
+    const svgEl    = document.getElementById('ge-map-svg');
+    const tooltip  = document.getElementById('ge-map-tooltip');
+    const legendMax= document.getElementById('ge-map-legend-max');
+    const legendBar= document.getElementById('ge-map-legend-bar');
+    if (!siren || !svgEl) return;
+
+    // Filter ETB rows for this company
+    const rows = ETB_DATA.filter(r => r['SIREN'] === siren);
+    if (!rows.length) { panel.style.display = 'none'; return; }
+
+    panel.style.display = 'block';
+
+    // Aggregate by region or department
+    const KEY = level === 'reg' ? 'C_REGION' : 'C_DEPT';
+    const agg = {};
+    rows.forEach(r => {
+      const k = r[KEY];
+      if (!k) return;
+      if (!agg[k]) agg[k] = { N_NBDPAEP1M:0, N_NBDPAEP6M:0, NUMERATEUR_N:0, N_NBPOEI:0, N_NBPDP:0, N_NBOFFP1M:0, N_NBOFFP6M:0 };
+      ['N_NBDPAEP1M','N_NBDPAEP6M','NUMERATEUR_N','N_NBPOEI','N_NBPDP','N_NBOFFP1M','N_NBOFFP6M'].forEach(f => {
+        agg[k][f] += parseInt(r[f] || '0', 10);
+      });
+    });
+
+    const vals = Object.values(agg).map(v => v[indic] || 0);
+    const maxVal = Math.max(1, ...vals);
+
+    // Load GeoJSON
+    const geoUrl = level === 'reg' ? 'reg.geojson' : 'dep.geojson';
+    let geo;
+    if (level === 'reg') {
+      if (!_geoRegCache) { const r = await fetch('reg.geojson'); _geoRegCache = await r.json(); }
+      geo = _geoRegCache;
+    } else {
+      if (!_geoDepCache) { const r = await fetch('dep.geojson'); _geoDepCache = await r.json(); }
+      geo = _geoDepCache;
+    }
+
+    // D3 projection
+    const W = svgEl.parentElement.clientWidth || 280;
+    const H = 310;
+    svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const proj = d3.geoConicConformal()
+      .center([2.454071, 46.279229])
+      .scale(level === 'dep' ? W * 3.2 : W * 3.0)
+      .translate([W / 2, H / 2]);
+    const path = d3.geoPath().projection(proj);
+    const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxVal]);
+
+    const svg = d3.select(svgEl);
+    svg.selectAll('*').remove();
+
+    const codeKey = level === 'reg' ? 'code' : 'code';
+    svg.selectAll('path')
+      .data(geo.features)
+      .enter().append('path')
+        .attr('d', path)
+        .attr('fill', f => {
+          const code = f.properties[codeKey] || f.properties.CODE || f.properties.NUM_DEP || '';
+          const v = agg[code]?.[indic] || 0;
+          return v > 0 ? colorScale(v) : '#f1f5f9';
+        })
+        .attr('stroke', '#fff')
+        .attr('stroke-width', level === 'dep' ? 0.5 : 0.8)
+        .on('mouseover', function(event, f) {
+          const code = f.properties[codeKey] || f.properties.CODE || f.properties.NUM_DEP || '';
+          const name = f.properties.nom || f.properties.NOM || code;
+          const d = agg[code];
+          if (!d) { tooltip.style.display = 'none'; return; }
+          const LABELS = { N_NBDPAEP1M:'DPAE>1M', N_NBDPAEP6M:'DPAE>6M', NUMERATEUR_N:'Étab.', N_NBPOEI:'POEI', N_NBPDP:'PDP', N_NBOFFP1M:'Offres>1M', N_NBOFFP6M:'Offres>6M' };
+          let html = `<strong style="font-size:12px">${name}</strong><br>`;
+          Object.entries(LABELS).forEach(([k,lbl]) => {
+            const v = d[k] || 0;
+            html += `<span style="color:${k===indic?'#93c5fd':'#94a3b8'}">${lbl}</span>: <strong>${v.toLocaleString('fr-FR')}</strong><br>`;
+          });
+          tooltip.innerHTML = html;
+          tooltip.style.display = 'block';
+          // Position relative to svg container
+          const box = svgEl.getBoundingClientRect();
+          const ex = event.clientX - box.left, ey = event.clientY - box.top;
+          tooltip.style.left = (ex + 10) + 'px';
+          tooltip.style.top  = (ey - 10) + 'px';
+          d3.select(this).attr('stroke','#1d4ed8').attr('stroke-width', 1.5);
+        })
+        .on('mousemove', function(event) {
+          const box = svgEl.getBoundingClientRect();
+          tooltip.style.left = (event.clientX - box.left + 10) + 'px';
+          tooltip.style.top  = (event.clientY - box.top - 10) + 'px';
+        })
+        .on('mouseout', function() {
+          tooltip.style.display = 'none';
+          d3.select(this).attr('stroke','#fff').attr('stroke-width', level==='dep'?0.5:0.8);
+        });
+
+    // Legend
+    if (legendMax) legendMax.textContent = maxVal.toLocaleString('fr-FR');
+    const INDIC_LABELS = { N_NBDPAEP1M:'DPAE > 1 mois', NUMERATEUR_N:'Étab. recruteurs' };
+    if (legendBar) {
+      legendBar.style.background = `linear-gradient(to right,#dbeafe,#1d4ed8)`;
+    }
+  };
+
+  function showEtbMap(siren) {
+    _currentEtbSiren = siren;
+    const rows = ETB_DATA.filter(r => r['SIREN'] === siren);
+    const panel = document.getElementById('ge-map-panel');
+    if (!rows.length) { if(panel) panel.style.display='none'; return; }
+    drawEtbMap();
   }
 
   window.geResetAll = function() {
