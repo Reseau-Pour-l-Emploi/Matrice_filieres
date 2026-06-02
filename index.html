@@ -4476,21 +4476,9 @@ async function adminSave() {
               <svg width="11" height="11" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
               Implantation
             </span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <!-- Toggle switch Régions / Depts -->
-              <div style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:20px;padding:2px;font-size:10px;font-weight:600">
-                <button id="ge-map-lvl-reg" onclick="setMapLevel('reg')"
-                  style="padding:3px 9px;border-radius:16px;border:none;cursor:pointer;background:#2563eb;color:#fff;font-size:10px;font-weight:700;transition:all .15s">
-                  Régions
-                </button>
-                <button id="ge-map-lvl-dep" onclick="setMapLevel('dep')"
-                  style="padding:3px 9px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:#64748b;font-size:10px;font-weight:600;transition:all .15s">
-                  Depts
-                </button>
-              </div>
-              <!-- Hidden select kept for JS compatibility -->
-              <select id="ge-map-level" style="display:none">
-                <option value="reg" selected>Régions</option>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+              <select id="ge-map-level" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
+                <option value="reg">Régions</option>
                 <option value="dep">Départements</option>
               </select>
               <select id="ge-map-indicator" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
@@ -5540,20 +5528,6 @@ async function adminSave() {
     th.dataset.dir = _etbSortDir;
     th.querySelector('.etb-sort-icon').textContent = _etbSortDir === -1 ? '↓' : '↑';
     renderEtbTable();
-  };
-
-  window.setMapLevel = function(level) {
-    const sel = document.getElementById('ge-map-level');
-    if (sel) sel.value = level;
-    const btnReg = document.getElementById('ge-map-lvl-reg');
-    const btnDep = document.getElementById('ge-map-lvl-dep');
-    if (btnReg) { btnReg.style.background = level==='reg' ? '#2563eb' : 'transparent'; btnReg.style.color = level==='reg' ? '#fff' : '#64748b'; btnReg.style.fontWeight = level==='reg' ? '700' : '600'; }
-    if (btnDep) { btnDep.style.background = level==='dep' ? '#2563eb' : 'transparent'; btnDep.style.color = level==='dep' ? '#fff' : '#64748b'; btnDep.style.fontWeight = level==='dep' ? '700' : '600'; }
-    // Clear territorial filter when switching level
-    _etbMapFilter = null;
-    const badge = document.getElementById('ge-etb-map-filter-badge');
-    if (badge) badge.style.display = 'none';
-    drawEtbMap();
   };
 
   window.clearEtbMapFilter = function() {
