@@ -5047,40 +5047,30 @@ async function adminSave() {
 
   // ── ANNUAIRE ENTREPRISES enrichment ────────────────────────────────────────
   async function enrichFicheAnnuaire(siren) {
-    const enrich = document.getElementById('ge-enrichissement');
-    const spinner = document.getElementById('ge-enrich-spinner');
-    enrich.style.display = 'block';
-    spinner.style.display = 'inline';
+    const bottomPanel = document.getElementById('ge-bottom-panel');
+    if (bottomPanel) bottomPanel.style.display = 'block';
 
     try {
       const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siren}&per_page=1`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) return;
       const data = await res.json();
-      const e = data.results?.[0];
-      if (!e) throw new Error('Non trouvé');
+      const e = data?.results?.[0];
+      if (!e) return;
 
-      // Résumé
-      if (e.description || e.activite_principale_label) {
-        const resumeEl = document.getElementById('ge-enrich-resume');
-        resumeEl.textContent = e.description || `Activité principale : ${e.activite_principale_label}`;
-        resumeEl.style.display = 'block';
-      }
-
-      // Grille d'infos
+      // Catégorie juridique via cj.json
       const njCode  = (e.nature_juridique || '').toString().trim();
-      // Use local cj.json — strip leading zeros for lookup (e.g. "5710" or "570")
       const njLabel = CJ_MAP[njCode] || CJ_MAP[njCode.replace(/^0+/,'')] || e.nature_juridique_label || '';
       const njVal   = njLabel
         ? `${njLabel}<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:6px">(${njCode})</span>`
         : njCode || '—';
+
       const infos = [
         { label:'⚖️ Catégorie juridique', val: njVal },
         { label:'📅 Date de création',    val: e.date_creation ? new Date(e.date_creation).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '—' },
         { label:'🏷️ Catégorie', val: ({'GE':'Grande Entreprise','ETI':'Entreprise de Taille Intermédiaire','PME':'Petite et Moyenne Entreprise','TPE':'Très Petite Entreprise'}[e.categorie_entreprise] || e.categorie_entreprise || '—') },
-        // Étab. actifs → shown in indicators block (ge-kpi-etb-val)
       ];
-      const grid = document.getElementById('ge-enrich-grid') || { innerHTML:'', style:{}, className:'' };
-      // Populate inline annuaire block
+
+      // Populate inline annuaire block (left column)
       const inlineEl = document.getElementById('ge-annuaire-inline');
       if (inlineEl) {
         inlineEl.style.display = 'block';
@@ -5088,113 +5078,78 @@ async function adminSave() {
           infos.map(i => `<div class="ge-kv"><div class="ge-kv-label">${i.label} <span style="cursor:help;color:#94a3b8;font-size:9px" title="Source : Annuaire entreprises (data.gouv.fr)">ⓘ</span></div><div class="ge-kv-value" style="font-size:13px">${i.val}</div></div>`).join('') +
           `</div>`;
       }
+
       // Populate Étab. actifs KPI
       const etbActifsVal = document.getElementById('ge-kpi-etb-val');
-      if (etbActifsVal && e.nombre_etablissements_ouverts != null) {
-        etbActifsVal.textContent = e.nombre_etablissements_ouverts.toLocaleString('fr-FR');
-      } else if (etbActifsVal) {
-        etbActifsVal.textContent = '—';
+      if (etbActifsVal) {
+        etbActifsVal.textContent = e.nombre_etablissements_ouverts != null
+          ? e.nombre_etablissements_ouverts.toLocaleString('fr-FR') : '—';
       }
-      // Hide old grid
-      grid.style.display = 'none';
 
-      // Labels
-      const labels = e.complements?.identifiant_association
-        ? ['Association']
-        : [];
+      // Labels & certifications → right column bottom panel
+      const labels = [];
+      if (e.complements?.identifiant_association) labels.push('Association');
       if (e.complements?.est_entreprise_individuelle) labels.push('Entreprise individuelle');
       if (e.complements?.est_ess) labels.push('ESS');
       if (e.complements?.egapro_renseignee) labels.push('Index Égapro');
       if (e.complements?.bilan_carbone_renseigne) labels.push('Bilan carbone');
-      // Labels go to right column below map
-      const bottomPanel = document.getElementById('ge-bottom-panel');
-      const labelsListEl = document.getElementById('ge-labels-list');
+
+      const labelsListEl  = document.getElementById('ge-labels-list');
       const labelsEmptyEl = document.getElementById('ge-labels-empty');
-      if (bottomPanel) bottomPanel.style.display = 'block';
-      // Also show bottom panel regardless
-      if (labelsListEl) labelsListEl.innerHTML = '';
       if (labelsListEl) {
-        if (labels.length) {
-          labelsListEl.innerHTML = labels.map(l =>
-            `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600">${l}</span>`
-          ).join('');
-          if (labelsEmptyEl) labelsEmptyEl.style.display = 'none';
-        } else {
-          labelsListEl.innerHTML = '';
-          if (labelsEmptyEl) labelsEmptyEl.style.display = 'block';
+        labelsListEl.innerHTML = labels.length
+          ? labels.map(l => `<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600;display:inline-block">${l}</span>`).join('')
+          : '';
+        if (labelsEmptyEl) labelsEmptyEl.style.display = labels.length ? 'none' : 'block';
+      }
+
+      // Commune name
+      if (e.siege?.code_commune) {
+        const communeEl = document.getElementById('ge-kv-commune');
+        const code = e.siege.code_commune;
+        if (communeEl) {
+          const valEl = communeEl.querySelector('.ge-kv-value');
+          if (valEl) {
+            if (GE_COMMUNE_CACHE[code]) {
+              valEl.textContent = GE_COMMUNE_CACHE[code];
+            } else {
+              fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom`)
+                .then(r => r.ok ? r.json() : null)
+                .then(d => {
+                  if (d?.nom) {
+                    GE_COMMUNE_CACHE[code] = d.nom;
+                    valEl.textContent = d.nom;
+                  }
+                }).catch(() => {});
+            }
+          }
         }
       }
-      const oldLabelsEl = document.getElementById('ge-enrich-labels');
-      if (oldLabelsEl) oldLabelsEl.style.display = 'none';
-
-      // Bilans financiers via open data
-      fetchBilans(siren);
-
-    } catch(e) {
-      console.warn('[GE enrich]', e.message);
-    } finally {
-      spinner.style.display = 'none';
-    }
-  }
-
-  async function fetchBilans(siren) {
-    try {
-      const res = await fetch(`https://data.opendatagouv.fr/api/3/action/datastore_search?resource_id=0b54bad0-5879-4088-b46d-97f79d3fc0f2&q=${siren}&limit=5`);
-      if (!res.ok) return;
-      // Fallback: try recherche-entreprises finances
-      const res2 = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siren}&per_page=1`);
-      if (!res2.ok) return;
-      const data = await res2.json();
-      const finances = data.results?.[0]?.finances;
-      if (!finances || !Object.keys(finances).length) return;
-
-      const bilansEl = document.getElementById('ge-enrich-bilans');
-      const chartEl  = document.getElementById('ge-enrich-bilans-chart');
-      bilansEl.style.display = 'block';
-
-      const years = Object.keys(finances).sort();
-      const vals  = years.map(y => finances[y]?.ca || 0);
-      const maxV  = Math.max(...vals, 1);
-
-      chartEl.innerHTML = years.map((y, i) => {
-        const h = Math.max(4, Math.round((vals[i] / maxV) * 60));
-        const ca = vals[i] >= 1e6
-          ? (vals[i]/1e6).toFixed(1) + 'M€'
-          : vals[i] >= 1e3
-            ? (vals[i]/1e3).toFixed(0) + 'k€'
-            : vals[i] + '€';
-        return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
-          <div style="font-size:9px;color:#64748b">${ca}</div>
-          <div style="width:100%;background:#2563eb;border-radius:4px 4px 0 0;height:${h}px;min-height:4px"></div>
-          <div style="font-size:9px;color:#94a3b8">${y}</div>
-        </div>`;
-      }).join('');
-    } catch(_) {}
+    } catch(e) { console.warn('[GE] enrichFicheAnnuaire error:', e); }
   }
 
   // ── GOOGLE NEWS pour l'entreprise ──────────────────────────────────────────
   async function enrichFicheNews(raisonSociale, siren) {
-    const bottomPanel2 = document.getElementById('ge-bottom-panel');
-    if (bottomPanel2) bottomPanel2.style.display = 'block';
-    const spinner   = document.getElementById('ge-news-spinner2');
-    const titleEl   = document.getElementById('ge-news-title2');
-    const gridEl    = document.getElementById('ge-news-grid2');
+    const bottomPanel = document.getElementById('ge-bottom-panel');
+    if (bottomPanel) bottomPanel.style.display = 'block';
+
+    const spinner = document.getElementById('ge-news-spinner2');
+    const titleEl = document.getElementById('ge-news-title2');
+    const gridEl  = document.getElementById('ge-news-grid2');
     if (!gridEl) return;
 
     if (titleEl) titleEl.textContent = raisonSociale;
     if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
 
-    // Build a smarter query: short name (first 3 words) for better results
-    const shortName = raisonSociale.split(/\s+/).slice(0,3).join(' ');
+    // Query: first 3 words of name for better coverage
+    const shortName = raisonSociale.split(/\s+/).slice(0, 3).join(' ');
     const q = encodeURIComponent(`"${shortName}"`);
     const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=FR&ceid=FR:fr`;
 
     let items = [];
     try {
-      // Try rss2json first
       try { items = await fetchRssViaRss2Json(rssUrl, 6); } catch(_) {}
-      // Fallback: proxy with timeout
       if (!items.length) {
         try {
           const xml = await Promise.race([
@@ -5208,7 +5163,6 @@ async function adminSave() {
           });
         } catch(_) {}
       }
-      // Filter to last 12 months
       const cutoff = Date.now() - 365 * 24 * 3600 * 1000;
       items = items.filter(item => {
         if (!item.pubDate) return true;
@@ -5216,9 +5170,9 @@ async function adminSave() {
       });
     } catch(_) {}
 
-    spinner.style.display = 'none';
+    if (spinner) spinner.style.display = 'none';
     if (!items.length) {
-      if (gridEl) gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
+      gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
       return;
     }
     gridEl.innerHTML = items.slice(0, 6).map(item => {
@@ -5233,124 +5187,6 @@ async function adminSave() {
     }).join('');
   }
 
-  // ETB table state
-  let _etbRows = [];
-  let _etbSortCol = 'N_NBDPAEP1M';
-  let _etbSortDir = -1;
-  let _etbFilter  = '';
-
-  async function showEtbTable(siren) {
-    _etbRows = ETB_DATA.filter(r => r['SIREN'].trim() === siren);
-    const wrap = document.getElementById('ge-etb-table-wrap');
-    const count = document.getElementById('ge-etb-count');
-    if (!wrap) return;
-    if (!_etbRows.length) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'block';
-    if (count) count.textContent = _etbRows.length;
-    document.getElementById('ge-etb-filter').value = '';
-    _etbFilter = '';
-    _etbFilterCol = 'C_SIRET';
-    const colSel = document.getElementById('ge-etb-filter-col');
-    if (colSel) colSel.value = 'C_SIRET';
-    // Fetch all commune names then render
-    const codes = [...new Set(_etbRows.map(r => r['C_COMMUNE']).filter(Boolean))];
-    const missing = codes.filter(c => !GE_COMMUNE_CACHE[c]);
-    if (missing.length) {
-      await Promise.allSettled(missing.map(code =>
-        fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom`)
-          .then(res => res.ok ? res.json() : null)
-          .then(d => { if (d?.nom) GE_COMMUNE_CACHE[code] = d.nom; })
-          .catch(() => {})
-      ));
-    }
-    // Set scroll height to exactly 15 rows
-    setTimeout(() => {
-      const scroll = document.getElementById('ge-etb-scroll');
-      if (!scroll) return;
-      const tbody = scroll.querySelector('tbody');
-      const rows = tbody?.querySelectorAll('tr');
-      if (rows?.length) {
-        const rowH = rows[0].offsetHeight || 30;
-        const theadH = scroll.querySelector('thead')?.offsetHeight || 38;
-        scroll.style.maxHeight = (theadH + rowH * 15) + 'px';
-      } else {
-        scroll.style.maxHeight = '488px'; // fallback: 38 + 30×15
-      }
-    }, 50);
-    renderEtbTable();
-  }
-
-  function renderEtbTable() {
-    const tbody = document.getElementById('ge-etb-tbody');
-    if (!tbody) return;
-    const fmt = v => { const n = parseInt(v||'0',10); return isNaN(n)||n===0 ? '—' : n.toLocaleString('fr-FR'); };
-
-    let rows = getFilteredEtbRows();
-
-    rows.sort((a, b) => {
-      const av = a[_etbSortCol] || '', bv = b[_etbSortCol] || '';
-      const an = parseFloat(av), bn = parseFloat(bv);
-      if (!isNaN(an) && !isNaN(bn)) return (an - bn) * _etbSortDir;
-      return av.localeCompare(bv, 'fr') * _etbSortDir;
-    });
-
-    tbody.innerHTML = rows.map((r, i) => {
-      const siret = r['C_SIRET'] || '';
-      const url   = siret ? `https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}` : '#';
-      const bg    = i % 2 === 0 ? '#fff' : '#fafbff';
-      const communeNom = GE_COMMUNE_CACHE[r['C_COMMUNE']] || r['C_COMMUNE'] || '—';
-      return `<tr style="background:${bg}" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='${bg}'">
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;text-align:center">
-          <a href="${url}" target="_blank" rel="noopener" style="font-family:monospace;font-size:10.5px;color:#2563eb;text-decoration:none;font-weight:600">${siret||'—'}</a>
-        </td>
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center" title="${r['C_COMMUNE']||''}">${communeNom}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid #f5f7ff;color:#475569;font-size:11px;text-align:center">${r['C_DEPT']||'—'}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;font-weight:600;color:#059660">${fmt(r['N_NBDPAEP1M'])}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#7c3aed">${fmt(r['N_NBDPAEP6M'])}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#0891b2">${fmt(r['N_NBPOEI'])}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#d97706">${fmt(r['N_NBPDP'])}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#dc2626">${fmt(r['N_NBOFFP1M'])}</td>
-        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#9f1239">${fmt(r['N_NBOFFP6M'])}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  window.sortEtbTable = function(th) {
-    const col = th.dataset.col;
-    const curDir = parseInt(th.dataset.dir || '0', 10);
-    // Reset all headers
-    document.querySelectorAll('#ge-etb-thead th').forEach(t => {
-      t.dataset.dir = '0';
-      t.querySelector('.etb-sort-icon').textContent = '↕';
-    });
-    _etbSortDir = curDir === -1 ? 1 : -1;
-    _etbSortCol = col;
-    th.dataset.dir = _etbSortDir;
-    th.querySelector('.etb-sort-icon').textContent = _etbSortDir === -1 ? '↓' : '↑';
-    renderEtbTable();
-  };
-
-  let _etbFilterCol = 'C_SIRET';
-
-  window.filterEtbTable = function(q) {
-    _etbFilter    = q.trim().toLowerCase();
-    _etbFilterCol = document.getElementById('ge-etb-filter-col')?.value || 'C_SIRET';
-    renderEtbTable();
-    // Update count
-    const filtered = getFilteredEtbRows();
-    const c = document.getElementById('ge-etb-count');
-    if (c) c.textContent = filtered.length;
-  };
-
-  function getFilteredEtbRows() {
-    if (!_etbFilter) return _etbRows;
-    return _etbRows.filter(r => {
-      const val = _etbFilterCol === 'C_COMMUNE'
-        ? (GE_COMMUNE_CACHE[r['C_COMMUNE']] || r['C_COMMUNE'] || '').toLowerCase()
-        : (r[_etbFilterCol] || '').toLowerCase();
-      return val.includes(_etbFilter);
-    });
-  }
 
   // ── ETB MAP ──────────────────────────────────────────────────────────────────
   let _currentEtbSiren = null;
