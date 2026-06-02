@@ -3912,21 +3912,19 @@ function updateRanking() {
     if (cjRes.ok)  CJ_MAP  = await cjRes.json();
     if (nafRes.ok) NAF_MAP = await nafRes.json();
     if (etbRes.ok) {
-      const text = await etbRes.text();
-      const lines = text.split(/
-?
-/).filter(l => l.trim());
-      const sep = lines[0].includes(';') ? ';' : ',';
-      const hdrs = lines[0].split(sep).map(h => h.replace(/^﻿/,'').trim().replace(/^"|"$/g,''));
-      ETB_DATA = lines.slice(1).map(line => {
-        const vals = line.split(sep).map(v => v.replace(/^"|"$/g,'').trim());
-        const obj = {};
-        hdrs.forEach((h,i) => obj[h] = vals[i] || '');
-        return obj;
-      }).filter(r => r['SIREN'] || r[Object.keys(r)[0]]);
-      // Normalize SIREN key (handle BOM)
-      ETB_DATA.forEach(r => { if (!r['SIREN']) { const k = Object.keys(r)[0]; r['SIREN'] = r[k]; } });
-    }
+        const text = await etbRes.text();
+        const lines = text.split('\n').filter(l => l.trim());
+        const sep = lines[0].indexOf(';') !== -1 ? ';' : ',';
+        const clean = v => { let s = v.trim(); if (s[0] === '"') s = s.slice(1); if (s[s.length-1] === '"') s = s.slice(0,-1); return s; };
+        const hdrs = lines[0].split(sep).map(h => { let v = clean(h); if (v.charCodeAt(0) === 0xFEFF) v = v.slice(1); return v; });
+        ETB_DATA = lines.slice(1).map(line => {
+          const vals = line.split(sep).map(clean);
+          const obj = {};
+          hdrs.forEach((h,i) => { obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+          return obj;
+        }).filter(r => r['SIREN'] || r[hdrs[0]]);
+        ETB_DATA.forEach(r => { if (!r['SIREN'] && hdrs[0] !== 'SIREN') r['SIREN'] = r[hdrs[0]]; });
+      }
   } catch(e) { console.warn('Init load error:', e); }
 
   // Load shared user news once at startup
@@ -4592,9 +4590,9 @@ async function adminSave() {
       const lines = text.split(/\r?\n/).filter(l => l.trim());
       // Detect separator
       const sep = lines[0].includes(';') ? ';' : ',';
-      const headers = lines[0].split(sep).map(h => h.replace(/^\uFEFF/, '').trim().replace(/^"|"$/g, ''));
+      const headers = lines[0].split(sep).map(h => { let v = h.trim(); if (v.charCodeAt(0)===0xFEFF) v=v.slice(1); if(v[0]=='"')v=v.slice(1); if(v[v.length-1]=='"')v=v.slice(0,-1); return v; });
       GE_DATA = lines.slice(1).map(line => {
-        const vals = line.split(sep).map(v => v.replace(/^"|"$/g, '').trim());
+        const vals = line.split(sep).map(v => { let s=v.trim(); if(s[0]=='"')s=s.slice(1); if(s[s.length-1]=='"')s=s.slice(0,-1); return s; });
         const obj = {};
         headers.forEach((h, i) => obj[h] = vals[i] || '');
         // Precompute region and filières
