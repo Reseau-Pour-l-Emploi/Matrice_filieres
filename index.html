@@ -4855,7 +4855,9 @@ async function adminSave() {
       // Grille d'infos
       const njCode  = e.nature_juridique || '';
       const njLabel = e.nature_juridique_label || e.forme_juridique_label || '';
-      const njVal   = [njCode, njLabel].filter(Boolean).join(' — ') || '—';
+      const njVal   = njLabel
+        ? `${njLabel}${njCode ? ` <span style="font-size:11px;color:#94a3b8;font-weight:400">(${njCode})</span>` : ''}`
+        : njCode || '—';
       const infos = [
         { label:'⚖️ Catégorie juridique', val: njVal },
         { label:'📅 Date de création',    val: e.date_creation ? new Date(e.date_creation).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '—' },
