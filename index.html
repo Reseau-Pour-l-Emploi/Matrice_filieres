@@ -4526,7 +4526,7 @@ async function adminSave() {
       </div><!-- /fiche-top grid -->
 
       <!-- Tableau SIRET établissements -->
-      <div id="ge-etb-table-wrap" style="display:none;margin-top:16px">
+      <div id="ge-etb-table-wrap" style="margin-top:16px;display:none">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#2563eb;display:flex;align-items:center;gap:5px">
             <svg width="10" height="10" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="3"/></svg>
@@ -5039,7 +5039,7 @@ async function adminSave() {
     const _le  = document.getElementById('ge-labels-empty');
     if (_le)  _le.style.display  = 'none';
     const _ng  = document.getElementById('ge-news-grid2');
-    if (_ng)  _ng.innerHTML      = '';
+    if (_ng)  { _ng.innerHTML = ''; _ng.style.display = 'grid'; } // réinitialiser ET s'assurer qu'il est visible
     const _nt  = document.getElementById('ge-news-title2');
     if (_nt)  _nt.textContent    = '';
     const _ns  = document.getElementById('ge-news-spinner2');
@@ -5271,6 +5271,12 @@ async function adminSave() {
   let _currentEtbSiren = null;
   let _geoRegCache = null;
   let _geoDepCache = null;
+  
+  // ── ETB TABLE ────────────────────────────────────────────────────────────────
+  let _etbTableData = []; // données du tableau courant
+  let _etbTableFilterCol = 'C_SIRET'; // colonne de filtre
+  let _etbTableFilterValue = ''; // valeur de filtre
+  let _etbTableSort = { col: 'N_NBDPAEP1M', dir: -1 }; // colonne et direction de tri
 
   window.drawEtbMap = async function() {
     const siren    = _currentEtbSiren;
@@ -5396,10 +5402,122 @@ async function adminSave() {
     drawEtbMap();
   }
 
+  // ── ETB TABLE fonctions ────────────────────────────────────────────────────────
+  function showEtbTable(siren) {
+    _currentEtbSiren = (siren || '').trim();
+    _etbTableData = ETB_DATA.filter(r => r['SIREN'].trim() === _currentEtbSiren);
+    _etbTableFilterValue = ''; // réinitialiser le filtre
+    _etbTableFilterCol = 'C_SIRET';
+    _etbTableSort = { col: 'N_NBDPAEP1M', dir: -1 };
+    
+    const wrap = document.getElementById('ge-etb-table-wrap');
+    const countBadge = document.getElementById('ge-etb-count');
+    if (!wrap) return;
+    
+    if (!_etbTableData.length) {
+      wrap.style.display = 'none';
+      return;
+    }
+    
+    wrap.style.display = 'block';
+    if (countBadge) countBadge.textContent = _etbTableData.length;
+    
+    // Réinitialiser le filtre input et le select
+    const filterInput = document.getElementById('ge-etb-filter');
+    const filterSelect = document.getElementById('ge-etb-filter-col');
+    if (filterInput) filterInput.value = '';
+    if (filterSelect) filterSelect.value = 'C_SIRET';
+    
+    renderEtbTable();
+  }
+
+  function renderEtbTable() {
+    // Appliquer le filtre
+    let filtered = _etbTableData;
+    if (_etbTableFilterValue.trim()) {
+      const searchTerm = _etbTableFilterValue.toLowerCase().trim();
+      filtered = _etbTableData.filter(row => {
+        const cellValue = (row[_etbTableFilterCol] || '').toString().toLowerCase();
+        return cellValue.includes(searchTerm);
+      });
+    }
+    
+    // Appliquer le tri
+    filtered.sort((a, b) => {
+      const aVal = a[_etbTableSort.col];
+      const bVal = b[_etbTableSort.col];
+      const aNum = parseFloat(aVal) || 0;
+      const bNum = parseFloat(bVal) || 0;
+      
+      // Si les deux sont des nombres
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return _etbTableSort.dir * (aNum - bNum);
+      }
+      // Sinon, tri alphanumérique
+      const aStr = String(aVal || '').toLowerCase();
+      const bStr = String(bVal || '').toLowerCase();
+      return _etbTableSort.dir * aStr.localeCompare(bStr);
+    });
+    
+    // Rendre les lignes du tableau
+    const tbody = document.getElementById('ge-etb-tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = filtered.map(row => {
+      return `<tr style="border-bottom:1px solid #f0f4ff">
+        <td style="padding:7px 10px;text-align:center;font-size:11px;color:#0f172a">${row['C_SIRET'] || '—'}</td>
+        <td style="padding:7px 10px;text-align:center;font-size:11px;color:#0f172a">${row['C_COMMUNE'] || '—'}</td>
+        <td style="padding:7px 10px;text-align:center;font-size:11px;color:#0f172a;font-weight:600">${row['C_DEPT'] || '—'}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#059660;font-weight:600">${(row['N_NBDPAEP1M'] || '0')}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#7c3aed;font-weight:600">${(row['N_NBDPAEP6M'] || '0')}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#0891b2;font-weight:600">${(row['N_NBPOEI'] || '0')}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#d97706;font-weight:600">${(row['N_NBPDP'] || '0')}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#dc2626;font-weight:600">${(row['N_NBOFFP1M'] || '0')}</td>
+        <td style="padding:7px 10px;text-align:right;font-size:11px;color:#9f1239;font-weight:600">${(row['N_NBOFFP6M'] || '0')}</td>
+      </tr>`;
+    }).join('');
+    
+    // Mettre à jour les icônes de tri
+    document.querySelectorAll('#ge-etb-thead th[data-col]').forEach(th => {
+      const col = th.getAttribute('data-col');
+      const icon = th.querySelector('.etb-sort-icon');
+      if (col === _etbTableSort.col) {
+        if (icon) icon.textContent = _etbTableSort.dir > 0 ? '↑' : '↓';
+        th.style.color = '#2563eb';
+        th.style.background = '#eff6ff';
+      } else {
+        if (icon) icon.textContent = '↕';
+        th.style.color = '#475569';
+        th.style.background = '#f1f5ff';
+      }
+    });
+  }
+
+  window.filterEtbTable = function(value) {
+    _etbTableFilterValue = value;
+    renderEtbTable();
+  };
+
+  window.sortEtbTable = function(headerEl) {
+    const col = headerEl.getAttribute('data-col');
+    if (_etbTableSort.col === col) {
+      // Toggle direction
+      _etbTableSort.dir = _etbTableSort.dir > 0 ? -1 : 1;
+    } else {
+      // New column: default descending for numbers, ascending for strings
+      _etbTableSort.col = col;
+      _etbTableSort.dir = (col.startsWith('N_') || col.startsWith('NOMBRE')) ? -1 : 1;
+    }
+    renderEtbTable();
+  };
+
   window.geHideFiche = function() {
     document.getElementById('ge-fiche').classList.remove('visible');
     document.querySelectorAll('#ge-tbody tr').forEach(tr => tr.classList.remove('selected'));
     document.getElementById('ge-table-section').style.display = '';
+    // Réinitialiser aussi le tableau des établissements
+    const etbWrap = document.getElementById('ge-etb-table-wrap');
+    if (etbWrap) etbWrap.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
