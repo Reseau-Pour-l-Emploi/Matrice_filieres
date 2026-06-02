@@ -4853,34 +4853,40 @@ async function adminSave() {
           </div>
         </div>
 
-        <!-- Ligne 2 : DPAE 6M + Offres 1M -->
+        <!-- Ligne 2 : DPAE 6M + Étab. actifs annuaire + Offres 1M -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div style="background:#f5f3ff;border:2px solid #7c3aed25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
             <div style="font-size:18px">📦</div>
             <div><div style="font-size:16px;font-weight:900;color:#7c3aed;line-height:1">${fmtNum(r['NBDPAEP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">DPAE &gt; 6 mois</div></div>
           </div>
+          <div id="ge-kpi-etb-actifs" style="background:#f0fdf4;border:2px solid #16a34a25;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+            <div style="font-size:18px">🏗️</div>
+            <div><div id="ge-kpi-etb-val" style="font-size:16px;font-weight:900;color:#16a34a;line-height:1">…</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Étab. actifs <span title="Source : Annuaire entreprises (data.gouv.fr)" style="cursor:help">ⓘ</span></div></div>
+          </div>
+        </div>
+
+        <!-- Ligne 3 : Offres 1M + 6M -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div style="background:#fef2f2;border:2px solid #dc262625;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
             <div style="font-size:18px">📢</div>
             <div><div style="font-size:16px;font-weight:900;color:#dc2626;line-height:1">${fmtNum(r['NBOFFP1M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 1 mois</div></div>
           </div>
-        </div>
-
-        <!-- Ligne 3 : Offres 6M + POEI -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div style="background:#fff1f2;border:2px solid #9f123925;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
             <div style="font-size:18px">📬</div>
             <div><div style="font-size:16px;font-weight:900;color:#9f1239;line-height:1">${fmtNum(r['NBOFFP6M'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Offres &gt; 6 mois</div></div>
           </div>
+        </div>
+
+        <!-- Ligne 4 : POEI + Promotions -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div style="background:#ecfeff;border:2px solid #0891b225;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
             <div style="font-size:18px">🎯</div>
             <div><div style="font-size:16px;font-weight:900;color:#0891b2;line-height:1">${fmtNum(r['NBPOEI'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">POEI</div></div>
           </div>
-        </div>
-
-        <!-- Ligne 4 : Promotions pleine largeur -->
-        <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">
-          <div style="font-size:18px">⭐</div>
-          <div><div style="font-size:16px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div></div>
+          <div style="background:#fffbeb;border:2px solid #d9770625;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+            <div style="font-size:18px">⭐</div>
+            <div><div style="font-size:16px;font-weight:900;color:#d97706;line-height:1">${fmtNum(r['NBPDP'])}</div><div style="font-size:9px;font-weight:700;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Promotions de profil</div></div>
+          </div>
         </div>
       </div>`;
 
