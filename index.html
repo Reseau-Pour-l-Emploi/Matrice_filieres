@@ -3343,20 +3343,214 @@ function showAllUserNews() {
 
 // RSS feeds spécialisés par filière (flux publics gratuits)
 const FILIERE_RSS_FEEDS = {
-  'FIL01': ['https://www.pleinchamp.com/rss', 'https://www.reussir.fr/rss.xml'],
-  'FIL05': ['https://www.batiweb.com/rss/flux-rss.xml', 'https://www.lemoniteur.fr/rss/'],
-  'FIL06': ['https://www.francetvinfo.fr/culture.rss'],
-  'FIL08': ['https://www.actu-environnement.com/rss/actu.xml', 'https://www.enerzine.com/feed'],
-  'FIL09': ['https://www.foretpriveefrancaise.com/rss'],
-  'FIL10': ['https://www.lhôtellerie-restauration.fr/rss'],
-  'FIL11': ['https://www.process-alimentaire.com/rss.xml', 'https://www.usinenouvelle.com/rss/secteur/agroalimentaire.xml'],
-  'FIL12': ['https://www.automobile-entreprise.com/rss'],
-  'FIL13': ['https://www.aerobuzz.fr/feed/', 'https://www.usinenouvelle.com/rss/secteur/aeronautique.xml'],
-  'FIL15': ['https://www.lequotidiendumedecin.fr/rss', 'https://www.usinenouvelle.com/rss/secteur/pharmacie-biotechnologie.xml'],
-  'FIL22': ['https://www.sfen.org/feed/', 'https://www.world-nuclear-news.org/rss'],
-  'FIL23': ['https://www.silicon.fr/feed', 'https://www.journaldunet.com/rss/jdn.xml'],
-  'FIL25': ['https://www.hospimedia.fr/rss', 'https://www.gazette-sante-social.fr/rss'],
-  'FIL30': ['https://www.vecteurplus.com/rss', 'https://www.wk-transport-logistique.fr/rss'],
+  // FIL01 Agriculture, élevage, pêche
+  'FIL01': [
+    'https://www.pleinchamp.com/rss',
+    'https://www.reussir.fr/rss.xml',
+    'https://www.terre-net.fr/rss/actualites.xml',
+    'https://www.lafranceagricole.fr/rss/actualites.xml',
+  ],
+  // FIL02 Armées, défense, sécurité publique
+  'FIL02': [
+    'https://www.defense.gouv.fr/rss/toutes-actualites',
+    'https://www.opex360.com/feed/',
+    'https://www.meta-defense.fr/feed/',
+  ],
+  // FIL03 Banques, assurances, immobilier
+  'FIL03': [
+    'https://www.argusdelassurance.com/rss',
+    'https://www.revue-banque.fr/rss',
+    'https://www.moneyvox.fr/actu/rss',
+    'https://www.village-justice.com/articles/rss.php?rubrique=Immobilier',
+  ],
+  // FIL04 Commerce et distribution
+  'FIL04': [
+    'https://www.lsa-conso.fr/rss/toutes-les-actualites',
+    'https://www.lineaires.com/feed',
+    'https://www.e-marketing.fr/rss/all',
+    'https://www.businesscoot.com/rss',
+  ],
+  // FIL05 Construction, BTP
+  'FIL05': [
+    'https://www.batiweb.com/rss/flux-rss.xml',
+    'https://www.lemoniteur.fr/rss/',
+    'https://www.batiment-actualite.fr/feed',
+    'https://www.lebatiment.fr/rss.xml',
+  ],
+  // FIL06 Culture, cinéma, spectacle, audiovisuel
+  'FIL06': [
+    'https://www.telerama.fr/rss',
+    'https://next.liberation.fr/culture/rss',
+    'https://www.lefigaro.fr/rss/figaro_culture.xml',
+    'https://www.cnm.fr/actualites/feed',
+  ],
+  // FIL07 Emploi public (hors santé et défense)
+  'FIL07': [
+    'https://www.vie-publique.fr/syndication/actualites.rss',
+    'https://www.acteurspublics.fr/feed',
+    'https://www.fonction-publique.gouv.fr/rss',
+  ],
+  // FIL08 Énergies renouvelables et réseaux
+  'FIL08': [
+    'https://www.actu-environnement.com/rss/actu.xml',
+    'https://www.enerzine.com/feed',
+    'https://www.actu-energie.com/rss',
+    'https://www.pv-magazine.fr/feed/',
+    'https://www.connaissancedesenergies.org/rss.xml',
+  ],
+  // FIL09 Filière bois
+  'FIL09': [
+    'https://www.foretpriveefrancaise.com/rss',
+    'https://www.bois-foret-news.fr/rss.xml',
+    'https://www.filiere-3e.fr/rss',
+  ],
+  // FIL10 Hôtellerie, restauration (HCRB)
+  'FIL10': [
+    'https://www.lhotellerie-restauration.fr/rss',
+    'https://www.food-service-vision.com/feed',
+    'https://www.toquesetclochers.com/feed',
+    'https://www.hotellerie.com/feed',
+  ],
+  // FIL11 Industrie agroalimentaire
+  'FIL11': [
+    'https://www.process-alimentaire.com/rss.xml',
+    'https://www.usinenouvelle.com/rss/secteur/agroalimentaire.xml',
+    'https://www.linea-news.fr/rss.xml',
+    'https://www.ania.net/rss',
+  ],
+  // FIL12 Industrie automobile
+  'FIL12': [
+    'https://www.automobile-entreprise.com/rss',
+    'https://www.usinenouvelle.com/rss/secteur/automobile.xml',
+    'https://www.caradisiac.com/rss/news-auto.xml',
+    'https://www.autoplus.fr/rss',
+  ],
+  // FIL13 Industrie aéronautique et spatiale
+  'FIL13': [
+    'https://www.aerobuzz.fr/feed/',
+    'https://www.usinenouvelle.com/rss/secteur/aeronautique.xml',
+    'https://www.air-cosmos.com/rss',
+    'https://www.toutelactu.fr/feed/aeronautique/',
+  ],
+  // FIL14 Industrie chimique
+  'FIL14': [
+    'https://www.usinenouvelle.com/rss/secteur/chimie.xml',
+    'https://www.industrie-techno.com/rss',
+    'https://www.info-chimie.fr/rss.xml',
+  ],
+  // FIL15 Industrie de santé
+  'FIL15': [
+    'https://www.lequotidiendumedecin.fr/rss',
+    'https://www.usinenouvelle.com/rss/secteur/pharmacie-biotechnologie.xml',
+    'https://www.lesechos.fr/rss/sante.xml',
+    'https://www.ticsante.com/feed',
+  ],
+  // FIL16 Industrie ferroviaire
+  'FIL16': [
+    'https://www.mobilicites.com/rss',
+    'https://www.transportrail.eu/rss.xml',
+    'https://www.rail-actualites.fr/feed',
+  ],
+  // FIL17 Naval et nautisme
+  'FIL17': [
+    'https://www.meretmarine.com/rss',
+    'https://www.lemarin.fr/rss',
+    'https://www.nautisme-industries.fr/rss',
+  ],
+  // FIL18 Industrie plasturgique
+  'FIL18': [
+    'https://www.plastiques-caoutchoucs.com/rss.xml',
+    'https://www.usinenouvelle.com/rss/secteur/plastiques-caoutchoucs.xml',
+    'https://www.info-chimie.fr/rss.xml',
+  ],
+  // FIL19 Textile, mode et luxe
+  'FIL19': [
+    'https://www.journal-du-luxe.com/feed/',
+    'https://www.mode.com/rss',
+    'https://www.fashionnetwork.com/rss/news-fr.xml',
+    'https://wwd.com/feed/',
+  ],
+  // FIL20 Industrie électrique et électronique
+  'FIL20': [
+    'https://www.electroniques.biz/rss',
+    'https://www.usinenouvelle.com/rss/secteur/electronique.xml',
+    'https://www.elektor.fr/rss',
+    'https://www.01net.com/rss/informatique/actualites/',
+  ],
+  // FIL21 Métallurgie - UIMM
+  'FIL21': [
+    'https://www.usinenouvelle.com/rss/secteur/metallurgie.xml',
+    'https://www.acier.org/rss',
+    'https://www.industrie-techno.com/rss',
+    'https://www.metalorgie.com/rss',
+  ],
+  // FIL22 Nucléaire
+  'FIL22': [
+    'https://www.sfen.org/feed/',
+    'https://www.world-nuclear-news.org/rss',
+    'https://www.usinenouvelle.com/rss/secteur/nucleaire.xml',
+    'https://www.connaissancedesenergies.org/rss.xml',
+  ],
+  // FIL23 Numérique et télécommunications
+  'FIL23': [
+    'https://www.silicon.fr/feed',
+    'https://www.journaldunet.com/rss/jdn.xml',
+    'https://www.zdnet.fr/rss',
+    'https://www.01net.com/rss/',
+    'https://www.usine-digitale.fr/rss/',
+  ],
+  // FIL24 Propreté
+  'FIL24': [
+    'https://www.monde-de-la-proprete.com/rss.xml',
+    'https://www.hyginov-actuel.fr/rss',
+    'https://www.nettoyage-entreprise.com/rss',
+  ],
+  // FIL25 Santé, social, SAP
+  'FIL25': [
+    'https://www.hospimedia.fr/rss',
+    'https://www.gazette-sante-social.fr/rss',
+    'https://www.lien-social.com/rss',
+    'https://www.agevillage.com/rss.xml',
+    'https://www.infirmiers.com/rss.xml',
+  ],
+  // FIL26 Services automobiles
+  'FIL26': [
+    'https://www.largus.fr/rss',
+    'https://www.automobile-entreprise.com/rss',
+    'https://www.caradisiac.com/rss/news-auto.xml',
+  ],
+  // FIL27 Sport
+  'FIL27': [
+    'https://www.sportbusiness.fr/rss',
+    'https://www.sportstrategies.com/rss',
+    'https://www.sport-economie.fr/rss',
+  ],
+  // FIL28 Sécurité privée
+  'FIL28': [
+    'https://www.securite-privee.org/rss',
+    'https://www.actu-securite.fr/rss',
+    'https://www.securite-hebdo.com/rss.xml',
+  ],
+  // FIL29 Traitement et valorisation des ressources
+  'FIL29': [
+    'https://www.actu-environnement.com/rss/actu.xml',
+    'https://www.recyclage-recuperation.fr/rss',
+    'https://www.bioenergies-info.fr/rss',
+  ],
+  // FIL30 Transports et logistique
+  'FIL30': [
+    'https://www.vecteurplus.com/rss',
+    'https://www.wk-transport-logistique.fr/rss',
+    'https://www.supply-chain.fr/rss',
+    'https://www.logisticsmanager.com/feed/',
+  ],
+  // Flux transversaux emploi/formation (utilisés si pas de flux spécifique)
+  '_TRANSVERSAL': [
+    'https://www.apec.fr/rss/actualites.xml',
+    'https://travail-emploi.gouv.fr/rss',
+    'https://www.francecompetences.fr/feed/',
+    'https://www.usinenouvelle.com/rss/emploi.xml',
+  ],
 };
 
 function buildVeilleKeywords(filiereCode) {
@@ -3384,9 +3578,6 @@ function buildVeilleKeywords(filiereCode) {
     return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([w])=>w);
   })();
 
-  // ── CONSEIL GEMINI #3 : exclusion sites non pertinents ──────────────────
-  const EXCLUDED_SITES = '-site:pinterest.com -site:instagram.com -site:facebook.com -site:tiktok.com';
-
   const THEMES = [
     'emploi recrutement',
     'métiers compétences',
@@ -3400,31 +3591,25 @@ function buildVeilleKeywords(filiereCode) {
 
   const queries = [];
 
-  // ── CONSEIL GEMINI #1 : opérateur OR pour élargir avec mots-clés ────────
-  // Requête principale avec nom filière + mots-clés en OR
-  if (topWords.length > 0) {
-    const kwGroup = topWords.slice(0, 5).map(w => `"${w}"`).join(' OR ');
-    queries.push(`"${filiereShort}" (${kwGroup}) France emploi ${EXCLUDED_SITES}`);
-    queries.push(`"${filiereShort}" (${kwGroup}) recrutement formation ${EXCLUDED_SITES}`);
-  }
+  // 1. Filière × chaque thème
+  THEMES.forEach(theme => queries.push(`${filiereShort} ${theme} France`));
 
-  // Filière × chaque thème (avec exclusion)
-  THEMES.forEach(theme => queries.push(`${filiereShort} ${theme} France ${EXCLUDED_SITES}`));
-
-  // Groupes de mots-clés sectoriels × thèmes prioritaires
+  // 2. Groupes de mots-clés sectoriels × thèmes prioritaires
   if (topWords.length >= 4) {
     const g1 = topWords.slice(0, 4).join(' ');
     const g2 = topWords.slice(4, 8).join(' ');
-    queries.push(`${g1} emploi recrutement France ${EXCLUDED_SITES}`);
-    queries.push(`${g2} formation compétences ${EXCLUDED_SITES}`);
-    queries.push(`${g1} innovations réglementation ${EXCLUDED_SITES}`);
+    const g3 = topWords.slice(8, 12).join(' ');
+    queries.push(`${g1} emploi recrutement France`);
+    queries.push(`${g2} formation compétences`);
+    queries.push(`${g1} innovations réglementation`);
+    queries.push(`${g3} entreprises marché travail`);
   }
 
-  // Mots-clés individuels forts
-  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France ${EXCLUDED_SITES}`));
+  // 3. Mots-clés individuels forts × thèmes
+  topWords.slice(0, 4).forEach((kw, i) => queries.push(`${kw} ${THEMES[i]} France`));
 
-  // ── Requête de fallback simplifiée (conseil Gemini #4) ───────────────────
-  const fallbackQuery = `${filiereShort} France emploi actualités ${EXCLUDED_SITES}`;
+  // Requête de fallback simplifiée
+  const fallbackQuery = `${filiereShort} France emploi actualités`;
 
   const rssFeeds = FILIERE_RSS_FEEDS[filiereCode] || [];
   return { filiereLabel, queries, topWords, rssFeeds, fallbackQuery, filiereShort };
@@ -5195,63 +5380,92 @@ async function adminSave() {
     if (spinner) spinner.style.display = 'inline';
     gridEl.innerHTML = '';
 
-    // Build query variants: try most specific first, then shorter
-    const words = raisonSociale.trim().split(/\s+/);
-    const queries = [
-      words.slice(0, 3).join(' '),   // 3 premiers mots
-      words.slice(0, 2).join(' '),   // 2 premiers mots
-    ].filter((v, i, a) => a.indexOf(v) === i); // déduplique
+    // Construire des variantes de requête du plus précis au plus court
+    const words = raisonSociale.trim().split(/\s+/).filter(w => w.length > 1);
+    const stopwords = new Set(['sa','sas','sarl','sca','spa','snc','se','sci','scop','ste','the','les','des','and','et','de','du','france','group','groupe','international']);
+    const meaningful = words.filter(w => !stopwords.has(w.toLowerCase()) && !/^\d+$/.test(w));
+    
+    const queryVariants = [
+      `"${meaningful.slice(0, 3).join(' ')}"`,
+      `"${meaningful.slice(0, 2).join(' ')}"`,
+      meaningful.slice(0, 3).join(' '),        // sans guillemets = plus large
+      meaningful.slice(0, 2).join(' '),
+    ].filter((v, i, a) => v.trim().length > 1 && a.indexOf(v) === i);
 
-    let items = [];
-    for (const q of queries) {
-      if (items.length) break;
+    // Fonction helper : parse un flux RSS/Atom XML
+    function parseRssXml(xml) {
+      if (!xml) return [];
+      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      if (doc.querySelector('parsererror')) return [];
+      const items = [...doc.querySelectorAll('item, entry')];
+      return items.slice(0, 8).map(it => {
+        const gt  = tag => it.querySelector(tag)?.textContent?.trim() || '';
+        const lnk = gt('link') || it.querySelector('link[href]')?.getAttribute('href') || it.querySelector('guid')?.textContent?.trim() || '';
+        return { title: gt('title'), link: lnk, pubDate: gt('pubDate') || gt('updated') || gt('published'), author: gt('source') || gt('name') };
+      }).filter(i => i.title && i.link);
+    }
+
+    // Stratégie 1 : rss2json.com (supporte CORS, fiable)
+    async function tryRss2Json(q) {
       const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`;
-      // Strategy 1: rss2json
-      try { items = await fetchRssViaRss2Json(rssUrl, 8); } catch(_) {}
-      // Strategy 2: allorigins proxy
-      if (!items.length) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=8`;
+      const r = await Promise.race([
+        fetch(apiUrl).then(r => r.json()),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 10000))
+      ]);
+      if (r.status !== 'ok' || !r.items?.length) return [];
+      return r.items.map(i => ({ title: i.title, link: i.link || i.guid, pubDate: i.pubDate, author: i.author || '' }));
+    }
+
+    // Stratégie 2 : corsproxy.io (CORS proxy alternatif)
+    async function tryCorsProxy(q) {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`;
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
+      const res = await Promise.race([
+        fetch(proxyUrl).then(r => r.text()),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 10000))
+      ]);
+      return parseRssXml(res);
+    }
+
+    // Stratégie 3 : allorigins.win
+    async function tryAllOrigins(q) {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`;
+      const r = await Promise.race([
+        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`).then(r => r.json()),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 10000))
+      ]);
+      return parseRssXml(r.contents || '');
+    }
+
+    // Stratégie 4 : proxy interne (fetchWithProxy)
+    async function tryInternalProxy(q) {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`;
+      const xml = await Promise.race([
+        fetchWithProxy(rssUrl, 10000),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 10000))
+      ]);
+      return parseRssXml(xml);
+    }
+
+    const strategies = [tryRss2Json, tryCorsProxy, tryAllOrigins, tryInternalProxy];
+    let items = [];
+
+    // Essayer chaque variante de requête × chaque stratégie
+    outer:
+    for (const q of queryVariants) {
+      for (const strategy of strategies) {
         try {
-          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-          const res = await Promise.race([
-            fetch(proxyUrl).then(r => r.json()).then(d => d.contents || ''),
-            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 15000))
-          ]);
-          if (res) {
-            const doc = new DOMParser().parseFromString(res, 'text/xml');
-            items = [...doc.querySelectorAll('item')].slice(0, 8).map(it => {
-              const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
-              return {
-                title:   gt('title'),
-                link:    gt('link') || it.querySelector('guid')?.textContent?.trim() || '',
-                pubDate: gt('pubDate'),
-                author:  gt('source')
-              };
-            });
+          const res = await strategy(q);
+          if (res.length > 0) {
+            items = res;
+            break outer;
           }
-        } catch(_) {}
-      }
-      // Strategy 3: fetchWithProxy fallback
-      if (!items.length) {
-        try {
-          const xml = await Promise.race([
-            fetchWithProxy(rssUrl, 15000),
-            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 15000))
-          ]);
-          const doc = new DOMParser().parseFromString(xml, 'text/xml');
-          items = [...doc.querySelectorAll('item')].slice(0, 8).map(it => {
-            const gt = tag => it.querySelector(tag)?.textContent?.trim() || '';
-            return {
-              title:   gt('title'),
-              link:    gt('link') || it.querySelector('guid')?.textContent?.trim() || '',
-              pubDate: gt('pubDate'),
-              author:  gt('source')
-            };
-          });
         } catch(_) {}
       }
     }
 
-    // Filter to last 12 months
+    // Filtre 12 mois
     const cutoff = Date.now() - 365 * 24 * 3600 * 1000;
     items = items.filter(item => {
       if (!item.pubDate) return true;
@@ -5264,11 +5478,11 @@ async function adminSave() {
       return;
     }
     gridEl.innerHTML = items.slice(0, 6).map(item => {
-      const titre = decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, ''));
+      const titre = typeof decodeHtml === 'function' ? decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, '')) : (item.title || '');
       const date  = item.pubDate ? (typeof formatRssDate === 'function' ? formatRssDate(item.pubDate) : '') : '';
-      const src   = item.author || extractDomain(item.link || '');
+      const src   = item.author || (typeof extractDomain === 'function' ? extractDomain(item.link || '') : '');
       const url   = item.link || '#';
-      return `<div class="ge-news-card" onclick="window.open('${url}','_blank','noopener')">
+      return `<div class="ge-news-card" onclick="window.open('${url.replace(/'/g, "\\'")}','_blank','noopener')">
         <div style="font-size:12px;font-weight:600;color:#0f172a;line-height:1.45;margin-bottom:6px">${titre}</div>
         <div style="font-size:10px;color:#94a3b8">${src}${date ? ' · ' + date : ''}</div>
       </div>`;
