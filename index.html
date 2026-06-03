@@ -561,11 +561,12 @@
       display: flex; border: 1px solid var(--ft-blue-lt); border-radius: 8px; overflow: hidden;
     }
     .maille-btn {
-      flex: 1; padding: 7px 0;
+      flex: 1; padding: 7px 12px;
       font-family: inherit; font-size: 12px; font-weight: 600;
       border: none; cursor: pointer;
       background: #fff; color: var(--ft-muted);
       transition: background .15s, color .15s;
+      white-space: nowrap;
     }
     .maille-btn.active { background: var(--ft-blue); color: #fff; }
 
@@ -5430,11 +5431,18 @@ async function adminSave() {
     const stopwords = new Set(['sa','sas','sarl','sca','spa','snc','se','sci','scop','ste','the','les','des','and','et','de','du','france','group','groupe','international']);
     const meaningful = words.filter(w => !stopwords.has(w.toLowerCase()) && !/^\d+$/.test(w));
     
+    // Thèmes emploi/innovation/investissements pour cibler les actualités pertinentes
+    const THEMES_GE = ['emploi recrutement', 'investissement', 'innovation technologie', 'croissance expansion'];
+    const name2  = meaningful.slice(0, 2).join(' ');
+    const name3  = meaningful.slice(0, 3).join(' ');
+
+    // Requêtes thématiques : nom entreprise + thème
     const queryVariants = [
-      `"${meaningful.slice(0, 3).join(' ')}"`,
-      `"${meaningful.slice(0, 2).join(' ')}"`,
-      meaningful.slice(0, 3).join(' '),        // sans guillemets = plus large
-      meaningful.slice(0, 2).join(' '),
+      ...THEMES_GE.map(t => `${name3} ${t}`),
+      ...THEMES_GE.map(t => `${name2} ${t}`),
+      `"${name3}"`,
+      `"${name2}"`,
+      name3,
     ].filter((v, i, a) => v.trim().length > 1 && a.indexOf(v) === i);
 
     // Fonction helper : parse un flux RSS/Atom XML
