@@ -4688,9 +4688,13 @@ async function adminSave() {
               <svg width="11" height="11" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
               Implantation
             </span>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-              <select id="ge-map-level" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
-                <option value="reg">Régions</option>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <div class="maille-toggle" style="font-size:11px">
+                <button class="maille-btn active" id="ge-btn-reg" onclick="setGeMapLevel('reg')">Régionale</button>
+                <button class="maille-btn" id="ge-btn-dep" onclick="setGeMapLevel('dep')">Départementale</button>
+              </div>
+              <select id="ge-map-level" style="display:none">
+                <option value="reg" selected>Régions</option>
                 <option value="dep">Départements</option>
               </select>
               <select id="ge-map-indicator" onchange="drawEtbMap()" style="font-size:10px;padding:3px 7px;border:1px solid #e2e8f0;border-radius:6px;background:#fff">
@@ -4727,10 +4731,16 @@ async function adminSave() {
 
               <!-- Cols 2+3 : Actualités -->
               <div>
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ea4335;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ea4335;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                   <svg width="10" height="10" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                   Actualités — <span id="ge-news-title2"></span>
                   <span id="ge-news-spinner2" style="color:#94a3b8;display:none">⏳</span>
+                  <button id="ge-news-btn" onclick="launchNewsSearch()"
+                    style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#fef2f2;color:#ea4335;border:1px solid #fecaca;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:background .15s"
+                    onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+                    <svg width="10" height="10" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Rechercher
+                  </button>
                 </div>
                 <div id="ge-news-grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
               </div>
@@ -5285,7 +5295,12 @@ async function adminSave() {
       enrichFicheAnnuaire(siren);
       console.log('[GE] showFiche siren:', JSON.stringify(siren));
     }
-    enrichFicheNews(r['DC_RAISONSOCIALEENTREPRISE'], siren);
+    // Store company info for manual news search
+    if (document.getElementById('ge-news-title2')) document.getElementById('ge-news-title2').textContent = r['DC_RAISONSOCIALEENTREPRISE'];
+    if (document.getElementById('ge-news-btn')) {
+      document.getElementById('ge-news-btn').dataset.siren = siren;
+      document.getElementById('ge-news-btn').dataset.name  = r['DC_RAISONSOCIALEENTREPRISE'];
+    }
     showEtbMap(siren);
     showEtbTable(siren);
   };
@@ -5507,7 +5522,7 @@ async function adminSave() {
       gridEl.innerHTML = '<p style="grid-column:1/-1;font-size:12px;color:#94a3b8;padding:8px 0">Aucune actualité récente trouvée.</p>';
       return;
     }
-    gridEl.innerHTML = items.slice(0, 6).map(item => {
+    gridEl.innerHTML = items.slice(0, 4).map(item => {
       const titre = typeof decodeHtml === 'function' ? decodeHtml((item.title || '').replace(/\s*-\s*[^-]+$/, '')) : (item.title || '');
       const date  = item.pubDate ? (typeof formatRssDate === 'function' ? formatRssDate(item.pubDate) : '') : '';
       const src   = item.author || (typeof extractDomain === 'function' ? extractDomain(item.link || '') : '');
@@ -5771,6 +5786,33 @@ async function adminSave() {
     th.dataset.dir = _etbSortDir;
     th.querySelector('.etb-sort-icon').textContent = _etbSortDir === -1 ? '↓' : '↑';
     renderEtbTable();
+  };
+
+  window.launchNewsSearch = function() {
+    const btn = document.getElementById('ge-news-btn');
+    if (!btn) return;
+    const siren = btn.dataset.siren || '';
+    const name  = btn.dataset.name  || '';
+    if (!name) return;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    enrichFicheNews(name, siren).then(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="10" height="10" fill="none" stroke="#ea4335" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Actualiser';
+    });
+  };
+
+  window.setGeMapLevel = function(level) {
+    const sel = document.getElementById('ge-map-level');
+    if (sel) sel.value = level;
+    const btnReg = document.getElementById('ge-btn-reg');
+    const btnDep = document.getElementById('ge-btn-dep');
+    if (btnReg) btnReg.classList.toggle('active', level === 'reg');
+    if (btnDep) btnDep.classList.toggle('active', level === 'dep');
+    _etbMapFilter = null;
+    const badge = document.getElementById('ge-etb-map-filter-badge');
+    if (badge) badge.style.display = 'none';
+    drawEtbMap();
   };
 
   window.clearEtbMapFilter = function() {
