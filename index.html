@@ -4535,9 +4535,12 @@ async function adminSave() {
 #tab-ge .chart-area::-webkit-scrollbar-track { background:transparent; }
 #tab-ge .chart-area::-webkit-scrollbar-thumb { background:#94a3b8; border-radius:4px; }
 @media (max-width:768px) {
-  #tab-ge { height:calc(100vh - 100px); }
-  #tab-ge .page { grid-template-columns:1fr !important; height:auto; overflow:visible; }
-  #tab-ge .chart-area { height:auto; overflow-y:visible; }
+  #tab-ge { height:auto !important; overflow:visible !important; }
+  #tab-ge .page { grid-template-columns:1fr !important; height:auto !important; overflow:visible !important; display:block !important; }
+  #tab-ge .chart-area { height:auto !important; overflow-y:visible !important; }
+  #tab-ge .sidebar { height:auto; }
+  #ge-fiche-top { grid-template-columns:1fr !important; }
+  #ge-map-panel { position:static !important; }
 }
 .ge-fiche-grid-wrap { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
 .ge-news-grid-wrap { grid-template-columns:repeat(3,1fr); }
