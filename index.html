@@ -4675,6 +4675,7 @@ async function adminSave() {
         <div>
           <div class="ge-fiche-title" id="ge-fiche-name"></div>
           <div id="ge-fiche-siren-line" style="font-size:12px;color:#64748b;margin-top:2px"></div>
+          <div id="ge-fiche-dirigeant-line" style="font-size:12px;color:#475569;margin-top:3px"></div>
         </div>
         <a id="ge-fiche-annuaire" href="#" target="_blank" rel="noopener"
            style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:linear-gradient(135deg,#eff6ff,#e0ecff);color:#1d4ed8;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;border:1.5px solid #bfdbfe;box-shadow:0 1px 6px rgba(37,99,235,.15)">
@@ -5284,6 +5285,8 @@ async function adminSave() {
     if (_ns)  _ns.style.display  = 'none';
     const _ai  = document.getElementById('ge-annuaire-inline');
     if (_ai)  { _ai.style.display = 'none'; _ai.innerHTML = ''; }
+    const _dl = document.getElementById('ge-fiche-dirigeant-line');
+    if (_dl) _dl.innerHTML = '';
     const _ev  = document.getElementById('ge-kpi-etb-val');
     if (_ev)  _ev.textContent    = '…';
     const _mp  = document.getElementById('ge-map-panel');
@@ -5328,10 +5331,92 @@ async function adminSave() {
         ? `${njLabel}<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:6px">(${njCode})</span>`
         : njCode || '—';
 
+      // ── Dirigeant → ligne sous le SIREN en haut de fiche ──────────────────
+      const dirigeants = e.dirigeants || [];
+      let dirigeantTxt = '';
+      if (dirigeants.length) {
+        const d = dirigeants[0];
+        if (d.type_dirigeant === 'personne morale' || d.denomination) {
+          dirigeantTxt = `${d.denomination || ''}${d.qualite ? ` (${d.qualite})` : ''}`;
+        } else {
+          const nomComplet = [d.prenoms, d.nom].filter(Boolean).join(' ').trim()
+            || [d.prenom, d.nom_naissance || d.nom].filter(Boolean).join(' ').trim();
+          if (nomComplet) {
+            const naissance = d.annee_de_naissance ? ` (né en ${d.annee_de_naissance})` : '';
+            dirigeantTxt = `${nomComplet}${d.qualite ? ` – ${d.qualite}` : ''}${naissance}`;
+          }
+        }
+      }
+      const dirLine = document.getElementById('ge-fiche-dirigeant-line');
+      if (dirLine) dirLine.innerHTML = dirigeantTxt ? `👤 <strong>${dirigeantTxt}</strong>` : '';
+
+      // ── Chiffre d'affaires + évolution ────────────────────────────────────
+      const finances = e.finances || {};
+      const years = Object.keys(finances).filter(y => finances[y] && finances[y].ca != null).sort();
+      let caVal = '—';
+      if (years.length) {
+        const lastYear = years[years.length - 1];
+        const lastCA   = finances[lastYear].ca;
+        const fmtCA = n => {
+          if (n >= 1e9) return (n/1e9).toFixed(2).replace('.', ',') + ' Md€';
+          if (n >= 1e6) return (n/1e6).toFixed(1).replace('.', ',') + ' M€';
+          if (n >= 1e3) return (n/1e3).toFixed(0) + ' k€';
+          return n.toLocaleString('fr-FR') + ' €';
+        };
+        let evolHtml = '';
+        if (years.length >= 2) {
+          const prevYear = years[years.length - 2];
+          const prevCA = finances[prevYear].ca;
+          if (prevCA > 0) {
+            const evol = ((lastCA - prevCA) / prevCA) * 100;
+            const sign = evol >= 0 ? '+' : '';
+            const col  = evol >= 0 ? '#16a34a' : '#dc2626';
+            const arrow = evol >= 0 ? '↑' : '↓';
+            evolHtml = ` <span style="font-size:11px;font-weight:700;color:${col}">${arrow} ${sign}${evol.toFixed(1).replace('.', ',')}%</span>`;
+          }
+        }
+        caVal = `${fmtCA(lastCA)} <span style="font-size:11px;color:#94a3b8">(${lastYear})</span>${evolHtml}`;
+      }
+
+      // ── Résultat net ──────────────────────────────────────────────────────
+      let resVal = '—';
+      if (years.length) {
+        const lastY = years[years.length - 1];
+        const rn = finances[lastY].resultat_net;
+        if (rn != null) {
+          const fmtR = n => {
+            const abs = Math.abs(n);
+            if (abs >= 1e9) return (n/1e9).toFixed(2).replace('.', ',') + ' Md€';
+            if (abs >= 1e6) return (n/1e6).toFixed(1).replace('.', ',') + ' M€';
+            if (abs >= 1e3) return (n/1e3).toFixed(0) + ' k€';
+            return n.toLocaleString('fr-FR') + ' €';
+          };
+          const col = rn >= 0 ? '#16a34a' : '#dc2626';
+          resVal = `<span style="color:${col};font-weight:600">${rn >= 0 ? '+' : ''}${fmtR(rn)}</span> <span style="font-size:11px;color:#94a3b8">(${lastY})</span>`;
+        }
+      }
+
+      // ── Tranche d'effectifs ───────────────────────────────────────────────
+      const EFFECTIF_LABELS = {
+        'NN':'Non renseigné', '00':'0 salarié', '01':'1 ou 2 salariés', '02':'3 à 5 salariés',
+        '03':'6 à 9 salariés', '11':'10 à 19 salariés', '12':'20 à 49 salariés', '21':'50 à 99 salariés',
+        '22':'100 à 199 salariés', '31':'200 à 249 salariés', '32':'250 à 499 salariés',
+        '41':'500 à 999 salariés', '42':'1 000 à 1 999 salariés', '51':'2 000 à 4 999 salariés',
+        '52':'5 000 à 9 999 salariés', '53':'10 000 salariés et plus'
+      };
+      const effCode = e.tranche_effectif_salarie || '';
+      const effLabel = EFFECTIF_LABELS[effCode] || (effCode || '—');
+      const effYear = e.annee_tranche_effectif_salarie ? ` <span style="font-size:11px;color:#94a3b8">(${e.annee_tranche_effectif_salarie})</span>` : '';
+      const effVal = effLabel !== '—' && effLabel !== 'Non renseigné' ? effLabel + effYear : '—';
+
+      // ── Ordre : catégorie juridique, date création, catégorie | CA, résultat net, tranche effectifs ──
       const infos = [
         { label:'⚖️ Catégorie juridique', val: njVal },
         { label:'📅 Date de création',    val: e.date_creation ? new Date(e.date_creation).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '—' },
         { label:'🏷️ Catégorie', val: ({'GE':'Grande Entreprise','ETI':'Entreprise de Taille Intermédiaire','PME':'Petite et Moyenne Entreprise','TPE':'Très Petite Entreprise'}[e.categorie_entreprise] || e.categorie_entreprise || '—') },
+        { label:"💶 Chiffre d'affaires", val: caVal },
+        { label:'📊 Résultat net', val: resVal },
+        { label:"👥 Tranche d'effectifs", val: effVal },
       ];
 
       // Populate inline annuaire block (left column)
