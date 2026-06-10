@@ -1,0 +1,15 @@
+pages:
+  stage: deploy
+  image: docker.io/node:lts-alpine
+  script:
+    - mkdir -p public
+    - cp index.html public/
+    - cp *.json public/ 2>/dev/null || true
+    - cp *.csv public/ 2>/dev/null || true
+    - cp *.geojson public/ 2>/dev/null || true
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - main
