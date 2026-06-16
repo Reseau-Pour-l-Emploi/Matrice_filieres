@@ -4647,6 +4647,8 @@ async function adminSave() {
           <th data-sort="NBDPAEP1M" onclick="geSort(this)">📋 DPAE&gt;1M</th>
           <th data-sort="NBDPAEP6M" onclick="geSort(this)">📦 DPAE&gt;6M</th>
           <th data-sort="NBOFFP1M" onclick="geSort(this)">📢 Offres&gt;1M</th>
+          <th data-sort="_ratioOffDpae" onclick="geSort(this)" title="Offres > 1 mois / DPAE > 1 mois">📐 Off/DPAE</th>
+          <th data-sort="_ratioDpae6_1" onclick="geSort(this)" title="DPAE > 6 mois / DPAE > 1 mois">📐 DPAE6/1</th>
           <th data-sort="NB_SIRET" onclick="geSort(this)">🏗️ Étab.</th>
           <th>⭐ Groupe</th>
         </tr></thead>
@@ -4924,6 +4926,12 @@ async function adminSave() {
         r._filieres = getFilieresForRow(r);
         r._filieresCodes = r._filieres.map(f => f.code);
         r._filiere_sort = r._filieresCodes[0] || '';
+        // Ratios
+        const dpae1 = parseInt(r['NBDPAEP1M'], 10) || 0;
+        const dpae6 = parseInt(r['NBDPAEP6M'], 10) || 0;
+        const off1  = parseInt(r['NBOFFP1M'], 10)  || 0;
+        r._ratioOffDpae  = dpae1 > 0 ? off1  / dpae1 : null;
+        r._ratioDpae6_1  = dpae1 > 0 ? dpae6 / dpae1 : null;
       });
 
       // Populate region dropdown
@@ -5087,10 +5095,12 @@ async function adminSave() {
         <td style="font-weight:600;color:#059660">${fmtNum(r['NBDPAEP1M'])}</td>
         <td style="color:#7c3aed">${fmtNum(r['NBDPAEP6M'])}</td>
         <td style="color:#dc2626">${fmtNum(r['NBOFFP1M'])}</td>
+        <td style="text-align:center;color:${r._ratioOffDpae==null?'#cbd5e1':(r._ratioOffDpae>=1?'#16a34a':'#475569')};font-weight:600">${r._ratioOffDpae==null ? '—' : r._ratioOffDpae.toFixed(2)}</td>
+        <td style="text-align:center;color:${r._ratioDpae6_1==null?'#cbd5e1':'#475569'}">${r._ratioDpae6_1==null ? '—' : r._ratioDpae6_1.toFixed(2)}</td>
         <td>${fmtNum(r['NB_SIRET'])}</td>
         <td>${r['GROUPE'] ? `<span class="ge-tag ge-tag-g" style="font-size:10px">${r['GROUPE']}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
       </tr>`;
-    }).join('') || `<tr><td colspan="8" style="text-align:center;padding:32px;color:#94a3b8">Aucune entreprise trouvée.</td></tr>`;
+    }).join('') || `<tr><td colspan="10" style="text-align:center;padding:32px;color:#94a3b8">Aucune entreprise trouvée.</td></tr>`;
 
     // Pagination
     const start = (GE_PAGE-1)*GE_PAGE_SIZE + 1;
