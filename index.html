@@ -4629,7 +4629,10 @@ async function adminSave() {
         <p style="font-size:11px;color:#64748b;margin:0 0 4px;line-height:1.6;max-width:700px">
           Les grandes entreprises référencées ont réalisé plus de 1 000 DPAE &gt; 1 mois en 2025 et au moins 20 établissements recruteurs leur sont rattachés. Les <strong>grands comptes</strong> sont les entreprises liées à France Travail par un accord. La gestion des grands comptes est déléguée aux Directions Régionales ou à la Direction Générale selon les cas.
         </p>
-        <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0">Chargement…</p>
+        <p id="ge-count-label" style="font-size:11px;color:#94a3b8;margin:0 0 4px">Chargement…</p>
+        <p style="font-size:10.5px;color:#94a3b8;margin:0;line-height:1.5;max-width:700px;font-style:italic">
+          💡 Les offres et les DPAE d'une grande entreprise peuvent être gérées par des établissements différents (ex. siège vs agences). Les ratios <strong>Off/DPAE</strong> et <strong>DPAE6/1</strong> peuvent donc présenter des résultats atypiques (offres &gt; DPAE par exemple), à interpréter avec prudence au niveau entreprise.
+        </p>
       </div>
       <span id="ge-status" style="font-size:11px;color:#94a3b8"></span>
     </div>
@@ -4647,7 +4650,7 @@ async function adminSave() {
           <th data-sort="NBDPAEP1M" onclick="geSort(this)">📋 DPAE&gt;1M</th>
           <th data-sort="NBDPAEP6M" onclick="geSort(this)">📦 DPAE&gt;6M</th>
           <th data-sort="NBOFFP1M" onclick="geSort(this)">📢 Offres&gt;1M</th>
-          <th data-sort="_ratioOffDpae" onclick="geSort(this)" title="Offres > 1 mois / DPAE > 1 mois">📐 Off/DPAE</th>
+          <th data-sort="_ratioOffDpae" onclick="geSort(this)" title="Offres > 1 mois / DPAE > 1 mois — peut être atypique si offres et DPAE ne sont pas gérées par le même établissement">📐 Off/DPAE</th>
           <th data-sort="_ratioDpae6_1" onclick="geSort(this)" title="DPAE > 6 mois / DPAE > 1 mois">📐 DPAE6/1</th>
           <th data-sort="NB_SIRET" onclick="geSort(this)">🏗️ Étab.</th>
           <th>⭐ Groupe</th>
