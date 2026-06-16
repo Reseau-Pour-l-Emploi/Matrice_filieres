@@ -4795,6 +4795,8 @@ async function adminSave() {
                   <th data-col="N_NBPDP"      data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;cursor:pointer;user-select:none">PDP <span class="etb-sort-icon">↕</span></th>
                   <th data-col="N_NBOFFP1M"   data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">Offres&gt;1M <span class="etb-sort-icon">↕</span></th>
                   <th data-col="N_NBOFFP6M"   data-dir="0" onclick="sortEtbTable(this)" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#9f1239;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">Offres&gt;6M <span class="etb-sort-icon">↕</span></th>
+                  <th data-col="_ratioOffDpae" data-dir="0" onclick="sortEtbTable(this)" title="Offres > 1 mois / DPAE > 1 mois" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">📐 Off/DPAE <span class="etb-sort-icon">↕</span></th>
+                  <th data-col="_ratioDpae6_1" data-dir="0" onclick="sortEtbTable(this)" title="DPAE > 6 mois / DPAE > 1 mois" style="padding:7px 10px;text-align:right;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none">📐 DPAE6/1 <span class="etb-sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody id="ge-etb-tbody"></tbody>
@@ -5789,6 +5791,14 @@ async function adminSave() {
 
   async function showEtbTable(siren) {
     _etbRows = ETB_DATA.filter(r => r['SIREN'].trim() === siren);
+    // Précompute ratios (sentinelle -1 si pas de DPAE>1M pour rester numérique au tri)
+    _etbRows.forEach(r => {
+      const dpae1 = parseInt(r['N_NBDPAEP1M'], 10) || 0;
+      const dpae6 = parseInt(r['N_NBDPAEP6M'], 10) || 0;
+      const off1  = parseInt(r['N_NBOFFP1M'],  10) || 0;
+      r._ratioOffDpae = dpae1 > 0 ? off1  / dpae1 : -1;
+      r._ratioDpae6_1 = dpae1 > 0 ? dpae6 / dpae1 : -1;
+    });
     _etbMapFilter = null;
     const wrap  = document.getElementById('ge-etb-table-wrap');
     const count = document.getElementById('ge-etb-count');
@@ -5852,7 +5862,7 @@ async function adminSave() {
     const fmt = v => { const n = parseInt(v||'0',10); return isNaN(n)||n===0 ? '—' : n.toLocaleString('fr-FR'); };
     let rows = getFilteredEtbRows();
     rows.sort((a, b) => {
-      const av = a[_etbSortCol] || '', bv = b[_etbSortCol] || '';
+      const av = a[_etbSortCol] ?? '', bv = b[_etbSortCol] ?? '';
       const an = parseFloat(av), bn = parseFloat(bv);
       if (!isNaN(an) && !isNaN(bn)) return (an - bn) * _etbSortDir;
       return av.localeCompare(bv, 'fr') * _etbSortDir;
@@ -5879,6 +5889,8 @@ async function adminSave() {
         <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#d97706">${fmt(r['N_NBPDP'])}</td>
         <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#dc2626">${fmt(r['N_NBOFFP1M'])}</td>
         <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:#9f1239">${fmt(r['N_NBOFFP6M'])}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;font-weight:600;color:${r._ratioOffDpae<0?'#cbd5e1':(r._ratioOffDpae>=1?'#16a34a':'#475569')}">${r._ratioOffDpae<0 ? '—' : (r._ratioOffDpae*100).toFixed(0)+'%'}</td>
+        <td style="padding:6px 10px;text-align:center;border-bottom:1px solid #f5f7ff;color:${r._ratioDpae6_1<0?'#cbd5e1':'#475569'}">${r._ratioDpae6_1<0 ? '—' : (r._ratioDpae6_1*100).toFixed(0)+'%'}</td>
       </tr>`;
     }).join('');
   }
