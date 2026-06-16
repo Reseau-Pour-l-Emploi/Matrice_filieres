@@ -5095,8 +5095,8 @@ async function adminSave() {
         <td style="font-weight:600;color:#059660">${fmtNum(r['NBDPAEP1M'])}</td>
         <td style="color:#7c3aed">${fmtNum(r['NBDPAEP6M'])}</td>
         <td style="color:#dc2626">${fmtNum(r['NBOFFP1M'])}</td>
-        <td style="text-align:center;color:${r._ratioOffDpae==null?'#cbd5e1':(r._ratioOffDpae>=1?'#16a34a':'#475569')};font-weight:600">${r._ratioOffDpae==null ? '—' : r._ratioOffDpae.toFixed(2)}</td>
-        <td style="text-align:center;color:${r._ratioDpae6_1==null?'#cbd5e1':'#475569'}">${r._ratioDpae6_1==null ? '—' : r._ratioDpae6_1.toFixed(2)}</td>
+        <td style="text-align:center;color:${r._ratioOffDpae==null?'#cbd5e1':(r._ratioOffDpae>=1?'#16a34a':'#475569')};font-weight:600">${r._ratioOffDpae==null ? '—' : (r._ratioOffDpae*100).toFixed(0)+'%'}</td>
+        <td style="text-align:center;color:${r._ratioDpae6_1==null?'#cbd5e1':'#475569'}">${r._ratioDpae6_1==null ? '—' : (r._ratioDpae6_1*100).toFixed(0)+'%'}</td>
         <td>${fmtNum(r['NB_SIRET'])}</td>
         <td>${r['GROUPE'] ? `<span class="ge-tag ge-tag-g" style="font-size:10px">${r['GROUPE']}</span>` : '<span style="color:#cbd5e1">—</span>'}</td>
       </tr>`;
